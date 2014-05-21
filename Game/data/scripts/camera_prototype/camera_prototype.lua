@@ -5,7 +5,7 @@ logMessage("Initializing camera_prototype/camera_prototype.lua ...")
 --
 local cinfo = WorldCInfo()
 cinfo.gravity = Vec3(0, 0, -9.81)
-cinfo.worldSize = 2000.0
+cinfo.worldSize = 4000.0
 local world = PhysicsFactory:createWorld(cinfo)
 PhysicsSystem:setWorld(world)
 PhysicsSystem:setDebugDrawingEnabled(true)
@@ -305,3 +305,6 @@ player.angularVelocitySwapped = false
 player.viewUpDown = 0.0
 
 logMessage("... finished initializing camera_prototype/camera_prototype.lua.")
+
+logWarning("Dummy warning")
+logError("Dummy error")

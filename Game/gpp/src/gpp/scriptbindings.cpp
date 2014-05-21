@@ -86,7 +86,7 @@ void gpp::Game::bindOther()
     scripting->bind<gep::IPhysicsSystem>("PhysicsSystem", g_globalManager.getPhysicsSystem());
     scripting->bind<gep::IScriptingManager>("Scripting", g_globalManager.getScriptingManager());
     scripting->bind<gep::IPhysicsFactory>("PhysicsFactory", g_globalManager.getPhysicsSystem()->getPhysicsFactory());
-    scripting->bind<gep::ILogging>("Log", g_globalManager.getLogging());
+    scripting->bind<gep::ILogging>("Logging", g_globalManager.getLogging());
     scripting->bind<gep::IRenderer>("Renderer", g_globalManager.getRenderer());
 
     //Cam

@@ -21,10 +21,6 @@ namespace gep
         virtual void logWarning(const char* fmt, ...) override;
         virtual void logError(const char* fmt, ...) override;
 
-        virtual void logMessageUnformatted(const char* message) override;
-        virtual void logWarningUnformatted(const char* message) override;
-        virtual void logErrorUnformatted(const char* message) override;
-
         virtual void registerSink(ILogSink* pSink) override;
         virtual void deregisterSink(ILogSink* pSink) override;
 

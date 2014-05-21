@@ -68,8 +68,6 @@ gep::ScriptingManager::ScriptingManager(const std::string& scriptsRoot, const st
 
 gep::ScriptingManager::~ScriptingManager()
 {
-    lua_close(m_L);
-    m_L = nullptr;
 }
 
 void gep::ScriptingManager::initialize()
@@ -78,6 +76,8 @@ void gep::ScriptingManager::initialize()
 
 void gep::ScriptingManager::destroy()
 {
+    lua_close(m_L);
+    m_L = nullptr;
 }
 
 void gep::ScriptingManager::update(float elapsedTime)

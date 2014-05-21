@@ -1,21 +1,21 @@
-local function doLog(mode, args)
-	local message = ""
+local function createMessage(args)
+	local message = "Lua: "
 	for _,arg in ipairs(args) do
 		message = message .. arg
 	end
-	print(message)
+	return message
 end
 
 function logMessage(...)
-	doLog(nil, {...})
+	Logging:logMessage(createMessage({...}))
 end
 
 function logWarning(...)
-	doLog(nil, {...})
+	Logging:logWarning(createMessage({...}))
 end
 
 function logError(...)
-	doLog(nil, {...})
+	Logging:logError(createMessage({...}))
 end
 
 function prettyPrint(...)
