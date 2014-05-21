@@ -17,10 +17,6 @@ namespace gpp
         virtual void logWarning(GEP_PRINTF_FORMAT_STRING const char* fmt, ...) override {}
         virtual void logError(GEP_PRINTF_FORMAT_STRING const char* fmt, ...) override {}
 
-        virtual void logMessageUnformatted(const char* message) override {}
-        virtual void logWarningUnformatted(const char* message) override {}
-        virtual void logErrorUnformatted(const char* message) override {}
-
         virtual void registerSink(gep::ILogSink* pSink) override {}
         virtual void deregisterSink(gep::ILogSink* pSink) override {}
     };

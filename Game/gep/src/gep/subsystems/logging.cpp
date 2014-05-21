@@ -76,33 +76,6 @@ void gep::Logging::deregisterSink(ILogSink* pSink)
     }
 }
 
-void gep::Logging::logMessageUnformatted(const char* message)
-{
-    ScopedLock<Mutex> lock(m_sinkMutex);
-    for(ILogSink* sink : m_sinks)
-    {
-        sink->take(LogChannel::message, message);
-    }
-}
-
-void gep::Logging::logWarningUnformatted(const char* message)
-{
-    ScopedLock<Mutex> lock(m_sinkMutex);
-    for(ILogSink* sink : m_sinks)
-    {
-        sink->take(LogChannel::message, message);
-    }
-}
-
-void gep::Logging::logErrorUnformatted(const char* message)
-{
-    ScopedLock<Mutex> lock(m_sinkMutex);
-    for(ILogSink* sink : m_sinks)
-    {
-        sink->take(LogChannel::message, message);
-    }
-}
-
 void gep::ConsoleLogSink::take(LogChannel channel, const char* msg)
 {
     const char* channelName = "Unkown: ";

@@ -44,18 +44,6 @@ namespace gpp
 
             logFormatted(gep::LogChannel::error, buffer);
         }
-        virtual void logMessageUnformatted(const char* message) override
-        {
-            logFormatted(gep::LogChannel::message, message);
-        }
-        virtual void logWarningUnformatted(const char* message) override
-        {
-            logFormatted(gep::LogChannel::warning, message);
-        }
-        virtual void logErrorUnformatted(const char* message) override
-        {
-            logFormatted(gep::LogChannel::error, message);
-        }
         virtual void registerSink(gep::ILogSink* pSink) override
         {
         }

@@ -107,7 +107,7 @@ void gep::GlobalManager::initialize()
 
     // tell the scripting system to collect its garbage within the game thread
     // to make sure there is nothing left from the game within the scripting system.
-    m_pUpdateFramework->registerDestroyCallback([&](){ m_pScriptingManager->collectGarbage(); });
+    m_pUpdateFramework->registerDestroyCallback([&](){ m_pScriptingManager->destroy(); });
 
     m_pLogging->logMessage("initializing task queue");
     m_pTaskQueue = new TaskQueue();
