@@ -25,11 +25,10 @@ end
 -- scene
 --
 scene = {}
-scene.sponza = GameObjectManager:createGameObject("sponza")
-scene.sponza.rc = scene.sponza:createRenderComponent()
-scene.sponza.rc:setPath("data/sponza/sponza.thModel")
-scene.ground = createCollisionBox("ground", Vec3(1750.0, 1000.0, 10.0), Vec3(0.0, 0.0, -10.0))
-scene.ground = createCollisionBox("wallRight", Vec3(1000.0, 40.0, 200.0), Vec3(-60.0, 280.0, 200.0))
+scene.plane = GameObjectManager:createGameObject("plane")
+scene.plane.rc = scene.plane:createRenderComponent()
+scene.plane.rc:setPath("data/models/plane.thModel")
+scene.ground = createCollisionBox("ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
 
 function createDefaultCam(guid)
 	local cam = GameObjectManager:createGameObject(guid)
@@ -55,12 +54,12 @@ function debugCamUpdate(updateData)
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "debugCamUpdate")
 
 	local mouseDelta = InputHandler:getMouseDelta()
-	local rotationSpeed = 0.2 * updateData:getElapsedTime()
+	local rotationSpeed = 0.1 * updateData:getElapsedTime()
 	local lookVec = mouseDelta:mulScalar(rotationSpeed)
 	debugCam.cc:look(lookVec)
 	
 	local moveVec = Vec3(0.0, 0.0, 0.0)
-	local moveSpeed = 0.5 * updateData:getElapsedTime()
+	local moveSpeed = 0.2 * updateData:getElapsedTime()
 	if (InputHandler:isPressed(Key.Shift)) then
 		moveSpeed = moveSpeed * 5
 	end
@@ -119,10 +118,15 @@ function normalCamFirstPersonLeave(leaveData)
 	return EventResult.Handled
 end
 
+distance = 50.0
+distanceDelta = 5.0
+distanceMin = 15.0
+distanceMax = 200.0
+
 normalCam.thirdPerson = createDefaultCam("thirdPerson")
 normalCam.thirdPerson.pc = normalCam.thirdPerson:createPhysicsComponent()
 local cinfo = RigidBodyCInfo()
-cinfo.shape = PhysicsFactory:createSphere(2.5)
+cinfo.shape = PhysicsFactory:createSphere(0.5)
 cinfo.motionType = MotionType.Dynamic
 cinfo.mass = 50.0
 cinfo.restitution = 0.0
@@ -133,7 +137,7 @@ cinfo.gravityFactor = 0.0
 normalCam.thirdPerson.pc.rb = normalCam.thirdPerson.pc:createRigidBody(cinfo)
 normalCam.thirdPerson.pc:setState(ComponentState.Inactive)
 normalCam.thirdPerson.calcPosTo = function()
-	return player:getPosition() + player:getViewDirection():mulScalar(-150.0) + Vec3(0.0, 0.0, 50.0)
+	return player:getPosition() + player:getViewDirection():mulScalar(-distance) + Vec3(0.0, 0.0, distance/3 )
 end
 
 function normalCamThirdPersonEnter(enterData)
@@ -143,6 +147,15 @@ function normalCamThirdPersonEnter(enterData)
 end
 
 function normalCamThirdPersonUpdate(updateData)
+	if (InputHandler:isPressed(Key.Oem_Minus)) then
+		if ( distance > distanceMin) then
+			distance = distance - distanceDelta
+		end
+	elseif (InputHandler:isPressed(Key.Oem_Plus)) then
+		if ( distance < distanceMax) then
+			distance = distance + distanceDelta
+		end
+	end
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "thirdPerson")
 	local camPosTo = normalCam.thirdPerson.calcPosTo()
 	local camPosIs = normalCam.thirdPerson:getPosition()
@@ -150,7 +163,7 @@ function normalCamThirdPersonUpdate(updateData)
 	if (camPosVel:length() > 1.0 ) then
 		normalCam.thirdPerson.pc.rb:setLinearVelocity(camPosVel:mulScalar(2.5))
 	end
-	normalCam.thirdPerson.cc:lookAt(player:getPosition() + Vec3(0.0, 0.0, 30.0))
+	normalCam.thirdPerson.cc:lookAt(player:getPosition() + Vec3(0.0, 0.0, 5.0))
 	return EventResult.Handled
 end
 
@@ -229,15 +242,18 @@ StateTransitions{
 function playerUpdate(guid, elapsedTime)
 	local position = player:getPosition()
 	local viewDir = player:getViewDirection()
+	local rightDir = player:getRightDirection()
 	DebugRenderer:drawArrow(position, position + viewDir:mulScalar(25.0))
-	local moveSpeed = 1200.0
+	local moveSpeed = 50.0
 	if (InputHandler:isPressed(Key.Shift)) then
 		moveSpeed = moveSpeed * 2.5
 	end
-	if (InputHandler:isPressed(Key.W)) then
+	if (InputHandler:isPressed(Key.Space)) then
+		player.pc.rb:applyLinearImpulse(Vec3(0.0,0.0,20.0))
+	elseif (InputHandler:isPressed(Key.W)) then
 		player.pc.rb:applyLinearImpulse(viewDir:mulScalar(moveSpeed))
 	elseif (InputHandler:isPressed(Key.S)) then
-		player.pc.rb:applyLinearImpulse(viewDir:mulScalar(-0.5 * moveSpeed))
+		player.pc.rb:applyLinearImpulse(viewDir:mulScalar(-moveSpeed))
 	end
 	if (player.firstPersonMode) then
 		DebugRenderer:printText(Vec2(-0.01, 0.05), "X")
@@ -245,9 +261,16 @@ function playerUpdate(guid, elapsedTime)
 		if (InputHandler:isPressed(Key.A) and InputHandler:isPressed(Key.D)) then
 			-- no sideways walking
 		elseif (InputHandler:isPressed(Key.A)) then
-			player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
+			player.currentAngularVelocity = Vec3(0.0, 0.0, 2.5)
+			player.angularVelocitySwapped = false
+			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
 		elseif (InputHandler:isPressed(Key.D)) then
-			player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+			player.currentAngularVelocity = Vec3(0.0, 0.0, -2.5)
+			player.angularVelocitySwapped = false
+			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
+		--elseif (InputHandler:isPressed(Key.D)) then
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 		end
 		local mouseDelta = InputHandler:getMouseDelta()
 		local angularVelocity = Vec3(0.0, 0.0, mouseDelta.x * -0.05 * elapsedTime)
@@ -268,11 +291,13 @@ function playerUpdate(guid, elapsedTime)
 			end
 			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
 		elseif (InputHandler:isPressed(Key.A)) then
-			player.currentAngularVelocity = Vec3(0.0, 0.0, 2.5)
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
+			player.currentAngularVelocity = Vec3(20.5,0.0,0.0)
 			player.angularVelocitySwapped = false
 			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
 		elseif (InputHandler:isPressed(Key.D)) then
-			player.currentAngularVelocity = Vec3(0.0, 0.0, -2.5)
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+			player.currentAngularVelocity = Vec3(-20.5,0.0, 0.0)
 			player.angularVelocitySwapped = false
 			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
 		else
@@ -286,16 +311,16 @@ player.rc = player:createRenderComponent()
 player.rc:setPath("data/models/Sphere_Wood.thModel")
 player.pc = player:createPhysicsComponent()
 local cinfo = RigidBodyCInfo()
-cinfo.shape = PhysicsFactory:createBox(Vec3(10.0, 10.0, 20.0))
+cinfo.shape = PhysicsFactory:createSphere(1)
 cinfo.motionType = MotionType.Dynamic
 cinfo.mass = 100.0
 cinfo.restitution = 0.0
-cinfo.friction = 0.0
-cinfo.maxLinearVelocity = 5000.0
-cinfo.maxAngularVelocity = 250.0
+cinfo.friction = 1.0
+cinfo.maxLinearVelocity = 5.0
+cinfo.maxAngularVelocity = 2.0
 cinfo.linearDamping = 5.0
 cinfo.angularDamping = 10.0
-cinfo.position = Vec3(0.0, 0.0, 20.5)
+cinfo.position = Vec3(0.0, 0.0, 2.0)
 player.pc.rb = player.pc:createRigidBody(cinfo)
 player.sc = player:createScriptComponent()
 player.sc:setUpdateFunction(playerUpdate)
