@@ -9,6 +9,7 @@
 #include "gep/interfaces/renderer.h"
 #include "gep/interfaces/inputHandler.h"
 #include "gep/interfaces/logging.h"
+#include "gep/interfaces/animation.h"
 
 #include "gep/interfaces/physics/contact.h"
 #include "gep/interfaces/physics/characterController.h"
@@ -22,6 +23,7 @@
 #include "gpp/gameComponents/renderComponent.h"
 #include "gpp/gameComponents/scriptComponent.h"
 #include "gpp/gameComponents/characterComponent.h"
+#include "gpp/gameComponents/animationComponent.h"
 
 #include "gep/interfaces/events.h"
 
@@ -46,6 +48,7 @@ void gpp::Game::bindOther()
     scripting->bind<gep::Quaternion>("_Quaternion");
     scripting->bind<gep::mat3>("Mat3");
     scripting->bind<gep::mat4>("Mat4");
+    scripting->bind<gep::Color>("Color");
 
     scripting->bind<gpp::Game>("Game", this);
 
@@ -74,6 +77,7 @@ void gpp::Game::bindOther()
     scripting->bind<gpp::ScriptComponent>("ScriptComponent");
     scripting->bind<gpp::RenderComponent>("RenderComponent");
     scripting->bind<gpp::CameraComponent>("CameraComponent");
+    scripting->bind<gpp::AnimationComponent>("AnimationComponent");
     scripting->bind<gpp::CharacterComponent>("CharacterComponent");
 
     scripting->bind<gep::ICharacterRigidBody>("CharacterRigidBody");
@@ -88,7 +92,6 @@ void gpp::Game::bindOther()
     scripting->bind<gep::IPhysicsFactory>("PhysicsFactory", g_globalManager.getPhysicsSystem()->getPhysicsFactory());
     scripting->bind<gep::ILogging>("Logging", g_globalManager.getLogging());
     scripting->bind<gep::IRenderer>("Renderer", g_globalManager.getRenderer());
-
     //Cam
     scripting->bind<gep::FreeCamera>("Cam", m_pDummyCam);
 

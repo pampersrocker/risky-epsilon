@@ -233,8 +233,8 @@ gep::Quaternion  gep::CameraLookAtHorizon::getRotation()
 void gep::CameraLookAtHorizon::look(const vec2& delta)
 {
     vec3 right = m_viewDir.cross(m_upVector);
-    auto qy = Quaternion(right, delta.y);
-    auto qx = Quaternion(m_upVector, delta.x);
+    auto qy = Quaternion(right, -delta.y);
+    auto qx = Quaternion(m_upVector, -delta.x);
     m_viewDir = (qy * qx).toMat3() * m_viewDir;
 
 

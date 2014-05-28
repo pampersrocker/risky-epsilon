@@ -11,8 +11,8 @@ local function checkName(cinfo)
 	assert(cinfo.name:find("/") == nil, "Your state name may not contain forward slashes '/'! name = " .. cinfo.name)
 end
 
-local function printInvalidKeys(invalidKeys)
-	local message = "Detected invalid keys in state cinfo:"
+local function printInvalidKeys(invalidKeys, name)
+	local message = "Detected invalid keys in cinfo for '" .. name .. "':"
 	for _, invalidKey in ipairs(invalidKeys) do
 		message = message ..  "\n\t" .. invalidKey
 	end
@@ -48,36 +48,55 @@ end
 local function createAllStates(instance, cinfo)
 	-- if there are no states, return
 	if not cinfo.states then
-		logWarning("No inner states in the state machine")
 		return
 	end
 
 	for _, stateCInfo in ipairs(cinfo.states) do
-		-- Creates the state instance add it to the state machine
+		-- Creates the state instance and adds it to the state machine
 		if stateCInfo.parent ~= nil then
-			logWarning("Inner states should not have a parent set!")
+			logWarning("Inner states should not have a parent set! Ignoring parent.")
 		end
 		stateCInfo.parent = instance
 		State(stateCInfo)
 	end
 end
 
-State = {}
+-- used by the state machine creator function
+local function createAllStateMachines(instance, cinfo)
+	-- if there are no stateMachines, return
+	if not cinfo.stateMachines then
+		return
+	end
+
+	for _, stateMachineCInfo in ipairs(cinfo.stateMachines) do
+		-- Creates the stateMachine instance and adds it to the state machine
+		if stateMachineCInfo.parent ~= nil then
+			logWarning("Inner stateMachines should not have a parent set! Ignoring parent.")
+		end
+		stateMachineCInfo.parent = instance
+		StateMachine(stateMachineCInfo)
+	end
+end
+
+State = {
+	validKeys = { "name",
+				  "parent",
+				  "eventListeners",
+				}
+}
 setmetatable(State, State)
 function State:__call(cinfo)
-	local invalidKeys = checkTableKeys(cinfo, { "name",
-												"parent",
-												"eventListeners", })
 	checkName(cinfo)
-
-	if not isEmpty(invalidKeys) then
-		printInvalidKeys(invalidKeys)
-	end
+	local invalidKeys = checkTableKeys(cinfo, self.validKeys)
 
 	assert(cinfo.parent, "A State MUST have a parent state machine!")
 	local parent = extractParentStateMachine(cinfo)
 	local instance = parent:createState(cinfo.name)
 	instance.__type = "state"
+
+	if not isEmpty(invalidKeys) then
+		printInvalidKeys(invalidKeys, instance:getQualifiedName())
+	end
 
 	setAllEventListeners(instance, cinfo)
 
@@ -85,20 +104,21 @@ function State:__call(cinfo)
 end
 
 -- state machine creation helper
-StateMachine = {}
+StateMachine = {
+	validKeys = { "name",
+				  "parent",
+				  "eventListeners",
+				  "states",
+				  "stateMachines",
+				  "transitions",
+				}
+}
 setmetatable(StateMachine, StateMachine)
 function StateMachine:__call(cinfo)
-	local invalidKeys = checkTableKeys(cinfo, { "name",
-												"parent",
-												"eventListeners",
-												"states",
-												"transitions", })
 	checkName(cinfo)
+	local invalidKeys = checkTableKeys(cinfo, self.validKeys)
 
-	if not isEmpty(invalidKeys) then
-		printInvalidKeys(invalidKeys)
-	end
-
+	assert(cinfo.parent, "A StateMachine MUST have a parent state machine!")
 	local parent = extractParentStateMachine(cinfo)
 	local instance = nil
 	if parent then
@@ -108,11 +128,20 @@ function StateMachine:__call(cinfo)
 	end
 	instance.__type = "stateMachine"
 
+	if not isEmpty(invalidKeys) then
+		printInvalidKeys(invalidKeys, instance:getQualifiedName())
+	end
+
 	setAllEventListeners(instance, cinfo)
-	createAllStates(instance, cinfo)
+	if cinfo.states or cinfo.stateMachines then
+		createAllStates(instance, cinfo)
+		createAllStateMachines(instance, cinfo)
+	elseif not cinfo.states and not cinfo.states then
+		logWarning("No inner states or state machines in the state machine '" .. instance:getQualifiedName() .. "'")
+	end
 
 	-- create transitions
-	local transitions = cinfo.transitions
+	local transitions = assert(cinfo.transitions, "A state machine needs to have transitions!")
 	transitions.parent = instance
 	StateTransitions(transitions)
 

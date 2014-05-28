@@ -7,6 +7,7 @@
 #include "gep/math3d/mat4.h"
 #include "gep/math3d/aabb.h"
 #include "gep/memory/allocators.h"
+#include "gep/container/hashmap.h"
 
 struct ID3D11Device;
 
@@ -35,7 +36,7 @@ namespace gep
         enum Enum {
             Version1 = 1, //Initial version
             Version2 = 2, //saving material names
-            Version3 = 3  //Bones, baby!
+            Version3 = 3, //Bones, baby!
         };
     };
 
@@ -73,22 +74,8 @@ namespace gep
                 Everything = 0xFFFF
             };
         };
-
-        struct BoneData
-        {
-            const char* name;
-            mat4 offsetMatrix;
-        };
-
-        struct BoneInfo
-        {
-            enum { NUM_SUPPORTED_BONES = 4 };
-
-            uint32 boneIndices[NUM_SUPPORTED_BONES];
-            float weights[NUM_SUPPORTED_BONES];
-        };
-
-        static_assert(sizeof(BoneInfo) == sizeof(uint32) * 4 + sizeof(float) * 4, "Size of BoneInfo is wrong!");
+        struct BoneInfo;
+        struct BoneNode;
 
         struct FaceData
         {
@@ -118,8 +105,8 @@ namespace gep
             ArrayPtr<vec3> tangents;
             ArrayPtr<vec3> bitangents;
             ArrayPtr<vec2> texcoords[4];
-            ArrayPtr<BoneData> bones;
             ArrayPtr<BoneInfo> boneInfos;
+            BoneNode* rootBone;
         };
 
         struct NodeData;
@@ -127,6 +114,7 @@ namespace gep
         struct NodeDrawData
         {
             mat4 transform;
+            NodeDrawData* parent;
             ArrayPtr<NodeDrawData*> children;
             ArrayPtr<uint32> meshes;
             NodeData* data;
@@ -135,9 +123,26 @@ namespace gep
         struct NodeData
         {
             const char* name;
-            NodeDrawData* parent;
             ArrayPtr<MeshData*> meshData;
         };
+
+        struct BoneInfo
+        {
+            enum { NUM_SUPPORTED_BONES = 4 };
+
+            uint32 boneIds[NUM_SUPPORTED_BONES];
+            float weights[NUM_SUPPORTED_BONES];
+        };
+
+        struct BoneNode
+        {
+            NodeDrawData* node;
+            mat4 offsetMatrix;
+        };
+
+        static_assert(
+            sizeof(BoneInfo) == sizeof(uint32) * BoneInfo::NUM_SUPPORTED_BONES + sizeof(float) * BoneInfo::NUM_SUPPORTED_BONES,
+            "Size of BoneInfo is wrong!");
 
         struct ModelData
         {
@@ -145,6 +150,7 @@ namespace gep
             ArrayPtr<MaterialData> materials;
             ArrayPtr<MeshData> meshes;
             NodeDrawData* rootNode;
+            ArrayPtr<BoneNode> bones;
             bool hasData;
 
             inline ModelData() : rootNode(nullptr), hasData(false) {}
@@ -152,11 +158,14 @@ namespace gep
 
     private:
 
-        StackAllocator* m_pMeshDataAllocator;
+        StackAllocator* m_pModelDataAllocator;
         IAllocator* m_pAllocator;
         void * m_pStartMarker;
         ModelData m_modelData;
         std::string m_filename;
+
+        Hashmap<const char*, NodeDrawData*, StringHashPolicy> m_nodeLookupByName;
+        ArrayPtr<NodeDrawData> m_nodes;
 
         template <typename T>
         uint32 allocationSize(uint32 num)

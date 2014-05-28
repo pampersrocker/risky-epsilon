@@ -28,7 +28,7 @@ gpp::sm::State::~State()
 void gpp::sm::State::enter(EnterEventData* pData)
 {
     m_pLogging->logMessage(">> %s", getQualifiedName().c_str());
-    pData->m_pCurrentState = this;
+    pData->m_pEnteredState = this;
     getEnterEvent()->trigger(pData);
 }
 

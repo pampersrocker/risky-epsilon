@@ -224,6 +224,8 @@ namespace gep
         virtual void applyAngularImpulse(const vec3& impulse)  = 0;
         virtual void applyPointImpulse(const vec3& impulse, const vec3& point)  = 0;
 
+        virtual void reset() = 0;
+
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(getLinearVelocity)
             LUA_BIND_FUNCTION(setLinearVelocity)
@@ -262,7 +264,9 @@ namespace gep
             LUA_BIND_FUNCTION(activate)
             LUA_BIND_FUNCTION(requestDeactivation)
             LUA_BIND_FUNCTION(isActive)
-            
+
+            LUA_BIND_FUNCTION(reset)
+
         LUA_BIND_REFERENCE_TYPE_END
     };
 

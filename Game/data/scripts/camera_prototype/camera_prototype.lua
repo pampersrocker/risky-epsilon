@@ -305,6 +305,3 @@ player.angularVelocitySwapped = false
 player.viewUpDown = 0.0
 
 logMessage("... finished initializing camera_prototype/camera_prototype.lua.")
-
-logWarning("Dummy warning")
-logError("Dummy error")

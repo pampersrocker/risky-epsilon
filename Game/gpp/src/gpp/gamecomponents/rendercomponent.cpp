@@ -4,14 +4,22 @@
 #include "gep/interfaces/renderer.h"
 #include "gep/interfaces/logging.h"
 
+
 #include "gep/interfaces/scripting.h"
+#include "gep/interfaces/animation.h"
+
+#include "gep/ArrayPtr.h"
+#include "gep/math3d/mat4.h"
+
+#include <array>
 
 
 gpp::RenderComponent::RenderComponent():
     Component(),
     m_path(),
     m_pModel(nullptr),
-    m_extractionCallbackId(0)
+    m_extractionCallbackId(0),
+    m_bones()
 {
 
 }
@@ -49,6 +57,22 @@ void gpp::RenderComponent::destroy()
 void gpp::RenderComponent::extract(gep::IRendererExtractor& extractor)
 {
     m_pModel->extract(extractor, m_pParentGameObject->getTransformationMatrix());
+}
+
+
+void gpp::RenderComponent::applyBoneTransformations(const gep::ArrayPtr<gep::BoneTransform>& transformations)
+{
+    m_bones.clear();
+    m_bones.reserve(transformations.length());
+
+    int i =0;
+    for (auto& trans :transformations)
+    {
+        gep::mat4 transformation = gep::mat4::translationMatrix(trans.translation);
+        transformation.setRotationPart(trans.rotation.toMat3());
+        m_bones.append(transformation);
+    }
+    m_pModel->setBones(m_bones.toArray());
 }
 
 void gpp::RenderComponent::setState(State::Enum state)

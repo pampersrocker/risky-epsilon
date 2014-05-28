@@ -9,6 +9,7 @@ SamplerState samLinear
 cbuffer cbNeverChanges
 {
     matrix View;
+    uint NumBones;
 };
 
 cbuffer cbChangeOnResize
@@ -19,6 +20,7 @@ cbuffer cbChangeOnResize
 cbuffer cbChangesEveryFrame
 {
     matrix Model;
+    matrix Bones[128];
 };
 
 struct VS_INPUT

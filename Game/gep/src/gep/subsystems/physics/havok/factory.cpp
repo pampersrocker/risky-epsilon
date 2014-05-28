@@ -73,6 +73,8 @@ gep::IResourceLoader* gep::CollisionMesh::getLoader()
     return m_pCollisionMeshFileLoader;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
 gep::CollisionMeshFileLoader::CollisionMeshFileLoader(const char* path) : m_path(path)
 {
 
@@ -153,6 +155,7 @@ gep::IResource* gep::CollisionMeshFileLoader::loadResource(IResource* pInPlace)
     return loadResource(dynamic_cast<CollisionMesh*>(pInPlace));
 }
 
+//////////////////////////////////////////////////////////////////////////
 gep::HavokPhysicsFactory::HavokPhysicsFactory(IAllocator* allocator) :
     m_pAllocator(allocator)
 {
@@ -163,7 +166,6 @@ gep::HavokPhysicsFactory::~HavokPhysicsFactory()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////
 
 void gep::HavokPhysicsFactory::initialize()
 {
@@ -212,5 +214,5 @@ gep::ResourcePtr<gep::ICollisionMesh> gep::HavokPhysicsFactory::loadCollisionMes
 
 gep::IShape* gep::HavokPhysicsFactory::loadCollisionMeshFromLua(const char* path)
 {
-	return loadCollisionMesh(path).get()->getShape();
+    return loadCollisionMesh(path).get()->getShape();
 }

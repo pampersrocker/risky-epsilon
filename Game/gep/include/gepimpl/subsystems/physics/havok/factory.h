@@ -92,7 +92,7 @@ namespace gep
         virtual IRigidBody* createRigidBody(const RigidBodyCInfo& cinfo) const override;
         virtual ICharacterRigidBody* createCharacterRigidBody(const CharacterRigidBodyCInfo& cinfo) const override;
 
-		virtual ResourcePtr<ICollisionMesh> loadCollisionMesh(const char* path);
-		virtual IShape* loadCollisionMeshFromLua(const char* path);
+        virtual ResourcePtr<ICollisionMesh> loadCollisionMesh(const char* path);
+        virtual IShape* loadCollisionMeshFromLua(const char* path);
     };
 }

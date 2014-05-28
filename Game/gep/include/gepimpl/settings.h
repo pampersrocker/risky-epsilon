@@ -8,8 +8,11 @@ namespace gep
     class Settings : public ISettings
     {
         settings::Video m_video;
+        settings::Lua m_lua;
+
         ScriptTableWrapper m_scriptTable;
     public:
+
         Settings();
         virtual ~Settings();
 
@@ -19,5 +22,8 @@ namespace gep
         virtual       settings::Video& getVideoSettings()       override { return m_video; }
         virtual const settings::Video& getVideoSettings() const override { return m_video; }
 
+        virtual void setLuaSettings(const settings::Lua& settings) override { m_lua = settings; }
+        virtual       settings::Lua& getLuaSettings() override { return m_lua; }
+        virtual const settings::Lua& getLuaSettings() const override { return m_lua; }
     };
 }

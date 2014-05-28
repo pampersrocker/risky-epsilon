@@ -5,6 +5,7 @@
 #include "gep/math3d/vec3.h"
 #include "gep/math3d/vec4.h"
 #include "gep/interfaces/scripting.h"
+#include "gep/container/DynamicArray.h"
 #include "gep/math3d/mat4.h"
 #include "gep/math3d/color.h"
 #include "gep/math3d/quaternion.h"
@@ -52,30 +53,40 @@ namespace gep
             Color colorY = Color::green(),
             Color colorZ = Color::blue()) = 0;
 
-         LUA_BIND_REFERENCE_TYPE_BEGIN
-             LUA_BIND_FUNCTION_NAMED(scripting_printText,"printText")
-			 LUA_BIND_FUNCTION_NAMED(scripting_drawLine3D,"drawLine3D")
-			 LUA_BIND_FUNCTION_NAMED(scripting_drawLine2D,"drawLine2D")
-			 LUA_BIND_FUNCTION_NAMED(scripting_drawArrow,"drawArrow")
-         LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_BEGIN
+            LUA_BIND_FUNCTION_NAMED(scripting_printText, "printText")
+            LUA_BIND_FUNCTION_NAMED(scripting_drawLine3D, "drawLine3D")
+            LUA_BIND_FUNCTION_NAMED(scripting_drawLine3DColor, "drawLine3DColor")
+            LUA_BIND_FUNCTION_NAMED(scripting_drawLine2D, "drawLine2D")
+            LUA_BIND_FUNCTION_NAMED(scripting_drawArrow, "drawArrow")
+            LUA_BIND_FUNCTION_NAMED(scripting_drawArrowColor, "drawArrowColor")
+        LUA_BIND_REFERENCE_TYPE_END
 
     private:
         void scripting_printText(const vec2& screenPositionNormalized, const char* text)
         {
             printText(screenPositionNormalized, text);
         }
-		void scripting_drawLine3D(const vec3& start, const vec3& end)
-		{
-			drawLine(start, end, Color::green());
-		}
-		void scripting_drawLine2D(const vec2& start, const vec2& end)
-		{
-			drawLine(start, end, Color::white());
-		}
-		void scripting_drawArrow(const vec3& start, const vec3& end)
-		{
-			drawArrow(start, end, Color::red());
-		}
+        void scripting_drawLine3D(const vec3& start, const vec3& end)
+        {
+            drawLine(start, end, Color::green());
+        }
+        void scripting_drawLine3DColor(const vec3& start, const vec3& end, const Color& color)
+        {
+            drawLine(start, end, color);
+        }
+        void scripting_drawLine2D(const vec2& start, const vec2& end)
+        {
+            drawLine(start, end, Color::white());
+        }
+        void scripting_drawArrow(const vec3& start, const vec3& end)
+        {
+            drawArrow(start, end, Color::red());
+        }
+        void scripting_drawArrowColor(const vec3& start, const vec3& end, const Color& color)
+        {
+            drawArrow(start, end, color);
+        }
 	};
 
     /// \brief interface for drawing 2d elements
@@ -157,6 +168,21 @@ namespace gep
     public:
         virtual ~IModel() {}
         virtual void extract(IRendererExtractor& extractor, mat4 modelMatrix) = 0;
+
+        virtual void setDebugDrawingEnabled(bool value) = 0;
+        virtual bool getDebugDrawingEnabled() const = 0;
+        /// \brief Convenience function to toggle whether this model draws a debug version of itself
+        /// (usually drawing its wireframe, bones, etc).
+        virtual void toggleDebugDrawing() = 0;
+        virtual void setBones(const ArrayPtr<gep::mat4>& transformations) = 0;
+    };
+
+    class IAnimation
+    {
+    public:
+        virtual ~IAnimation() = 0 {}
+
+        virtual void update(float elapsedSeconds) = 0;
     };
 
     struct DebugMarkerSection
@@ -177,5 +203,5 @@ namespace gep
         }
     };
 
-
 };
+

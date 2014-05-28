@@ -23,6 +23,7 @@ namespace gep
     class IEventManager;
     class ICameraManager;
     class ISettings;
+    class IAnimationSystem;
 
     /// \brief the global manager responsible for destroying most subsystems
     class GEP_API GlobalManager : public DoubleLockingSingleton<GlobalManager>
@@ -47,6 +48,7 @@ namespace gep
         IEventManager* m_pEventManager;
         ICameraManager* m_pCameraManager;
         ISettings* m_pSettings;
+        IAnimationSystem* m_pAnimationSystem;
 
         GlobalManager();
         ~GlobalManager();
@@ -107,11 +109,16 @@ namespace gep
             GEP_ASSERT(m_pSoundSystem != nullptr, "sound system has not been created yet");
             return m_pSoundSystem;
         }
-
         inline ICameraManager* getCameraManager()
         {
             GEP_ASSERT(m_pCameraManager != nullptr, "camera system has not been created yet");
             return m_pCameraManager;
+        }
+
+        inline IAnimationSystem* getAnimationSystem()
+        {
+            GEP_ASSERT(m_pAnimationSystem != nullptr, "animation system has not been created yet");
+            return m_pAnimationSystem;
         }
         inline IPhysicsSystem* getPhysicsSystem()
         {

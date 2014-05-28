@@ -52,6 +52,17 @@ namespace gep
 
         Quaternion_t(vec3_t<T> axis1, vec3_t<T> axis2)
         {
+           if (axis1.epsilonCompare(-axis2))
+           {
+               // TODO Make this quaternion a 180 degree rotation!!!
+               // The axes are the opposite of one another
+               this->x = 0;
+               this->y = 0;
+               this->z = 1;
+               this->angle = 0;
+               return;
+           }
+           
            T cosTheta = axis1.dot(axis2);
            T theta = acos(cosTheta);
            
@@ -83,9 +94,9 @@ namespace gep
             if(trace > GetEpsilon<T>::value())
             {
                 T S = gep::sqrt(trace) * 2.0f;
-                this->x = ( rot.data[7] - rot.data[5] ) / S;
-                this->y = ( rot.data[2] - rot.data[6] ) / S;
-                this->z = ( rot.data[3] - rot.data[1] ) / S;
+                this->x = ( rot.data[5] - rot.data[7] ) / S;
+                this->y = ( rot.data[6] - rot.data[2] ) / S;
+                this->z = ( rot.data[1] - rot.data[3] ) / S;
                 this->angle = T(0.25) * S;
             }
             else
@@ -96,7 +107,7 @@ namespace gep
                     this->x = 0.25f * S;
                     this->y = ( rot.data[3] + rot.data[1] ) / S;
                     this->z = ( rot.data[2] + rot.data[6] ) / S;
-                    this->angle = ( rot.data[7] - rot.data[5] ) / S;
+                    this->angle = ( rot.data[5] - rot.data[7] ) / S;
                 }
                 else if( rot.data[4] > rot.data[8] ) // Column 1:
                 {
@@ -104,7 +115,7 @@ namespace gep
                     this->x = ( rot.data[3] + rot.data[1] ) / S;
                     this->y = 0.25f * S;
                     this->z = ( rot.data[7] + rot.data[5] ) / S;
-                    this->angle = ( rot.data[2] - rot.data[6] ) / S;
+                    this->angle = ( rot.data[6] - rot.data[2] ) / S;
                 }
                 else
                 {
@@ -112,7 +123,7 @@ namespace gep
                     this->x = ( rot.data[2] + rot.data[6] ) / S;
                     this->y = ( rot.data[7] + rot.data[5] ) / S;
                     this->z = 0.25f * S;
-                    this->angle = ( rot.data[3] - rot.data[1] ) / S;
+                    this->angle = ( rot.data[1] - rot.data[3] ) / S;
                 }
             }
         }
@@ -157,15 +168,19 @@ namespace gep
             auto yw  = norm.y * norm.angle;
             auto zz  = norm.z * norm.z;
             auto zw  = norm.z * norm.angle;
-            mat.data[0]  = T(1) - T(2) * ( yy + zz );
-            mat.data[1]  =        T(2) * ( xy - zw );
-            mat.data[2]  =        T(2) * ( xz + yw );
-            mat.data[4]  =        T(2) * ( xy + zw );
-            mat.data[5]  = T(1) - T(2) * ( xx + zz );
-            mat.data[6]  =        T(2) * ( yz - xw );
-            mat.data[8]  =        T(2) * ( xz - yw );
-            mat.data[9]  =        T(2) * ( yz + xw );
-            mat.data[10] = T(1) - T(2) * ( xx + yy );
+
+            mat.m00 = T(1) - T(2) * ( yy + zz );
+            mat.m01  =        T(2) * ( xy - zw );
+            mat.m02  =        T(2) * ( xz + yw );
+
+            mat.m10  =        T(2) * ( xy + zw );
+            mat.m11  = T(1) - T(2) * ( xx + zz );
+            mat.m12  =        T(2) * ( yz - xw );
+
+            mat.m20  =        T(2) * ( xz - yw );
+            mat.m21  =        T(2) * ( yz + xw );
+            mat.m22  = T(1) - T(2) * ( xx + yy );
+
             mat.data[3]  = mat.data[7] = mat.data[11] = mat.data[12] = mat.data[13] = mat.data[14] = T(0);
             mat.data[15] = T(1);
             return mat;
@@ -185,15 +200,15 @@ namespace gep
             auto yw  = norm.y * norm.angle;
             auto zz  = norm.z * norm.z;
             auto zw  = norm.z * norm.angle;
-            mat.data[0] = T(1) - T(2) * ( yy + zz );
-            mat.data[1] =        T(2) * ( xy - zw );
-            mat.data[2] =        T(2) * ( xz + yw );
-            mat.data[3] =        T(2) * ( xy + zw );
-            mat.data[4] = T(1) - T(2) * ( xx + zz );
-            mat.data[5] =        T(2) * ( yz - xw );
-            mat.data[6] =        T(2) * ( xz - yw );
-            mat.data[7] =        T(2) * ( yz + xw );
-            mat.data[8] = T(1) - T(2) * ( xx + yy );
+            mat.m00 = T(1) - T(2) * ( yy + zz );
+            mat.m01 =        T(2) * ( xy - zw );
+            mat.m02 =        T(2) * ( xz + yw );
+            mat.m10 =        T(2) * ( xy + zw );
+            mat.m11 = T(1) - T(2) * ( xx + zz );
+            mat.m12 =        T(2) * ( yz - xw );
+            mat.m20 =        T(2) * ( xz - yw );
+            mat.m21 =        T(2) * ( yz + xw );
+            mat.m22 = T(1) - T(2) * ( xx + yy );
             return mat;
         }
 
@@ -245,7 +260,7 @@ namespace gep
 
             T s = 1;
 
-            if(squaredVelocityLength * squaredVelocityLength / T(24) < FloatEpsilon)
+            if(squaredVelocityLength * squaredVelocityLength / T(24) < GetEpsilon<T>::value())
             {
                 deltaQ.angle = T(1) - squaredVelocityLength / T(2);
                 s = T(1) - squaredVelocityLength / T(6);
@@ -310,7 +325,9 @@ namespace gep
 			LUA_BIND_FUNCTION_NAMED(mulFromScript, "mul")
 			LUA_BIND_FUNCTION_NAMED(mulFromScript, "__mul")
 			LUA_BIND_FUNCTION_NAMED(mulScalarFromScript, "mulScalar")
+            LUA_BIND_FUNCTION(toMat3)
 			LUA_BIND_FUNCTION(isValid)
+            LUA_BIND_FUNCTION(Integrate)
         LUA_BIND_VALUE_TYPE_MEMBERS
             LUA_BIND_MEMBER(x)
             LUA_BIND_MEMBER(y)

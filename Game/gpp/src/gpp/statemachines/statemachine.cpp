@@ -77,6 +77,7 @@ void gpp::sm::StateMachine::addTransition(const std::string& from, const std::st
 void gpp::sm::StateMachine::enter(EnterEventData* pData)
 {
     State::enter(pData);
+    pData->m_pLeftState = m_pCurrentState;
     if (m_pCurrentState == m_pLeaveState)
     {
         m_pCurrentState = State::checkConditions().nextState;
@@ -122,10 +123,12 @@ void gpp::sm::StateMachine::update(UpdateEventData* pData)
 
     // Leave the current state and enter the next one
     //////////////////////////////////////////////////////////////////////////
+    auto pLeftState = m_pCurrentState;
     LeaveEventData leaveData;
     leaveData.m_pCurrentStateMachine = this;
     leaveData.m_pNextState = conditionResult.nextState;
-    m_pCurrentState->leave(&leaveData);
+    pLeftState->leave(&leaveData);
+
 
     // Try to get the next state
     GEP_ASSERT(leaveData.getNextState(), "There must be a next state after leaving the current state!");
@@ -140,6 +143,7 @@ void gpp::sm::StateMachine::update(UpdateEventData* pData)
 
     // Enter the next state
     EnterEventData enterData;
+    enterData.m_pLeftState = pLeftState;
     m_pCurrentState->enter(&enterData);
 }
 

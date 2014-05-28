@@ -1,5 +1,9 @@
 #include "stdafx.h"
 #include "gpp/gameObjectSystem.h"
+#include <algorithm>
+
+#include "gep/globalManager.h"
+#include "gep/interfaces/logging.h"
 
 //GameObjectManager
 
@@ -9,9 +13,9 @@ gep::Mutex gep::DoubleLockingSingleton<gpp::GameObjectManager>::s_creationMutex;
 
 gpp::GameObjectManager::GameObjectManager():
     m_gameObjects(),
-    m_state(State::PreInitialization)
+    m_state(State::PreInitialization),
+    m_tempAllocator(true, 1024)
 {
-
 }
 
 gpp::GameObjectManager::~GameObjectManager()
@@ -69,9 +73,7 @@ gpp::GameObject::GameObject() :
     m_transform(&m_defaultTransform),
     m_components(),
     m_updateQueue()
-   
 {
-    
 }
 
 gpp::GameObject::~GameObject()
@@ -124,21 +126,57 @@ void gpp::GameObject::update(float elapsedMs)
 
 void gpp::GameObject::initialize()
 {
-    for(auto component : m_components.values())
+    auto pAllocator = GameObjectManager::instance().getTempAllocator();
+
+    auto toInit = gep::DynamicArray<ComponentWrapper*>(pAllocator);
+    toInit.reserve(m_components.count());
+
+    for(auto& wrapper : m_components.values())
     {
-        component->initalize();
-        GEP_ASSERT(component->getState() != IComponent::State::Initial,
-            "A game component must set its state within its initialize function!");
+        toInit.append(&wrapper);
+    }
+
+    std::sort(toInit.begin(), toInit.end(), [](ComponentWrapper* lhs, ComponentWrapper* rhs){
+        return lhs->initializationPriority < rhs->initializationPriority;
+    });
+
+    for(auto wrapper : toInit)
+    {
+        wrapper->component->initalize();
+        GEP_ASSERT(wrapper->component->getState() != IComponent::State::Initial,
+                    "A game component must set its state within its initialize function!");
     }
 }
 
 void gpp::GameObject::destroy()
 {
-    // NOTE: Destroying in same order, not in reverse order, as initialization.
-    for(auto& component : m_components.values())
+    auto pAllocator = GameObjectManager::instance().getTempAllocator();
+
+    // Create a sorted array of all component instances.
+    auto toDestroy = gep::DynamicArray<ComponentWrapper*>(pAllocator);
+    toDestroy.reserve(m_components.count());
+
+    for(auto& wrapper : m_components.values())
     {
-        component->destroy();
-        DELETE_AND_NULL(component);
+        toDestroy.append(&wrapper);
+    }
+
+    // sort so least prioritized components come first.
+    std::sort(toDestroy.begin(), toDestroy.end(), [](ComponentWrapper* lhs, ComponentWrapper* rhs){
+        return lhs->initializationPriority > rhs->initializationPriority;
+    });
+
+    // Call destroy on all components
+    for(auto wrapper : toDestroy)
+    {
+        wrapper->component->destroy();
+
+    }
+
+    // Delete the components.
+    for(auto wrapper : toDestroy)
+    {
+        gep::deleteAndNull(wrapper->component);
     }
 
     m_components.clear();
@@ -165,16 +203,13 @@ gep::vec3 gpp::GameObject::getRightDirection()
     return m_transform->getRightDirection();
 }
 
-
-
 void gpp::GameObject::setComponentStates(IComponent::State::Enum value)
 {
-    for (auto component : m_components.values())
+    for (auto& wrapper : m_components.values())
     {
-        component->setState(value);
+        wrapper.component->setState(value);
     }
 }
-
 
 void gpp::GameObject::setBaseViewDirection(const gep::vec3& direction)
 {

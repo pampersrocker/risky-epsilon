@@ -8,7 +8,7 @@
 namespace gpp 
 {
     // TODO inherit from ITransform
-    class CameraComponent : public Component, public ITransform
+    class CameraComponent : public Component, public gep::ITransform
     {
     public:
         CameraComponent();
@@ -105,7 +105,8 @@ namespace gpp
     struct ComponentMetaInfo<CameraComponent>
     {
         static const char* name(){ return "CameraComponent"; }
-        static const int priority(){ return 23; }
+        static const gep::int32 initializationPriority() { return 0; }
+        static const gep::int32 updatePriority() { return 23; }
         static CameraComponent* create(){ return new CameraComponent(); }
     };
 }

@@ -178,6 +178,10 @@ namespace gep
 
         LUA_BIND_VALUE_TYPE_BEGIN
         LUA_BIND_VALUE_TYPE_MEMBERS
+            LUA_BIND_MEMBER(r)
+            LUA_BIND_MEMBER(g)
+            LUA_BIND_MEMBER(b)
+            LUA_BIND_MEMBER(a)
         LUA_BIND_VALUE_TYPE_END
     };
 

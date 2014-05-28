@@ -10,7 +10,7 @@
 
 namespace gpp
 {
-    class CharacterComponent : public Component, public ITransform
+    class CharacterComponent : public Component, public gep::ITransform
     {
     public:
         CharacterComponent();
@@ -49,18 +49,10 @@ namespace gpp
         inline const gep::IWorld* getWorld() const { return m_pWorld; }
         
         inline void setWorld(gep::IWorld* world) { m_pWorld = world; }
-        
 
-        
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(createCharacterRigidBody)
-        LUA_BIND_REFERENCE_TYPE_END
-
-       
-
-       
-
-        
+        LUA_BIND_REFERENCE_TYPE_END;
 
     private:
         gep::vec3 m_position;
@@ -74,7 +66,8 @@ namespace gpp
     struct ComponentMetaInfo<CharacterComponent>
     {
         static const char* name(){ return "CharacterComponent"; }
-        static const int priority(){ return 0; }
+        static const gep::int32 initializationPriority() { return 0; }
+        static const gep::int32 updatePriority() { return 0; }
         static CharacterComponent* create(){return new CharacterComponent(); }
     };
 }

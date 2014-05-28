@@ -15,6 +15,7 @@ struct ID3D11DeviceContext;
 struct ID3DX11EffectVectorVariable;
 struct ID3DX11EffectMatrixVariable;
 struct ID3DX11EffectShaderResourceVariable;
+struct ID3DX11EffectScalarVariable;
 struct ID3DX11EffectPass;
 
 namespace gep
@@ -97,6 +98,7 @@ namespace gep
         inline ShaderConstant(){}
         ShaderConstant(const char* name, ResourcePtr<Shader> pShader);
         void set(mat4& value);
+        void setArray(ArrayPtr<mat4> arr);
     };
 
     template <>
@@ -145,6 +147,18 @@ namespace gep
         inline ShaderConstant(){}
         ShaderConstant(const char* name, ResourcePtr<Shader> pShader);
         void set(ResourcePtr<Texture2D> pTexture);
+    };
+
+    template<>
+    class ShaderConstant<uint32> : public ShaderConstantBase
+    {
+    private:
+        ID3DX11EffectScalarVariable* m_pVar;
+        void checkUpToDate();
+    public:
+        inline ShaderConstant(){}
+        ShaderConstant(const char* name, ResourcePtr<Shader> pShader);
+        void set(uint32 value);
     };
 
     /// \brief a shader

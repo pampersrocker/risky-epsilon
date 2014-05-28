@@ -61,7 +61,7 @@ namespace gpp { namespace sm {
             LUA_BIND_FUNCTION(getUpdateEvent)
             LUA_BIND_FUNCTION_NAMED(getNameCopy, "getName")
             LUA_BIND_FUNCTION(getQualifiedName)
-        LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_END;
 
     private:
         gep::IAllocator* m_pAllocator;
