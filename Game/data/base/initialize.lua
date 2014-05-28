@@ -1,8 +1,12 @@
 
 print("Initializing from lua...")
 
--- Scripting:registerScript("state_machine.lua")
+Scripting:registerScript("Utils.lua")
+Scripting:registerScript("Player/Player.lua")
+Scripting:registerScript("Camera/IsometricCamera.lua")
+Scripting:registerScript("GameLogic.lua")
 
-Scripting:registerScript("level_prototype/level_prototype.lua")
---Scripting:registerScript("animation_prototype/character_animation.lua")
+
+Scripting:registerScript("Levels/MaterialTest.lua")
+
 print("Finished initializing from lua.")
