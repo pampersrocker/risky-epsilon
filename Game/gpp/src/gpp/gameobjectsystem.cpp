@@ -26,9 +26,9 @@ gpp::GameObjectManager::~GameObjectManager()
 gpp::GameObject* gpp::GameObjectManager::createGameObject(const std::string& guid)
 {
     GEP_ASSERT(m_state == State::PreInitialization, "You are not allowed to create game objects after the initialization process.");
-
-    GEP_ASSERT(m_gameObjects[guid] == nullptr, "GameObject %s already exists!", guid.c_str());
-    auto gameObject = new GameObject();
+	GameObject* gameObject = nullptr;
+    GEP_ASSERT(!m_gameObjects.tryGet(guid, gameObject), "GameObject %s already exists!", guid.c_str());
+    gameObject = new GameObject();
     gameObject->m_name = guid;
     m_gameObjects[guid] = gameObject;
     return gameObject;
@@ -36,7 +36,13 @@ gpp::GameObject* gpp::GameObjectManager::createGameObject(const std::string& gui
 
 gpp::GameObject* gpp::GameObjectManager::getGameObject(const std::string& guid)
 {
-    return m_gameObjects[guid];
+	GameObject* pGameObject = nullptr;
+	if(!m_gameObjects.tryGet(guid, pGameObject))
+	{
+		g_globalManager.getLogging()->logWarning("Attempt to obtain non-existant game object '%s'",
+			guid.c_str());
+	}
+    return pGameObject;
 }
 
 void gpp::GameObjectManager::initialize()

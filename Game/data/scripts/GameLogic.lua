@@ -1,11 +1,10 @@
+GameLogic = CreateEmptyGameObject("GameLogic123")
 
-GameLogic = CreateEmptyGameObject("GameLogic")
-
-function GameLogic:update( guid, elapsedTime )
+function GameLogic.update( guid, elapsedTime )
 	logMessage("UPDATE!")
 end
 
-function GameLogic:init( ... )
+function GameLogic.init( ... )
 	-- body
 	local cinfo = WorldCInfo()
 	cinfo.gravity = Vec3(0,0,-9.81)
@@ -13,9 +12,30 @@ function GameLogic:init( ... )
 	local world = PhysicsFactory:createWorld(cinfo)
 	PhysicsSystem:setWorld(world)
 	PhysicsSystem:setDebugDrawingEnabled(true)
+	
+	-- create player 
+	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance") 
+	setmetatable( GameLogic.playerInstance, PlayerMeta)
+	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
+	
+	--create camera
+	
+	distance = 50.0
+	distanceDelta = 5.0
+	distanceMin = 15.0
+	distanceMax = 200.0
+	
+	
+	isoCam = createDefaultCam("IsoCam")
+	isoCam.go.cc:look(Vec2(0.0, 20.0))
+	
+	setmetatable( isoCam, IsoCamera)
+	CreateScriptComponent(isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
+	logMessage("GameLogic:init()")
 end
 
-function GameLogic:destroy( ... )
+
+function GameLogic.destroy( ... )
 	-- body
 	logMessage("DESTROY!")
 end
@@ -23,19 +43,19 @@ end
 -------------------------------------------------------
 -- Running State
 -------------------------------------------------------
-function GameLogic:updateRunning( updateData )
+function GameLogic.updateRunning( updateData )
 	-- body
 	logMessage("Updating running state");
 	return EventResult.Handled;
 end
 
-function GameLogic:enterRunning( updateData )
+function GameLogic.enterRunning( updateData )
 	-- body
 	logMessage("Entering running state");
 	return EventResult.Handled;
 end
 
-function GameLogic:leaveRunning( updateData )
+function GameLogic.leaveRunning( updateData )
 	-- body
 	logMessage("Leaving running state");
 	return EventResult.Handled;
@@ -46,19 +66,19 @@ end
 -- Pause State
 -------------------------------------------------------
 
-function GameLogic:updatePause( updateData )
+function GameLogic.updatePause( updateData )
 	-- body
 	logMessage("Updating Pause state");
 	return EventResult.Handled;
 end
 
-function GameLogic:enterPause( updateData )
+function GameLogic.enterPause( updateData )
 	-- body
 	logMessage("Entering Pause state");
 	return EventResult.Handled;
 end
 
-function GameLogic:leavePause( updateData )
+function GameLogic.leavePause( updateData )
 	-- body
 	logMessage("Leaving Pause state");
 	return EventResult.Handled;
@@ -69,15 +89,15 @@ end
 -------------------------------------------------------
 -- Transitions
 -------------------------------------------------------
-function GameLogic:checkPause()
+function GameLogic.checkPause()
 	return false;
 end
 
-function GameLogic:checkUnPause()
+function GameLogic.checkUnPause()
 	return false;
 end
 
-function GameLogic:canLeave()
+function GameLogic.canLeave()
 	return false;
 end
 
@@ -115,4 +135,8 @@ StateMachine{
 	}
 }
 
+StateTransitions{
+	parent = "/game/gameRunning",
+	{ from = "__enter", to = "GameStateMachine" }
+}
 CreateScriptComponent(GameLogic, GameLogic.init, GameLogic.update, GameLogic.destroy)

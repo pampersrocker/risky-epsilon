@@ -15,7 +15,7 @@ gep::Logging::~Logging()
 
 void gep::Logging::logMessage(const char* fmt, ...)
 {
-    char buffer[2048];
+    char buffer[2048 * 48];
     va_list argptr;
     va_start(argptr, fmt);
     vsprintf_s(buffer, fmt, argptr);
@@ -29,7 +29,7 @@ void gep::Logging::logMessage(const char* fmt, ...)
 
 void gep::Logging::logWarning(const char* fmt, ...)
 {
-    char buffer[2048];
+    char buffer[2048 * 48];
     va_list argptr;
     va_start(argptr, fmt);
     vsprintf_s(buffer, fmt, argptr);
@@ -43,7 +43,7 @@ void gep::Logging::logWarning(const char* fmt, ...)
 
 void gep::Logging::logError(const char* fmt, ...)
 {
-    char buffer[2048];
+    char buffer[2048 * 48];
     va_list argptr;
     va_start(argptr, fmt);
     vsprintf_s(buffer, fmt, argptr);

@@ -69,6 +69,9 @@ void gpp::Game::initialize()
     auto scripting = g_globalManager.getScriptingManager();
 
     makeScriptBindings();
+	auto L = scripting->getState();
+	lua_pushlightuserdata(L, nullptr);
+	lua_setglobal(L, "null");
 
     {
         // setup.lua

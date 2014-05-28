@@ -176,7 +176,7 @@ function normalCamIsometricEnter(enterData)
 end
 
 function normalCamIsometricUpdate(updateData)
-if (InputHandler:isPressed(Key.Oem_Minus)) then
+	if (InputHandler:isPressed(Key.Oem_Minus)) then
 		if ( distance > distanceMin) then
 			distance = distance - distanceDelta
 		end

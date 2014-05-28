@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="gep::Hashmap&lt;*&gt;">
+		<DisplayString>Count={m_fullCount}</DisplayString>
+		<Expand>
+			<Item Name="m_fullCount">m_fullCount</Item>
+			<Item Name="m_reserved">m_reserved</Item>
+			<ArrayItems>
+				<Size>m_reserved</Size>
+				<ValuePointer>m_data</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	
+	<Type Name="gep::DynamicArray&lt;*&gt;">
+		<DisplayString>Length={m_length} Reserved={m_reserved}</DisplayString>
+		<Expand>
+			<Item Name="m_length">m_length</Item>
+			<Item Name="m_reserved">m_reserved</Item>
+			<ArrayItems>
+				<Size>m_length</Size>
+				<ValuePointer>m_data</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	
+	<Type Name="gep::ArrayPtr&lt;*&gt;">
+		<DisplayString>Length={m_length}</DisplayString>
+		<Expand>
+			<Item Name="m_length">m_length</Item>
+			<ArrayItems>
+				<Size>m_length</Size>
+				<ValuePointer>m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	
+	<Type Name="gep::WeakPtr&lt;*&gt;">
+		<DisplayString>ptr = {m_pLastLookupResult}</DisplayString>
+		<Expand>
+			<Item Name="ptr" Condition="m_weakRefIndex.both != 0xFFFFFFFF">m_pLastLookupResult</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

@@ -1,2 +1,2 @@
 
-null = { __ptr = 0 }
+--null = { __ptr = 0 }
