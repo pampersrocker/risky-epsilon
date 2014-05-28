@@ -282,6 +282,12 @@ gep::ShaderConstant<gep::Texture2D>::ShaderConstant(const char* name, ResourcePt
     checkUpToDate();
 }
 
+gep::ShaderConstant<gep::uint32>::ShaderConstant(const char* name, ResourcePtr<Shader> pShader)
+    : ShaderConstantBase(name, pShader)
+{
+    checkUpToDate();
+}
+
 
 void gep::ShaderConstant<gep::vec2>::set(const vec2& value)
 {
@@ -332,12 +338,30 @@ void gep::ShaderConstant<gep::mat4>::set(mat4& value)
     }
 }
 
+void gep::ShaderConstant<gep::mat4>::setArray(ArrayPtr<mat4> arr)
+{
+    checkUpToDate();
+    if(m_isValid)
+    {
+        m_pVar->SetMatrixArray(arr.getPtr()->data, 0, UINT(arr.length()));
+    }
+}
+
 void gep::ShaderConstant<gep::Texture2D>::set(ResourcePtr<Texture2D> value)
 {
     checkUpToDate();
     if(m_isValid)
     {
         m_pVar->SetResource(value->getResourceView());
+    }
+}
+
+void gep::ShaderConstant<gep::uint32>::set(uint32 value)
+{
+    checkUpToDate();
+    if(m_isValid)
+    {
+        m_pVar->SetInt(int(value));
     }
 }
 
@@ -398,6 +422,16 @@ void gep::ShaderConstant<gep::Texture2D>::checkUpToDate()
     {
         m_pLastValidShader = m_pShader;
         m_pVar = m_pLastValidShader->getEffect()->GetVariableByName(m_name.c_str())->AsShaderResource();
+        m_isValid = true;
+    }
+}
+
+void gep::ShaderConstant<gep::uint32>::checkUpToDate()
+{
+    if(m_pShader != m_pLastValidShader && m_pShader->getEffect() != nullptr)
+    {
+        m_pLastValidShader = m_pShader;
+        m_pVar = m_pLastValidShader->getEffect()->GetVariableByName(m_name.c_str())->AsScalar();
         m_isValid = true;
     }
 }

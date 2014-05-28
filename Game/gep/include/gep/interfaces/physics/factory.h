@@ -37,8 +37,8 @@ namespace gep
         /// \brief Keep in mind that ICharacterRigidBody is a ReferenceCounted object. Use SmartPtrs whenever possible.
         virtual ICharacterRigidBody* createCharacterRigidBody(const CharacterRigidBodyCInfo& cinfo) const = 0;
 
-		virtual ResourcePtr<ICollisionMesh> loadCollisionMesh(const char* path) = 0;
-		virtual IShape* loadCollisionMeshFromLua(const char* path) = 0;
+        virtual ResourcePtr<ICollisionMesh> loadCollisionMesh(const char* path) = 0;
+        virtual IShape* loadCollisionMeshFromLua(const char* path) = 0;
 
         BoxShape* createBox(vec3 halfExtends){ return GEP_NEW(g_stdAllocator, BoxShape)(halfExtends); }
         SphereShape* createSphere(float radius){ return GEP_NEW(g_stdAllocator, SphereShape)(radius); }
@@ -46,9 +46,9 @@ namespace gep
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(createWorld)
             LUA_BIND_FUNCTION(createRigidBody)
-			LUA_BIND_FUNCTION(createBox)
-			LUA_BIND_FUNCTION(createSphere)
-			LUA_BIND_FUNCTION_NAMED(loadCollisionMeshFromLua, "loadCollisionMesh")
+            LUA_BIND_FUNCTION(createBox)
+            LUA_BIND_FUNCTION(createSphere)
+            LUA_BIND_FUNCTION_NAMED(loadCollisionMeshFromLua, "loadCollisionMesh")
         LUA_BIND_REFERENCE_TYPE_END
     };
 

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "gep/scripting/luaHelper.h"
+#include "gep/globalManager.h"
+#include "gep/settings.h"
 
 namespace helper
 {
@@ -108,10 +110,10 @@ std::string lua::utils::dumpStack(lua_State* L)
 {
     std::ostringstream output;
     const size_t level = 0;
-    const size_t maxLevel = 2;
+    const size_t maxLevel = g_globalManager.getSettings()->getLuaSettings().maxStackDumpLevel;
     int originalTop = lua_gettop(L);
 
-    output << "Stack size = " << originalTop;
+    output << "Size = " << originalTop;
 
     for (int index = originalTop; index > 0; --index)
     {
@@ -130,7 +132,8 @@ GEP_API std::string lua::utils::traceback(lua_State* L)
 {
     StackCleaner cleaner(L, 0);
 
-    lua_getglobal(L, "debug");
+    lua_getglobal(L, "__builtins");
+    lua_getfield(L, -1, "debug");
     lua_getfield(L, -1, "traceback");
     lua_pushnil(L);
     lua_pushinteger(L, 1);

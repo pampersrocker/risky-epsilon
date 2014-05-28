@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gep/math3d/transform.h"
+
 #include "gep/singleton.h"
 #include "gep/utils.h"
 #include "gep/math3d/vec3.h"
@@ -10,6 +12,9 @@
 #include "gep/weakPtr.h"
 
 #include "gep/interfaces/scripting.h"
+#include "gep/memory/allocators.h"
+
+#include "gep/math3d/transform.h"
 
 namespace gpp
 {
@@ -29,8 +34,8 @@ namespace gpp
             };
         };
 
-         GameObject* createGameObject(const std::string& guid);
-         GameObject* getGameObject(const std::string& guid);
+        GameObject* createGameObject(const std::string& guid);
+        GameObject* getGameObject(const std::string& guid);
 
         virtual void initialize();
         virtual void destroy();
@@ -38,17 +43,20 @@ namespace gpp
 
         State::Enum getState() { return m_state; }
 
+        inline gep::StackAllocator* getTempAllocator() { return &m_tempAllocator; }
+
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(createGameObject)
             LUA_BIND_FUNCTION(getGameObject)
-        LUA_BIND_REFERENCE_TYPE_END 
+        LUA_BIND_REFERENCE_TYPE_END;
 
     protected:
         GameObjectManager();
         virtual ~GameObjectManager();
     private:
-       gep::Hashmap<std::string, GameObject*, gep::StringHashPolicy> m_gameObjects;
-       State::Enum m_state;
+        gep::Hashmap<std::string, GameObject*, gep::StringHashPolicy> m_gameObjects;
+        State::Enum m_state;
+        gep::StackAllocator m_tempAllocator;
     };
 
     class IComponent
@@ -56,7 +64,7 @@ namespace gpp
         friend class GameObject;
     public:
 
-        struct State 
+        struct State
         {
             enum Enum
             {
@@ -104,73 +112,22 @@ namespace gpp
         virtual void setParentGameObject(GameObject* object) override { m_pParentGameObject = object; }
     };
 
-    class ITransform
-    {
-    public:
-        virtual ~ITransform() {}
-
-        virtual void setPosition(const gep::vec3& pos) = 0;
-        virtual void setRotation(const gep::Quaternion& rot) = 0;
-        virtual void setScale(const gep::vec3& scale) = 0;
-        virtual void setBaseOrientation(const gep::Quaternion& orientation) = 0;
-        virtual void setBaseViewDirection(const gep::vec3& direction) =0;
-
-        virtual gep::mat4 getTransformationMatrix() = 0;
-        virtual gep::vec3 getPosition() = 0;
-        virtual gep::Quaternion getRotation() = 0;
-        virtual gep::vec3 getScale() = 0;
-        virtual gep::vec3 getViewDirection() = 0;
-        virtual gep::vec3 getUpDirection() = 0;
-        virtual gep::vec3 getRightDirection() = 0;
-        
-        
-    };
-
-    class Transform : public ITransform
-    {
-    public:
-        Transform():
-            m_position(),
-            m_scale(),
-            m_rotation(),
-            m_baseOrientation()
-        {}
-        virtual ~Transform() {}
-
-        virtual void setPosition(const gep::vec3& pos) override { m_position = pos; }
-        virtual void setRotation(const gep::Quaternion& rot) override { m_rotation = rot; }
-        virtual void setScale(const gep::vec3& scale) override { m_scale = scale; }
-        virtual void setBaseOrientation(const gep::Quaternion& orientation) override { m_baseOrientation = orientation;}
-        virtual void setBaseViewDirection(const gep::vec3& direction) override { m_baseOrientation = gep::Quaternion(direction, gep::vec3(0,1,0));}
-        virtual gep::vec3 getPosition() override { return m_position; }
-        virtual gep::Quaternion getRotation() override { return m_rotation; }
-        virtual gep::vec3 getScale() override { return m_scale; }
-        //TODO: extend for scale
-        virtual gep::mat4 getTransformationMatrix() override { return gep::mat4::translationMatrix(m_position) * m_rotation .toMat4() ; }
-        virtual gep::vec3 getViewDirection() override {return (m_rotation * m_baseOrientation).toMat3() * gep::vec3(0,1,0);} 
-        virtual gep::vec3 getUpDirection() override {return  (m_rotation * m_baseOrientation).toMat3() * gep::vec3(0,0,1);}
-        virtual gep::vec3 getRightDirection() override {return (m_rotation * m_baseOrientation).toMat3() * gep::vec3(1,0,0);}
-
-        
-
-
-
-
-    private:
-        gep::vec3 m_position;
-        gep::vec3 m_scale;
-        gep::Quaternion m_rotation;
-        gep::Quaternion m_baseOrientation;
-        
-    };
-
-    class GameObject : public ITransform
+  
+    class GameObject : public gep::ITransform
     {
         friend class GameObjectManager;
         struct ComponentWrapper
         {
-            int priority;
+            int initializationPriority;
+            int updatePriority;
             IComponent* component;
+
+            ComponentWrapper() :
+                initializationPriority(-1),
+                updatePriority(-1),
+                component(nullptr)
+            {
+            }
         };
 
     public:
@@ -193,7 +150,15 @@ namespace gpp
         template<typename T>
         T* getComponent()
         {
-            return static_cast<T*>(m_components[ComponentMetaInfo<T>::name()]);
+            if(m_components.exists(ComponentMetaInfo<T>::name()))
+            {
+                return static_cast<T*>(m_components[ComponentMetaInfo<T>::name()].component);
+            }
+            else
+            {
+                return nullptr;
+            }
+            
         }
 
         virtual void setPosition(const gep::vec3& pos) override;
@@ -215,19 +180,21 @@ namespace gpp
 
         inline const std::string& getName() const { return m_name; }
 
-        inline       ITransform& getTransform()       { return *m_transform; }
-        inline const ITransform& getTransform() const { return *m_transform; }
-        inline void setTransform(ITransform& transform) { m_transform = &transform; }
+        inline       gep::ITransform& getTransform()       { return *m_transform; }
+        inline const gep::ITransform& getTransform() const { return *m_transform; }
+        inline void setTransform(gep::ITransform& transform) { m_transform = &transform; }
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION_NAMED(createComponent<CameraComponent>, "createCameraComponent")
             LUA_BIND_FUNCTION_NAMED(createComponent<RenderComponent>, "createRenderComponent")
             LUA_BIND_FUNCTION_NAMED(createComponent<PhysicsComponent>, "createPhysicsComponent")
             LUA_BIND_FUNCTION_NAMED(createComponent<ScriptComponent>, "createScriptComponent")
+            LUA_BIND_FUNCTION_NAMED(createComponent<AnimationComponent>, "createAnimationComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<CameraComponent>, "getCameraComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<RenderComponent>, "getRenderComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<PhysicsComponent>, "getPhysicsComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<ScriptComponent>, "getScriptComponent")
+            LUA_BIND_FUNCTION_NAMED(getComponent<AnimationComponent>, "getAnimationComponent")
             LUA_BIND_FUNCTION(setPosition)
             LUA_BIND_FUNCTION(getPosition)
             LUA_BIND_FUNCTION(setRotation)
@@ -240,16 +207,12 @@ namespace gpp
             LUA_BIND_FUNCTION(setBaseViewDirection)
         LUA_BIND_REFERENCE_TYPE_END
 
-        
-
-        
-
     private:
         std::string m_name;
         bool m_isActive;
-        Transform m_defaultTransform;
-        ITransform* m_transform;
-        gep::Hashmap<const char*, IComponent*> m_components;
+        gep::Transform m_defaultTransform;
+        gep::ITransform* m_transform;
+        gep::Hashmap<const char*, ComponentWrapper> m_components;
         gep::DynamicArray<ComponentWrapper> m_updateQueue;
 
         template<typename T>
@@ -259,28 +222,30 @@ namespace gpp
             //check weather T is really an ICompontent
             auto component = static_cast<IComponent*>(specializedComponent);
             ComponentWrapper wrapper;
-            wrapper.priority = ComponentMetaInfo<T>::priority();
+            wrapper.initializationPriority = ComponentMetaInfo<T>::initializationPriority();
+            wrapper.updatePriority = ComponentMetaInfo<T>::updatePriority();
             wrapper.component = component;
 
             const char* const typeName = ComponentMetaInfo<T>::name();
-            GEP_ASSERT(m_components[typeName] == nullptr, "A component of the same type has already been added to this gameObject", typeName, m_name);
-            if (m_components[typeName] != nullptr)
+            if(m_components[typeName].component != nullptr)
             {
+                GEP_ASSERT(false, "A component of the same type has already been added to this gameObject", typeName, m_name);
                 throw gep::Exception(gep::format("The component %s has already been added to gameObject %s", typeName, m_name));
             }
             component->setParentGameObject(this);
-            m_components[typeName] = component;
+            m_components[typeName] = wrapper;
 
-            if (wrapper.priority < 0)
+            if (wrapper.updatePriority == std::numeric_limits<gep::int32>::max())
             {
-                return; //Component needs no update
+                // Component needs no update
+                return;
             }
             //insert into update Queue
             size_t index = 0;
 
             for (auto entry : m_updateQueue)
             {
-                if (entry.priority > wrapper.priority)
+                if(entry.updatePriority > wrapper.updatePriority)
                 {
                     break;
                 }
@@ -293,9 +258,32 @@ namespace gpp
     template<typename T>
     struct ComponentMetaInfo
     {
-        static const char* name() { static_assert(false, "Please specialize this template in the specific component class!"); return nullptr;}
-        static const int priority() { static_assert(false, "Please specialize this template in the specific component class!"); return nullptr;}
-        static T* create() { static_assert(false, "Please specialize this template in the specific component class!"); return nullptr;}
+        static const char* name()
+        {
+            static_assert(false, "Please specialize this template in the specific component class!");
+            return nullptr;
+        }
+        
+        /// The smaller this value, the earlier this component type will be updated.
+        static const gep::int32 initializationPriority()
+        {
+            static_assert(false, "Please specialize this template in the specific component class!");
+            return 0;
+        }
+
+        /// The closer this value is to 0, the earlier the component is updated within one frame.
+        /// If this value is std::numeric_limits<gep::int32>::max(), this component type will never be updated.
+        static const gep::int32 updatePriority()
+        {
+            static_assert(false, "Please specialize this template in the specific component class!");
+            return std::numeric_limits<gep::int32>::max();
+        }
+        
+        static T* create()
+        {
+            static_assert(false, "Please specialize this template in the specific component class!");
+            return nullptr;
+        }
     };
 
 }

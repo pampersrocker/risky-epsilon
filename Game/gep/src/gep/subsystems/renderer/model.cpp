@@ -14,6 +14,8 @@ void gep::ModelMaterial::setShader(ResourcePtr<Shader> pShader)
     m_modelMatrixConstant = ShaderConstant<mat4>("Model", pShader);
     m_viewMatrixConstant = ShaderConstant<mat4>("View", pShader);
     m_projectionMatrixConstant = ShaderConstant<mat4>("Projection", pShader);
+    m_numBonesConstant = ShaderConstant<uint32>("NumBones", pShader);
+    m_bonesArrayConstant = ShaderConstant<mat4>("BonesArray", pShader);
 }
 
 void gep::ModelMaterial::addTexture(ShaderConstant<Texture2D> constant, ResourcePtr<Texture2D> pTexture)
@@ -31,11 +33,12 @@ gep::Model::MeshDrawData::~MeshDrawData()
 }
 
 gep::Model::Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext) :
-    m_needsNodeLookup(false),
     m_pVertexbuffer(nullptr),
     m_pDevice(pDevice),
     m_pDeviceContext(pContext),
-    m_pLoader(nullptr)
+    m_pLoader(nullptr),
+    m_debugDrawingEnabled(false),
+    m_bones(nullptr, 0)
 {
     GEP_ASSERT(pDevice != nullptr);
     GEP_ASSERT(pContext != nullptr);
@@ -98,15 +101,16 @@ void gep::Model::drawHelper(ID3D11DeviceContext* pContext, mat4 transformation, 
         {
             material.getViewMatrixConstant().set(view);
             material.getProjectionMatrixConstant().set(projection);
+            material.getNumBonesConstant().set(m_bones.length());
+            material.getBonesArrayConstant().setArray(m_bones);
             m_pLastShader = material.getShader();
-            
         }
         material.getShader()->use(pContext, drawData.vertexbuffer);
         drawData.vertexbuffer->draw(pContext, drawData.startIndex, drawData.numIndices);
     }
 
-    for(auto c : pNode->children){
-        drawHelper(pContext, transformation, c, view, projection);
+    for(auto child : pNode->children){
+        drawHelper(pContext, transformation, child, view, projection);
     }
 }
 
@@ -173,7 +177,7 @@ void gep::Model::generateMeshes()
         {
             neededChannels.append(Vertexbuffer::DataChannel::TEXCOORD0);
         }
-        if(mesh.bones.length() > 0)
+        if(mesh.boneInfos.length() > 0)
         {
             neededChannels.append(Vertexbuffer::DataChannel::BONE_INDICES);
             neededChannels.append(Vertexbuffer::DataChannel::BONE_WEIGHTS);
@@ -216,7 +220,7 @@ void gep::Model::generateMeshes()
                 break;
             case Vertexbuffer::DataChannel::BONE_INDICES:
             case Vertexbuffer::DataChannel::BONE_WEIGHTS:
-                if(mesh.bones.length() == 0){
+                if(mesh.boneInfos.length() == 0){
                     std::ostringstream msg;
                     msg << "Error loading file '" << m_modelLoader.getFilename() << "' bones requested but there are no bones in mesh number " << i;
                     throw LoadingError(msg.str());
@@ -279,7 +283,7 @@ void gep::Model::generateMeshes()
                     break;
                 case Vertexbuffer::DataChannel::BONE_INDICES:
                     {
-                        auto boneIndexData = ArrayPtr<float>((float*)mesh.boneInfos[j].boneIndices, dataChannelSize);
+                        auto boneIndexData = ArrayPtr<float>((float*)mesh.boneInfos[j].boneIds, dataChannelSize);
                         vb->getData().append(boneIndexData);
                     }
                     break;
@@ -375,6 +379,28 @@ void gep::Model::extract(IRendererExtractor& extractor, mat4 modelMatrix)
     auto& cmd = static_cast<RendererExtractor&>(extractor).makeCommand<CommandRenderModel>();
     cmd.model = this->makeResourcePtrFromThis<Model>();
     cmd.modelMatrix = modelMatrix;
+
+    // TODO implement debug drawing.
+}
+
+void gep::Model::setDebugDrawingEnabled(bool value)
+{
+    m_debugDrawingEnabled = value;
+}
+
+bool gep::Model::getDebugDrawingEnabled() const
+{
+    return m_debugDrawingEnabled;
+}
+
+void gep::Model::toggleDebugDrawing()
+{
+    setDebugDrawingEnabled(!getDebugDrawingEnabled());
+}
+
+void gep::Model::setBones(const ArrayPtr<mat4>& transformations)
+{
+    m_bones = transformations;
 }
 
 gep::IResource* gep::IModelLoader::loadResource(IResource* pInPlace)
@@ -509,3 +535,24 @@ const char* gep::ModelLoaderFromData::getResourceId()
 {
     return m_resourceID.c_str();
 }
+
+void gep::Animation::update(float elapsedSeconds)
+{
+    updateGlobalBoneTransforms(elapsedSeconds);
+}
+
+gep::Animation::Animation(Model* model) :
+    m_pModel(model)
+{
+}
+
+gep::Animation::~Animation()
+{
+    m_pModel = nullptr;
+}
+
+void gep::Animation::updateGlobalBoneTransforms(float elapedSeconds)
+{
+    // TODO implement me. Traverse bone hierarchy and update bone transformations.
+}
+

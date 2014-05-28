@@ -540,8 +540,6 @@ void gep::Renderer::executeCommands(RendererExtractor& extractor, CommandBase* c
 {
     BeginDebugMarker(L"3D Rendering");
     SCOPE_EXIT{ EndDebugMarker(); });
-    bool isFirstLineDrawCall = true;
-    bool isFirstTextBillboardDrawCall = true;
     while(currentCommand != nullptr)
     {
         switch(currentCommand->getType())
@@ -750,7 +748,7 @@ gep::ResourcePtr<gep::IModel> gep::Renderer::loadModel(const char* path)
     }
     return model;
 }
- gep::ResourcePtr< gep::IModel>  gep::Renderer::loadModel( gep::ReferenceCounted* pDataHolder,  gep::ArrayPtr< gep::vec4> vertices,  gep::ArrayPtr< gep::uint32> indices)
+ gep::ResourcePtr<gep::IModel>  gep::Renderer::loadModel( gep::ReferenceCounted* pDataHolder,  gep::ArrayPtr< gep::vec4> vertices,  gep::ArrayPtr< gep::uint32> indices)
  {
     auto id = InterlockedIncrement(&m_dataModelNum);
     char idString[256];
@@ -1061,6 +1059,7 @@ void gep::DebugRenderer::extract(IRendererExtractor& extractor)
     if(m_frameAllocator.getMarker() != m_pStartMarker)
         m_frameAllocator.freeToMarker(m_pStartMarker);
 }
+
 
 
 

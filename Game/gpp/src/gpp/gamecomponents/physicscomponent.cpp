@@ -131,8 +131,6 @@ void gpp::PhysicsComponent::collisionRemovedCallback(const gep::CollisionArgs& e
 {
 }
 
-
-
 gep::vec3 gpp::PhysicsComponent::getViewDirection()
 {
     return (m_pRigidBody->getRotation() * m_baseOrientation ).toMat3() * gep::vec3(0,1,0);

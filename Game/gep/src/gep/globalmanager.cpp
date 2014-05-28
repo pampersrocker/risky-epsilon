@@ -15,6 +15,7 @@
 #include "gepimpl/subsystems/scripting.h"
 #include "gepimpl/subsystems/cameraManager.h"
 #include "gepimpl/settings.h"
+#include "gepimpl/subsystems/animation/havok/animation.h"
 #include "gep/timer.h"
 #include "gepimpl/subsystems/events/eventManager.h"
 
@@ -38,7 +39,8 @@ gep::GlobalManager::GlobalManager() :
     , m_pScriptingManager(nullptr)
     , m_pEventManager(nullptr)
     , m_pCameraManager(nullptr)
-    , m_pSettings(nullptr)
+    , m_pSettings(nullptr),
+    m_pAnimationSystem(nullptr)
 {
 }
 
@@ -207,9 +209,23 @@ void gep::GlobalManager::initialize()
     m_pUpdateFramework->registerDestroyCallback([&]()
     {
         m_pLogging->logMessage("destroying camera system");
-        //if(m_pLuaManager) m_pLuaManager->destroy();
         DELETE_AND_NULL(m_pCameraManager);
         m_pLogging->logMessage("camera system destroyed");
+    });
+
+    m_pUpdateFramework->registerInitializeCallback([&]()
+    {
+        m_pLogging->logMessage("initializing animation system");
+        m_pAnimationSystem = new AnimationSystem();
+        m_pAnimationSystem->initialize();
+        m_pLogging->logMessage("animation system initialized");
+    });
+    m_pUpdateFramework->registerDestroyCallback([&]()
+    {
+        m_pLogging->logMessage("destroying animation system");
+        if(m_pAnimationSystem) m_pAnimationSystem->destroy();
+        DELETE_AND_NULL(m_pAnimationSystem);
+        m_pLogging->logMessage("camera animation destroyed");
     });
 
     m_pLogging->logMessage("\n"

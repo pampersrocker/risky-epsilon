@@ -445,12 +445,12 @@ namespace gep
             mat4_t<T> result(DO_NOT_INITIALIZE);
             float A,B,C,D,E,F,AD,BD;
 
-            A       = cos(-toRadians(rotation.x));
-            B       = sin(-toRadians(rotation.x));
-            C       = cos(-toRadians(rotation.y));
-            D       = sin(-toRadians(rotation.y));
-            E       = cos(-toRadians(rotation.z));
-            F       = sin(-toRadians(rotation.z));
+            A       = cos(toRadians(rotation.x));
+            B       = sin(toRadians(rotation.x));
+            C       = cos(toRadians(rotation.y));
+            D       = sin(toRadians(rotation.y));
+            E       = cos(toRadians(rotation.z));
+            F       = sin(toRadians(rotation.z));
             AD      =   A * D;
             BD      =   B * D;
             result.data[0]  =   C * E;
@@ -498,11 +498,41 @@ namespace gep
             return result;
         }
 
-
 		
 		LUA_BIND_VALUE_TYPE_BEGIN
+            LUA_BIND_FUNCTION(inverse)
+            LUA_BIND_FUNCTION(right2Left)
+            LUA_BIND_FUNCTION(transformDirection)
+            LUA_BIND_FUNCTION(transformPosition)
+            LUA_BIND_FUNCTION(submat)
+            LUA_BIND_FUNCTION(det)
+            LUA_BIND_FUNCTION(transposed)
+            LUA_BIND_FUNCTION(translationPart)
+            LUA_BIND_FUNCTION(rotationPart)
+            LUA_BIND_FUNCTION(setRotationPart)
+            LUA_BIND_FUNCTION(normalMatrix)
+            LUA_BIND_FUNCTION_NAMED(mulFromLua, "__mul")
 		LUA_BIND_VALUE_TYPE_MEMBERS
+            LUA_BIND_MEMBER(m00)
+            LUA_BIND_MEMBER(m01) 
+            LUA_BIND_MEMBER(m02)
+            LUA_BIND_MEMBER(m03)
+            LUA_BIND_MEMBER(m10)
+            LUA_BIND_MEMBER(m11)
+            LUA_BIND_MEMBER(m12)
+            LUA_BIND_MEMBER(m13)
+            LUA_BIND_MEMBER(m20)
+            LUA_BIND_MEMBER(m21)
+            LUA_BIND_MEMBER(m22)
+            LUA_BIND_MEMBER(m23)
+            LUA_BIND_MEMBER(m30)
+            LUA_BIND_MEMBER(m31)
+            LUA_BIND_MEMBER(m32)
+            LUA_BIND_MEMBER(m33)
 		LUA_BIND_VALUE_TYPE_END
+
+        private:
+            const mat4_t<T> mulFromLua (const mat4_t<T>& m) const {return *this * m;}
     };
 
     typedef mat4_t<float> mat4;

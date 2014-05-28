@@ -3,6 +3,8 @@
 #include "gpp/gameObjectSystem.h"
 #include "gep/interfaces/updateFramework.h"
 
+#include "gep/interfaces/animation.h"
+
 
 namespace gep
 {
@@ -31,6 +33,7 @@ namespace gpp
         inline void setPath(const std::string& path){ m_path = path; }
         inline const std::string& getPath() const { return m_path; }
         inline std::string getPathCopy() const { return m_path; }
+        virtual void applyBoneTransformations(const gep::ArrayPtr<gep::BoneTransform>& transformations);
 
         virtual void setState(State::Enum state) override;
 
@@ -45,6 +48,7 @@ namespace gpp
 
         std::string m_path;
         gep::CallbackId m_extractionCallbackId;
+        gep::DynamicArray<gep::mat4> m_bones;
 
 
     };
@@ -53,7 +57,8 @@ namespace gpp
     struct ComponentMetaInfo<RenderComponent>
     {
         static const char* name(){ return "RenderComponent"; }
-        static const int priority(){ return 1; }
+        static const gep::int32 initializationPriority() { return -10; }
+        static const gep::int32 updatePriority() { return std::numeric_limits<gep::int32>::max(); }
         static RenderComponent* create(){return new RenderComponent(); }
     };
 }

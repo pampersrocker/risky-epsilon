@@ -41,11 +41,15 @@ namespace gep
 
     int scriptErrorHandler(lua_State* L)
     {
+        auto luaMessage = lua_tostring(L, -1);
+        lua_pop(L, 1);
         auto callStack = lua::utils::traceback(L);
         auto stackDump = lua::utils::dumpStack(L);
-        auto message = gep::format("A Lua error occurred!\n%s\n%s", callStack.c_str(), stackDump.c_str());
-        //GEP_ASSERT(false, "A Lua error occurred!", callStack, stackDump);
-        throw ScriptExecutionException(std::move(message));
+        auto fmt = "in Lua: %s\n"
+                   "Lua call%s\n"
+                   "Lua stack dump %s";
+        g_globalManager.getLogging()->logError(fmt, luaMessage, callStack.c_str(), stackDump.c_str());
+        throw ScriptExecutionException("An error occurred in lua. Check the log.");
         return 0;
     }
 }
@@ -99,13 +103,11 @@ void gep::ScriptingManager::loadScript(const std::string& filename, LoadOptions:
             const char* theError = lua_tostring(m_L, lua_gettop(m_L));
             lua_pop(m_L, 1);
 
-            //luaL_error(L, theError);
-            throw ScriptLoadException(theError);
+            luaL_error(m_L, theError);
         }
         else
         {
-            //luaL_error(L, "Unknown error loading Lua file \"%s\"", filename);
-            throw ScriptLoadException(format("Unknown error loading Lua file \"%s\"", scriptFileName.c_str()));
+            luaL_error(m_L, "Unknown error loading Lua file \"%s\"", scriptFileName.c_str());
         }
     }
     else
@@ -121,13 +123,11 @@ void gep::ScriptingManager::loadScript(const std::string& filename, LoadOptions:
                 const char* theError = lua_tostring(m_L, lua_gettop(m_L));
                 lua_pop(m_L, 1);
 
-                //luaL_error(L, theError);
-                throw ScriptExecutionException(theError);
+                luaL_error(m_L, theError);
             }
             else
             {
-                //luaL_error(L, "Unknown error executing Lua file \"%s\"", filename);
-                throw ScriptExecutionException(format("Unknown error executing Lua file \"%s\"", scriptFileName.c_str()));
+                luaL_error(m_L, "Unknown error executing Lua file \"%s\"", scriptFileName.c_str());
             }
         }
     }

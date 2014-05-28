@@ -8,7 +8,7 @@ namespace gpp
 {
     class PhysicsComponent :
         public Component,
-        public ITransform,
+        public gep::ITransform,
         public gep::IContactListener
     {
         friend class CharacterComponent;
@@ -83,7 +83,8 @@ namespace gpp
     struct ComponentMetaInfo<PhysicsComponent>
     {
         static const char* name(){ return "PhysicsComponent"; }
-        static const int priority(){ return -1; }
+        static const gep::int32 initializationPriority() { return 0; }
+        static const gep::int32 updatePriority() { return std::numeric_limits<gep::int32>::max(); }
         static PhysicsComponent* create(){ return new PhysicsComponent(); }
     };
 

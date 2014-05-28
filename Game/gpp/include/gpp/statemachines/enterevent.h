@@ -13,14 +13,17 @@ namespace gpp { namespace sm {
     public:
         EnterEventData();
 
-        State* getState();
+        State* getEnteredState();
+        State* getLeftState();
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
-            LUA_BIND_FUNCTION(getState)
-            LUA_BIND_REFERENCE_TYPE_END
+            LUA_BIND_FUNCTION(getEnteredState)
+            LUA_BIND_FUNCTION(getLeftState)
+        LUA_BIND_REFERENCE_TYPE_END;
 
     private:
-        State* m_pCurrentState;
+        State* m_pEnteredState;
+        State* m_pLeftState;
     };
     typedef gep::Event<EnterEventData*> EnterEvent_t;
 

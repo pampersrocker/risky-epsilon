@@ -1,8 +1,9 @@
 
 print("Initializing from lua...")
 
--- Scripting:registerScript("state_machine.lua")
+-- Scripting:registerScript("defaults.lua")
+-- Scripting:registerScript("samples/animation-prototype.lua")
 
-Scripting:registerScript("camera_prototype/camera_prototype.lua")
+Scripting:registerScript("animation_prototype/character_animation.lua")
 
 print("Finished initializing from lua.")

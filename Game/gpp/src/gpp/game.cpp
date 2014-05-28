@@ -70,7 +70,6 @@ void gpp::Game::initialize()
 
     makeScriptBindings();
 
-    try
     {
         // setup.lua
         scripting->loadScript("setup.lua", IScriptingManager::LoadOptions::IsImportantScript);
@@ -81,36 +80,22 @@ void gpp::Game::initialize()
 
         scripting->loadScript("initialize.lua", IScriptingManager::LoadOptions::IsImportantScript);
     }
-    catch (ScriptLoadException& e)
-    {
-        auto message = format("Error loading script %s", e.what());
-        GEP_ASSERT(false, message.c_str());
-        g_globalManager.getLogging()->logError(message.c_str());
-        throw e;
-    }
-    catch (ScriptExecutionException& e)
-    {
-        auto message = format("Error executing script %s", e.what());
-        GEP_ASSERT(false, message.c_str());
-        g_globalManager.getLogging()->logError(message.c_str());
-        throw e;
-    }
 
     try
     {
         g_globalManager.getScriptingManager()->loadAllRegisteredScripts();
     }
-    catch (ScriptLoadException& e)
+    catch (ScriptLoadException&)
     {
-        auto message = format("Error loading script %s", e.what());
-        GEP_ASSERT(false, message.c_str());
-        g_globalManager.getLogging()->logError(message.c_str());
+        auto message = "An error occurred loading one of the registered scripts. Check the log.";
+        GEP_ASSERT(false, message);
+        g_globalManager.getLogging()->logError(message);
     }
-    catch (ScriptExecutionException& e)
+    catch (ScriptExecutionException&)
     {
-        auto message = format("Error executing script %s", e.what());
-        GEP_ASSERT(false, message.c_str());
-        g_globalManager.getLogging()->logError(message.c_str());
+        auto message = "An error occurred executing one of the registered scripts. Check the log.";
+        GEP_ASSERT(false, message);
+        g_globalManager.getLogging()->logError(message);
     }
 
     m_pStateMachine->run();

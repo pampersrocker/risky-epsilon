@@ -106,6 +106,16 @@ void gep::HavokRigidBody::triggerSimulationCallbacks() const
     }
 }
 
+void gep::HavokRigidBody::reset()
+{
+    auto pRigidBody = getHkpRigidBody();
+    // reset everything
+    pRigidBody->setPositionAndRotation(hkVector4(0.0f, 0.0f, 0.0f),
+                                       hkQuaternion::getIdentity());
+    pRigidBody->setLinearVelocity(hkVector4(0.0f, 0.0f, 0.0f));
+    pRigidBody->setAngularVelocity(hkVector4(0.0f, 0.0f, 0.0f));
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 gep::HavokCollidable::HavokCollidable(hkpCollidable* collidable) :

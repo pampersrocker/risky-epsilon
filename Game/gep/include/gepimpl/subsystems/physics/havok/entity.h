@@ -168,6 +168,8 @@ namespace gep
         virtual void activate() override { m_entity.activate(); }
         virtual void requestDeactivation() override { m_entity.requestDeactivation(); }
         virtual bool isActive() const override { return m_entity.isActive(); }
+
+        virtual void reset() override;
     };
 
     //TODO: Needs more wrapping!

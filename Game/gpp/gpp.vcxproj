@@ -190,6 +190,7 @@
     <ClInclude Include="include\gpp\game.h" />
     <ClInclude Include="include\gpp\dummyLogging.h" />
     <ClInclude Include="include\gpp\ExperimentalContactListener.h" />
+    <ClInclude Include="include\gpp\gameComponents\animationComponent.h" />
     <ClInclude Include="include\gpp\gameComponents\cameraComponent.h" />
     <ClInclude Include="include\gpp\gameComponents\characterComponent.h" />
     <ClInclude Include="include\gpp\gameComponents\physicsComponent.h" />
@@ -212,6 +213,7 @@
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\gpp\game.cpp" />
+    <ClCompile Include="src\gpp\gameComponents\animationComponent.cpp" />
     <ClCompile Include="src\gpp\gameComponents\cameraComponent.cpp" />
     <ClCompile Include="src\gpp\includeOnce.cpp" />
     <ClCompile Include="src\gpp\scriptBindings.cpp" />

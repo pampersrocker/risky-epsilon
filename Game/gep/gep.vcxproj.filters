@@ -510,6 +510,15 @@
     <ClInclude Include="include\gep\interfaces\events\eventScriptingManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\gepimpl\subsystems\animation\havok\animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gepimpl\subsystems\animation\havok\animationFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gep\math3d\transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp">
@@ -675,6 +684,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\gep\events.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gep\subsystems\animation\havok\animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gep\subsystems\animation\havok\animationFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

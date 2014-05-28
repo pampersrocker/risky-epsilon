@@ -15,7 +15,7 @@ namespace {
 }
 
 gep::ModelLoader::ModelLoader(IAllocator* pAllocator) :
-    m_pMeshDataAllocator(nullptr),
+    m_pModelDataAllocator(nullptr),
     m_pStartMarker(nullptr)
 {
     if(pAllocator == nullptr)
@@ -25,10 +25,10 @@ gep::ModelLoader::ModelLoader(IAllocator* pAllocator) :
 
 gep::ModelLoader::~ModelLoader()
 {
-    if(m_pMeshDataAllocator != nullptr)
+    if(m_pModelDataAllocator != nullptr)
     {
-        m_pMeshDataAllocator->freeToMarker(m_pStartMarker);
-        GEP_DELETE(m_pAllocator, m_pMeshDataAllocator);
+        m_pModelDataAllocator->freeToMarker(m_pStartMarker);
+        GEP_DELETE(m_pAllocator, m_pModelDataAllocator);
     }
 }
 
@@ -68,7 +68,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
 
     uint32 texturePathMemory = 0;
     uint32 materialNameMemory = 0;
-    uint32 boneNameMemory = 0;
+    uint32 numNodes = 0;
     //Read the size info
     {
         const size_t alignmentOverhead = AlignmentHelper::__ALIGNMENT - 1;
@@ -80,13 +80,13 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
             throw LoadingError(msg.str());
         }
 
-        size_t meshDataSize=0;
+        size_t modelDataSize=0;
 
         uint32 numTextures=0;
         file.read(numTextures);
         if(loadWhat & Load::Materials)
         {
-            meshDataSize += sizeof(const char*) * numTextures;
+            modelDataSize += sizeof(const char*) * numTextures;
             memstat.texturePathReferencesMemory = MemoryPool(sizeof(const char*) * numTextures);
         }
 
@@ -95,7 +95,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
         texturePathMemory = (uint32)AlignmentHelper::__alignedSize(texturePathMemory);
         if(loadWhat & Load::Materials)
         {
-            meshDataSize += texturePathMemory;
+            modelDataSize += texturePathMemory;
             memstat.texturePathMemory = MemoryPool(texturePathMemory);
         }
 
@@ -108,7 +108,6 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
         uint32 numBoneInfos = 0;
         if (file.getFileVersion() >= ModelFormatVersion::Version3)
         {
-            file.read(boneNameMemory);
             file.read(numBones);
             file.read(numBoneInfos);
         }
@@ -118,7 +117,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
         if(loadWhat & Load::Materials)
         {
             memstat.materialData = MemoryPool(numMaterials * sizeof(MaterialData));
-            meshDataSize += memstat.materialData.size;
+            modelDataSize += memstat.materialData.size;
         }
 
         if(file.getFileVersion() >= ModelFormatVersion::Version2)
@@ -128,40 +127,30 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                 materialNameMemory += AlignmentHelper::__ALIGNMENT - (materialNameMemory % AlignmentHelper::__ALIGNMENT);
             if(loadWhat & Load::Materials)
             {
-                meshDataSize += materialNameMemory;
+                modelDataSize += materialNameMemory;
                 memstat.materialNameMemory = MemoryPool(materialNameMemory);
             }
         }
 
-        if (file.getFileVersion() >= ModelFormatVersion::Version3)
+        if(file.getFileVersion() >= ModelFormatVersion::Version3 && loadWhat & Load::Bones)
         {
-            boneNameMemory += numBones; /// because of the trailing \0
+            modelDataSize += sizeof(BoneNode) * numBones;
+            memstat.boneDataArray.size += sizeof(BoneNode) * numBones;
 
-            if(boneNameMemory % AlignmentHelper::__ALIGNMENT != 0)
-                boneNameMemory += AlignmentHelper::__ALIGNMENT - (boneNameMemory % AlignmentHelper::__ALIGNMENT);
-            if(loadWhat & Load::Bones)
-            {
-                meshDataSize += boneNameMemory;
-                memstat.boneNameMemory = MemoryPool(boneNameMemory);
-
-                meshDataSize += sizeof(BoneData) * numBones;
-                memstat.boneDataArray = MemoryPool(sizeof(BoneData) * numBones);
-
-                meshDataSize += sizeof(BoneInfo) * numBoneInfos;
-                memstat.boneDataArray.size += sizeof(BoneInfo) * numBoneInfos; // extend the existing pool
-            }
+modelDataSize += sizeof(BoneInfo)* numBoneInfos;
+memstat.boneDataArray.size += sizeof(BoneInfo)* numBoneInfos; // extend the existing pool
         }
 
-        uint32 numMeshes=0;
+        uint32 numMeshes = 0;
         file.read(numMeshes);
         if(loadWhat & Load::Meshes)
         {
-            meshDataSize += sizeof(MeshData) * numMeshes;
-            memstat.meshDataArray = MemoryPool(sizeof(MeshData) * numMeshes);
+            modelDataSize += sizeof(MeshData)* numMeshes;
+            memstat.meshDataArray = MemoryPool(sizeof(MeshData)* numMeshes);
         }
-        for(uint32 i=0; i<numMeshes; i++)
+        for(uint32 i = 0; i < numMeshes; i++)
         {
-            uint32 numVertices=0, PerVertexFlags=0, numComponents=0, numTexcoords=0;
+            uint32 numVertices = 0, PerVertexFlags = 0, numComponents = 0, numTexcoords = 0;
             file.read(numVertices);
             file.read(PerVertexFlags);
 
@@ -182,16 +171,16 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
             if(PerVertexFlags & PerVertexData::TexCoord3)
                 numTexcoords++;
 
-            meshDataSize += allocationSize<float>(numVertices * 3) * numComponents;
+            modelDataSize += allocationSize<float>(numVertices * 3) * numComponents;
             memstat.vertexData.size += allocationSize<float>(numVertices * 3) * numComponents;
 
-            for(uint32 j=0; j<numTexcoords; j++)
+            for(uint32 j = 0; j < numTexcoords; j++)
             {
                 uint8 numUVComponents;
                 file.read(numUVComponents);
                 if(loadWhat & loadTexCoords[j])
                 {
-                    meshDataSize += allocationSize<float>(numVertices * 3) * numUVComponents;
+                    modelDataSize += allocationSize<float>(numVertices * 3) * numUVComponents;
                     memstat.vertexData.size += allocationSize<float>(numVertices * 3) * numUVComponents;
                 }
             }
@@ -200,13 +189,14 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
             file.read(numFaces);
             if(loadWhat & Load::Meshes)
             {
-                meshDataSize += numFaces * sizeof(FaceData);
+                modelDataSize += numFaces * sizeof(FaceData);
                 memstat.faceDataArray.size += numFaces * sizeof(FaceData);
             }
         }
 
-        uint32 numNodes = 0, numNodeReferences = 0, numMeshReferences = 0, numTextureReferences = 0;
+        uint32 numNodeReferences = 0, numMeshReferences = 0, numTextureReferences = 0;
         file.read(numNodes);
+
         file.read(numNodeReferences);
         file.read(nodeNameMemory);
         nodeNameMemory += numNodes; // trailing \0 bytes
@@ -218,29 +208,38 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
 
         if(loadWhat & Load::Nodes)
         {
-            meshDataSize += numNodes * sizeof(NodeData);
-            meshDataSize += numNodes * sizeof(NodeDrawData);
-            memstat.nodeData = MemoryPool(numNodes * sizeof(NodeData) + numNodes * sizeof(NodeDrawData));
+            modelDataSize += numNodes * sizeof(NodeData);
+            modelDataSize += numNodes * sizeof(NodeDrawData);
+            memstat.nodeData = MemoryPool(numNodes * sizeof(NodeData)+numNodes * sizeof(NodeDrawData));
 
-            meshDataSize += allocationSize<uint32>(numMeshReferences);
+            modelDataSize += allocationSize<uint32>(numMeshReferences);
             memstat.meshReferenceMemory = MemoryPool(allocationSize<uint32>(1) * numMeshReferences);
 
-            meshDataSize += numNodeReferences * sizeof(NodeData*);
+            modelDataSize += numNodeReferences * sizeof(NodeData*);
             memstat.nodeReferenceMemory = MemoryPool(numNodeReferences * sizeof(NodeDrawData*));
 
-            meshDataSize += nodeNameMemory;
+            modelDataSize += nodeNameMemory;
             memstat.nodeNameMemory = MemoryPool(nodeNameMemory);
         }
         if(loadWhat & Load::Materials)
         {
-            meshDataSize += numTextureReferences * sizeof(TextureReference);
+            modelDataSize += numTextureReferences * sizeof(TextureReference);
             memstat.textureReferenceMemory = MemoryPool(numTextureReferences * sizeof(TextureReference));
         }
 
         file.endReadChunk();
 
-        m_pMeshDataAllocator = GEP_NEW(m_pAllocator, StackAllocator)(true, meshDataSize, m_pAllocator);
-        m_pStartMarker = m_pMeshDataAllocator->getMarker();
+        m_pModelDataAllocator = GEP_NEW(m_pAllocator, StackAllocator)(true, modelDataSize, m_pAllocator);
+        m_pStartMarker = m_pModelDataAllocator->getMarker();
+    }
+
+    // Pre-allocate stuff
+    {
+        if(loadWhat & Load::Nodes)
+        {
+            memstat.nodeData += allocationSize<NodeDrawData>(numNodes);
+            m_nodes = GEP_NEW_ARRAY(m_pModelDataAllocator, NodeDrawData, numNodes);
+        }
     }
 
     // Load textures
@@ -260,10 +259,10 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
             if(numTextures > 0)
             {
                 memstat.texturePathReferencesMemory += allocationSize<const char*>(numTextures);
-                m_modelData.textures = GEP_NEW_ARRAY(m_pMeshDataAllocator, const char*, numTextures);
+                m_modelData.textures = GEP_NEW_ARRAY(m_pModelDataAllocator, const char*, numTextures);
 
                 memstat.texturePathMemory += allocationSize<char>(texturePathMemory);
-                char* textureNames = (char*)m_pMeshDataAllocator->allocateMemory(texturePathMemory);
+                char* textureNames = (char*)m_pModelDataAllocator->allocateMemory(texturePathMemory);
                 size_t curNamePos = 0;
                 for(auto& texture : m_modelData.textures)
                 {
@@ -302,14 +301,14 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
             if(numMaterials > 0)
             {
                 memstat.materialData += allocationSize<MaterialData>(numMaterials);
-                m_modelData.materials = GEP_NEW_ARRAY(m_pMeshDataAllocator, MaterialData, numMaterials);
+                m_modelData.materials = GEP_NEW_ARRAY(m_pModelDataAllocator, MaterialData, numMaterials);
 
                 ArrayPtr<char> materialNames;
                 size_t curNamePos = 0;
                 if(file.getFileVersion() >= ModelFormatVersion::Version2)
                 {
                     memstat.materialNameMemory += allocationSize<char>(materialNameMemory);
-                    materialNames = GEP_NEW_ARRAY(m_pMeshDataAllocator, char, materialNameMemory);
+                    materialNames = GEP_NEW_ARRAY(m_pModelDataAllocator, char, materialNameMemory);
                 }
 
                 for(auto& material : m_modelData.materials)
@@ -337,7 +336,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                     uint32 numTextures = 0;
                     file.read(numTextures);
                     memstat.textureReferenceMemory += allocationSize<TextureReference>(numTextures);
-                    material.textures = GEP_NEW_ARRAY(m_pMeshDataAllocator, TextureReference, numTextures);
+                    material.textures = GEP_NEW_ARRAY(m_pModelDataAllocator, TextureReference, numTextures);
                     for(auto& texture : material.textures)
                     {
                         uint32 textureIndex;
@@ -361,6 +360,45 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
         }
     }
 
+    // Read Bones
+    if (file.getFileVersion() >= ModelFormatVersion::Version3)
+    {
+        file.startReadChunk();
+        if(file.getCurrentChunkName() != "bones")
+        {
+            std::ostringstream msg;
+            msg << "Expected 'bones' chunk but got '" << file.getCurrentChunkName() << "' chunk in file '" << pFilename << "'";
+            throw LoadingError(msg.str());
+        }
+
+        if (loadWhat & Load::Bones)
+        {
+            size_t numBones = 0;
+            file.read(numBones);
+            memstat.boneDataArray += allocationSize<BoneNode>(numBones);
+            m_modelData.bones = GEP_NEW_ARRAY(m_pModelDataAllocator, BoneNode, numBones);
+
+            for (size_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
+            {
+                auto& boneNode = m_modelData.bones[boneIndex];
+
+                // Get offset matrix
+                file.read(boneNode.offsetMatrix);
+
+                // Get node id/index
+                uint32 nodeIndex = std::numeric_limits<uint32>::max();
+                file.read(nodeIndex);
+
+                boneNode.node = &m_nodes[nodeIndex];
+            }
+
+            file.endReadChunk();
+        }
+        else
+        {
+            file.skipCurrentChunk();
+        }
+    }
 
     // Read Meshes
     {
@@ -377,7 +415,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
             uint32 numMeshes;
             file.read(numMeshes);
             memstat.meshDataArray += allocationSize<MeshData>(numMeshes);
-            m_modelData.meshes = GEP_NEW_ARRAY(m_pMeshDataAllocator, MeshData, numMeshes);
+            m_modelData.meshes = GEP_NEW_ARRAY(m_pModelDataAllocator, MeshData, numMeshes);
 
             for(auto& mesh : m_modelData.meshes)
             {
@@ -408,7 +446,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                     throw LoadingError(msg.str());
                 }
                 memstat.vertexData += allocationSize<vec3>(numVertices);
-                mesh.vertices = GEP_NEW_ARRAY(m_pMeshDataAllocator, vec3, numVertices);
+                mesh.vertices = GEP_NEW_ARRAY(m_pModelDataAllocator, vec3, numVertices);
 
                 static_assert(sizeof(vec3) == 3 * sizeof(float), "The following read call assumes that a vec3 is 3 floats big");
                 file.readArray(ArrayPtr<float>(mesh.vertices[0].data, numVertices * 3));
@@ -421,7 +459,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                         if(loadWhat & Load::Normals)
                         {
                             memstat.vertexData += allocationSize<vec3>(numVertices);
-                            mesh.normals = GEP_NEW_ARRAY(m_pMeshDataAllocator, vec3, numVertices);
+                            mesh.normals = GEP_NEW_ARRAY(m_pModelDataAllocator, vec3, numVertices);
                             for(auto& normal : mesh.normals)
                             {
                                 normal.x = readCompressedFloat(file);
@@ -441,7 +479,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                         if(loadWhat & Load::Tangents)
                         {
                             memstat.vertexData += allocationSize<vec3>(numVertices);
-                            mesh.tangents = GEP_NEW_ARRAY(m_pMeshDataAllocator, vec3, numVertices);
+                            mesh.tangents = GEP_NEW_ARRAY(m_pModelDataAllocator, vec3, numVertices);
                             for(auto& tangent : mesh.tangents)
                             {
                                 tangent.x = readCompressedFloat(file);
@@ -461,7 +499,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                         if(loadWhat & Load::Bitangents)
                         {
                             memstat.vertexData += allocationSize<vec3>(numVertices);
-                            mesh.bitangents = GEP_NEW_ARRAY(m_pMeshDataAllocator, vec3, numVertices);
+                            mesh.bitangents = GEP_NEW_ARRAY(m_pModelDataAllocator, vec3, numVertices);
                             for(auto& bitangent : mesh.bitangents)
                             {
                                 bitangent.x = readCompressedFloat(file);
@@ -496,7 +534,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                                 if(loadWhat & loadTexCoords[i])
                                 {
                                     memstat.vertexData += allocationSize<vec2>(numVertices);
-                                    mesh.texcoords[i] = GEP_NEW_ARRAY(m_pMeshDataAllocator, vec2, numVertices);
+                                    mesh.texcoords[i] = GEP_NEW_ARRAY(m_pModelDataAllocator, vec2, numVertices);
                                     static_assert(sizeof(vec2) == 2 * sizeof(float), "the following read call assumes that a vec2 is twice the size of a float");
                                     file.readArray(ArrayPtr<float>((float*)mesh.texcoords[i].getPtr(), numVertices * numUVComponents));
                                 }
@@ -518,76 +556,38 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                     {
                         if (loadWhat & Load::Bones)
                         {
-                            // read bone data
-                            {
-                                uint32 numBones = 0;
-                                file.read(numBones);
-
-                                memstat.boneDataArray += allocationSize<BoneData>(numBones);
-                                mesh.bones = GEP_NEW_ARRAY(m_pMeshDataAllocator, BoneData, numBones);
-
-                                memstat.boneNameMemory += allocationSize<char>(boneNameMemory);
-                                auto boneNames = GEP_NEW_ARRAY(m_pMeshDataAllocator, char, boneNameMemory);
-
-                                size_t currentNamePos = 0;
-                                for (auto& bone : mesh.bones)
-                                {
-                                    // Get name
-                                    uint32 nameLen = 0;
-                                    file.read(nameLen);
-                                    auto data = boneNames(currentNamePos, currentNamePos + nameLen);
-                                    currentNamePos += nameLen;
-                                    file.readArray(data);
-                                    boneNames[currentNamePos++] = '\0';
-                                    bone.name = data.getPtr();
-
-                                    // Get the offset matrix
-                                    file.read(bone.offsetMatrix);
-                                }
-                            }
                             // Read bone infos
+                            uint32 numBoneInfos = 0;
+                            file.read(numBoneInfos);
+
+                            if (numVertices != numBoneInfos)
                             {
-                                uint32 numBoneInfos = 0;
-                                file.read(numBoneInfos);
-
-                                if (numVertices != numBoneInfos)
-                                {
-                                    throw LoadingError("Wrong number of bone infos! There must be exactly as many bone infos as there are vertices.");
-                                }
+                                throw LoadingError("Wrong number of bone infos! There must be exactly as many bone infos as there are vertices.");
+                            }
                             
-                                memstat.boneDataArray += allocationSize<BoneInfo>(numBoneInfos);
-                                mesh.boneInfos = GEP_NEW_ARRAY(m_pMeshDataAllocator, BoneInfo, numBoneInfos);
+                            memstat.boneDataArray += allocationSize<BoneInfo>(numBoneInfos);
+                            mesh.boneInfos = GEP_NEW_ARRAY(m_pModelDataAllocator, BoneInfo, numBoneInfos);
 
-                                static_assert(sizeof(BoneInfo) == sizeof(uint32) * 4 + sizeof(float) * 4,
-                                    "The size of the internal BoneInfo struct has changed."
-                                    "You should check that the code here is still correct.");
+                            static_assert(sizeof(BoneInfo) == sizeof(uint32) * 4 + sizeof(float) * 4,
+                                "The size of the internal BoneInfo struct has changed."
+                                "You should check that the code here is still correct.");
 
-                                // Needed because the BoneInfo used by the engine is not the same size as the BoneInfo in the file.
-                                struct BoneInfoInFile
+                            // Needed because the BoneInfo used by the engine is not the same size as the BoneInfo in the file.
+                            struct BoneInfoInFile
+                            {
+                                uint16 boneIds[BoneInfo::NUM_SUPPORTED_BONES];
+                                float weights[BoneInfo::NUM_SUPPORTED_BONES];
+                            };
+
+                            // Read all bone infos
+                            for (size_t boneIndex = 0; boneIndex < numBoneInfos; ++boneIndex)
+                            {
+                                BoneInfoInFile boneInfoIntermediate;
+                                file.read(boneInfoIntermediate);
+                                for (size_t vertexBoneIndex = 0; vertexBoneIndex < BoneInfo::NUM_SUPPORTED_BONES; ++vertexBoneIndex)
                                 {
-                                    uint16 boneIndices[4];
-                                    float weights[4];
-                                };
-
-                                static_assert(sizeof(BoneInfoInFile) < sizeof(BoneInfo), "You should also check that the allocation thing below is correct.");
-
-                                auto marker = m_pMeshDataAllocator->getMarker();
-                                SCOPE_EXIT{ m_pMeshDataAllocator->freeToMarker(marker); });
-
-                                #pragma message ("warning: Probably allocating too much memory here! In some cases, this could fail.")
-                                auto boneInfosInFile = GEP_NEW_ARRAY(m_pMeshDataAllocator, BoneInfoInFile, numBoneInfos);
-
-                                file.readArray(boneInfosInFile);
-
-                                for (size_t i = 0; i < numBoneInfos; i++)
-                                {
-                                    auto& boneInfoInFile = boneInfosInFile[i];
-                                    auto& boneInfo = mesh.boneInfos[i];
-                                    for (int j = 0; j < BoneInfo::NUM_SUPPORTED_BONES; j++)
-                                    {
-                                        boneInfo.boneIndices[j] = uint32(boneInfoInFile.boneIndices[j]);
-                                        boneInfo.weights[j] = float(boneInfoInFile.weights[j]);
-                                    }
+                                    mesh.boneInfos[boneIndex].boneIds[vertexBoneIndex] = boneInfoIntermediate.boneIds[vertexBoneIndex];
+                                    mesh.boneInfos[boneIndex].weights[vertexBoneIndex] = boneInfoIntermediate.weights[vertexBoneIndex];
                                 }
                             }
 
@@ -604,7 +604,7 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                         uint32 numFaces = 0;
                         file.read(numFaces);
                         memstat.faceDataArray += allocationSize<FaceData>(numFaces);
-                        mesh.faces = GEP_NEW_ARRAY(m_pMeshDataAllocator, FaceData, numFaces);
+                        mesh.faces = GEP_NEW_ARRAY(m_pModelDataAllocator, FaceData, numFaces);
                         GEP_ASSERT(mesh.faces.getPtr() != nullptr);
                         if(numVertices > std::numeric_limits<uint16>::max())
                         {
@@ -647,28 +647,29 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
         file.startReadChunk();
         if(loadWhat & Load::Nodes)
         {
-            if(file.getCurrentChunkName() != "nodes")
             {
-                std::ostringstream msg;
-                msg << "Expected 'nodes' chunk but got '" << file.getCurrentChunkName() << "' in file '" << pFilename << "'";
-                throw LoadingError(msg.str());
+                auto currentChunkName = file.getCurrentChunkName();
+                if(currentChunkName != "nodes")
+                {
+                    std::ostringstream msg;
+                    msg << "Expected 'nodes' chunk but got '" << file.getCurrentChunkName() << "' in file '" << pFilename << "'";
+                    throw LoadingError(msg.str());
+                }
             }
+            // This is actually superfluous, the data is being read from the size info chunk
             uint32 numNodes;
             file.read(numNodes);
 
             memstat.nodeNameMemory += allocationSize<char>(nodeNameMemory);
-            auto nodeNames = GEP_NEW_ARRAY(m_pMeshDataAllocator, char, nodeNameMemory);
+            auto nodeNames = GEP_NEW_ARRAY(m_pModelDataAllocator, char, nodeNameMemory);
 
             size_t curNodeNamePos = 0;
 
             memstat.nodeData += allocationSize<NodeData>(numNodes);
-            auto nodesData = GEP_NEW_ARRAY(m_pMeshDataAllocator, NodeData, numNodes);
-
-            memstat.nodeData += allocationSize<NodeDrawData>(numNodes);
-            auto nodes = GEP_NEW_ARRAY(m_pMeshDataAllocator, NodeDrawData, numNodes);
+            auto nodesData = GEP_NEW_ARRAY(m_pModelDataAllocator, NodeData, numNodes);
 
             size_t i = 0;
-            for(auto& node : nodes)
+            for(auto& node : m_nodes)
             {
                 node.data = &nodesData[i];
                 uint32 nameLength = 0;
@@ -679,33 +680,35 @@ void gep::ModelLoader::loadFile(const char* pFilename, uint32 loadWhat)
                 nodeNames[curNodeNamePos++] = '\0';
                 node.data->name = name.getPtr();
 
+                m_nodeLookupByName[node.data->name] = &node;
+
                 file.readArray<float>(node.transform.data);
                 uint32 nodeParentIndex = 0;
                 file.read(nodeParentIndex);
                 if(nodeParentIndex == std::numeric_limits<uint32>::max())
-                    node.data->parent = nullptr;
+                    node.parent = nullptr;
                 else
-                    node.data->parent = &nodes[nodeParentIndex];
+                    node.parent = &m_nodes[nodeParentIndex];
 
-                node.meshes = file.readAndAllocateArray<uint32, uint32>(m_pMeshDataAllocator);
+                node.meshes = file.readAndAllocateArray<uint32, uint32>(m_pModelDataAllocator);
                 memstat.meshReferenceMemory += allocationSize<uint32>((uint32)(node.meshes.length()));
                 uint32 numChildren = 0;
                 file.read(numChildren);
                 if(numChildren > 0)
                 {
                     memstat.nodeReferenceMemory += allocationSize<NodeDrawData*>(numChildren);
-                    node.children = GEP_NEW_ARRAY(m_pMeshDataAllocator, NodeDrawData*, numChildren);
+                    node.children = GEP_NEW_ARRAY(m_pModelDataAllocator, NodeDrawData*, numChildren);
                     for(auto& child : node.children)
                     {
                         uint32 childIndex = 0;
                         file.read(childIndex);
-                        child = &nodes[childIndex];
+                        child = &m_nodes[childIndex];
                     }
                 }
 
                 i++;
             }
-            m_modelData.rootNode = &nodes[0];
+            m_modelData.rootNode = &m_nodes[0];
 
             file.endReadChunk();
         }
@@ -731,19 +734,19 @@ void gep::ModelLoader::loadFromData(SmartPtr<ReferenceCounted> pDataHolder, Arra
     meshDataSize += allocationSize<uint32>(1);
     meshDataSize += allocationSize<MeshData*>(1);
 
-    m_pMeshDataAllocator = GEP_NEW(m_pAllocator, StackAllocator)(true, meshDataSize, m_pAllocator);
-    m_pStartMarker = m_pMeshDataAllocator->getMarker();
+    m_pModelDataAllocator = GEP_NEW(m_pAllocator, StackAllocator)(true, meshDataSize, m_pAllocator);
+    m_pStartMarker = m_pModelDataAllocator->getMarker();
 
-    m_modelData.rootNode = GEP_NEW(m_pMeshDataAllocator, NodeDrawData)();
-    m_modelData.rootNode->meshes = GEP_NEW_ARRAY(m_pMeshDataAllocator, uint32, 1);
+    m_modelData.rootNode = GEP_NEW(m_pModelDataAllocator, NodeDrawData)();
+    m_modelData.rootNode->meshes = GEP_NEW_ARRAY(m_pModelDataAllocator, uint32, 1);
     m_modelData.rootNode->meshes[0] = 0;
     m_modelData.rootNode->transform = mat4::identity().right2Left();
-    m_modelData.rootNode->data = GEP_NEW(m_pMeshDataAllocator, NodeData);
+    m_modelData.rootNode->data = GEP_NEW(m_pModelDataAllocator, NodeData);
     m_modelData.rootNode->data->name = "root node";
-    m_modelData.rootNode->data->parent = nullptr;
-    auto mesh = GEP_NEW(m_pMeshDataAllocator, MeshData)();
+    m_modelData.rootNode->parent = nullptr;
+    auto mesh = GEP_NEW(m_pModelDataAllocator, MeshData)();
     m_modelData.meshes = ArrayPtr<MeshData>(mesh, 1);
-    m_modelData.rootNode->data->meshData = GEP_NEW_ARRAY(m_pMeshDataAllocator, MeshData*, 1);
+    m_modelData.rootNode->data->meshData = GEP_NEW_ARRAY(m_pModelDataAllocator, MeshData*, 1);
     m_modelData.rootNode->data->meshData[0] = mesh;
     
     vec3 vmin(std::numeric_limits<float>::max());
@@ -758,7 +761,7 @@ void gep::ModelLoader::loadFromData(SmartPtr<ReferenceCounted> pDataHolder, Arra
         if(v.z > vmax.z) vmax.z = v.z;
     }
     mesh->bbox = AABB(vmin, vmax);
-    mesh->faces = GEP_NEW_ARRAY(m_pMeshDataAllocator, FaceData, indices.length() / 3);
+    mesh->faces = GEP_NEW_ARRAY(m_pModelDataAllocator, FaceData, indices.length() / 3);
 
     size_t i=0;
     for(auto& face : mesh->faces)
@@ -771,7 +774,7 @@ void gep::ModelLoader::loadFromData(SmartPtr<ReferenceCounted> pDataHolder, Arra
 
     mesh->materialIndex = 0;
     mesh->numFaces = indices.length() / 3;
-    mesh->vertices = GEP_NEW_ARRAY(m_pMeshDataAllocator, vec3, vertices.length());
+    mesh->vertices = GEP_NEW_ARRAY(m_pModelDataAllocator, vec3, vertices.length());
     
     i=0;
     for(auto& v : mesh->vertices)
@@ -780,7 +783,7 @@ void gep::ModelLoader::loadFromData(SmartPtr<ReferenceCounted> pDataHolder, Arra
         i++;
     }
 
-    m_modelData.materials = GEP_NEW_ARRAY(m_pMeshDataAllocator, MaterialData, 1);
+    m_modelData.materials = GEP_NEW_ARRAY(m_pModelDataAllocator, MaterialData, 1);
     m_modelData.materials[0].name = "dummy material";
     m_modelData.hasData = true;
     

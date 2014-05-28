@@ -54,7 +54,7 @@ void gep::Vertexbuffer::fillInputElementDesc(DataChannel channel, D3D11_INPUT_EL
         accumulatedOffset += 4 * sizeof(float);
         break;
     case DataChannel::BONE_INDICES:
-        desc.Format = DXGI_FORMAT_R16_UINT;
+        desc.Format = DXGI_FORMAT_R32_UINT;
         accumulatedOffset += 4 * sizeof(uint32);
         break;
     case DataChannel::BONE_WEIGHTS:

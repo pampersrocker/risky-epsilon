@@ -5,7 +5,7 @@
 #include "gep/interfaces/resourceManager.h"
 #include "gepimpl/subsystems/renderer/shader.h"
 #include "gep/modelloader.h"
-#include "gep/ReferenceCounting.h" 
+#include "gep/ReferenceCounting.h"
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -96,6 +96,9 @@ namespace gep
         ShaderConstant<mat4> m_modelMatrixConstant;
         ShaderConstant<mat4> m_viewMatrixConstant;
         ShaderConstant<mat4> m_projectionMatrixConstant;
+        ShaderConstant<uint32> m_numBonesConstant;
+        ShaderConstant<mat4> m_bonesArrayConstant;
+
     public:
         //inline ModelMaterial(){}
         //inline ~ModelMaterial(){}
@@ -135,6 +138,16 @@ namespace gep
         inline ShaderConstant<mat4>& getProjectionMatrixConstant()
         {
             return m_projectionMatrixConstant;
+        }
+
+        inline ShaderConstant<uint32>& getNumBonesConstant()
+        {
+            return m_numBonesConstant;
+        }
+
+        inline ShaderConstant<mat4>& getBonesArrayConstant()
+        {
+            return m_bonesArrayConstant;
         }
 
         void addTexture(ShaderConstant<Texture2D> constant, ResourcePtr<Texture2D> pTexture);
@@ -177,9 +190,9 @@ namespace gep
         ID3D11DeviceContext* m_pDeviceContext;
         IModelLoader* m_pLoader;
         ResourcePtr<Shader> m_pLastShader;
+        ArrayPtr<mat4> m_bones;
 
-        Hashmap<const char*, ModelLoader::NodeDrawData*, StringHashPolicy> m_nodeLookup;
-        bool m_needsNodeLookup;
+        bool m_debugDrawingEnabled;
 
         void drawHelper(ID3D11DeviceContext* pContext, mat4 transformation, const ModelLoader::NodeDrawData* pNode, mat4& view, mat4& projection);
         void doFindMinMax(mat4 transformation, const ModelLoader::NodeDrawData* pNode, vec3& min, vec3& max);
@@ -197,6 +210,7 @@ namespace gep
 
         ~Model();
 
+        void setBones(const ArrayPtr<mat4>& transformations);
         /// \brief draws the model
         void draw(const mat4& modelMatrix, mat4& viewMatrix, mat4& projectionMatrix, ID3D11DeviceContext* pContext);
 
@@ -211,7 +225,8 @@ namespace gep
         /**
         * gets the number of materials used
         */
-        inline size_t getNumMaterials() const {
+        inline size_t getNumMaterials() const
+        {
             return m_modelLoader.getModelData().materials.length();
         }
 
@@ -244,7 +259,8 @@ namespace gep
         * Has to be called after the model file has been loaded
         * Returns: A array of MaterialInfo structs
         */
-        inline const ArrayPtr<ModelLoader::MaterialData> getMaterialInfo() const {
+        inline const ArrayPtr<ModelLoader::MaterialData> getMaterialInfo() const
+        {
             return m_modelLoader.getModelData().materials;
         }
 
@@ -256,13 +272,17 @@ namespace gep
         */
         void findMinMax(vec3& min, vec3& max);
 
-        inline void printNodes() {
+        inline void printNodes()
+        {
             doPrintNodes(m_modelLoader.getModelData().rootNode);
         }
 
         const std::string& getFilename() const {
             return m_modelLoader.getFilename();
         }
+
+        inline ArrayPtr<mat4> getBones() { return m_bones; }
+        inline const ArrayPtr<mat4> getBones() const { return m_bones; }
 
         //IResource interface
         virtual IResource* getSuperResource() override;
@@ -276,5 +296,28 @@ namespace gep
 
         //IModel interface
         virtual void extract(IRendererExtractor& extractor, mat4 modelMatrix) override;
+
+        virtual void setDebugDrawingEnabled(bool value) override;
+        virtual bool getDebugDrawingEnabled() const override;
+        virtual void toggleDebugDrawing() override;
+
     };
+
+    class Animation : public IAnimation
+    {
+
+        Model* m_pModel;
+    public:
+        Animation(Model* model);
+        virtual ~Animation();
+
+        virtual void update(float elapsedSeconds) override;
+
+        void setModel(Model* model) { m_pModel = model; }
+        Model* getModel() const { return m_pModel; }
+
+    private:
+        void updateGlobalBoneTransforms(float elapedSeconds);
+    };
+    
 }

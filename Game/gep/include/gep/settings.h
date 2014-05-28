@@ -19,6 +19,16 @@ namespace gep
             {
             }
         };
+
+        struct Lua
+        {
+            size_t maxStackDumpLevel;
+
+            Lua() :
+                maxStackDumpLevel(2)
+            {
+            }
+        };
     }
 
     // Can be set in scripts
@@ -29,8 +39,12 @@ namespace gep
         virtual ~ISettings() {}
 
         virtual void setVideoSettings(const settings::Video& settings) = 0;
-        virtual       settings::Video& getVideoSettings()       = 0;
+        virtual       settings::Video& getVideoSettings() = 0;
         virtual const settings::Video& getVideoSettings() const = 0;
+
+        virtual void setLuaSettings(const settings::Lua& settings) = 0;
+        virtual       settings::Lua& getLuaSettings() = 0;
+        virtual const settings::Lua& getLuaSettings() const = 0;
 
         virtual void loadFromScriptTable(ScriptTableWrapper table) = 0;
 
