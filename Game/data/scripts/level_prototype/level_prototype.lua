@@ -27,7 +27,7 @@ end
 scene = {}
 scene.plane = GameObjectManager:createGameObject("plane")
 scene.plane.rc = scene.plane:createRenderComponent()
-scene.plane.rc:setPath("data/models/plane.thModel")
+scene.plane.rc:setPath("data/models/LevelElements/plane.thModel")
 scene.ground = createCollisionBox("ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
 
 function createDefaultCam(guid)
@@ -176,6 +176,15 @@ function normalCamIsometricEnter(enterData)
 end
 
 function normalCamIsometricUpdate(updateData)
+if (InputHandler:isPressed(Key.Oem_Minus)) then
+		if ( distance > distanceMin) then
+			distance = distance - distanceDelta
+		end
+	elseif (InputHandler:isPressed(Key.Oem_Plus)) then
+		if ( distance < distanceMax) then
+			distance = distance + distanceDelta
+		end
+	end
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "isometric")
 	local rotationSpeed = 0.05 * updateData:getElapsedTime()
 	local mouseDelta = InputHandler:getMouseDelta()
@@ -183,8 +192,8 @@ function normalCamIsometricUpdate(updateData)
 	mouseDelta.y = 0.0
 	normalCam.isometric.cc:look(mouseDelta)
 	local viewDir = normalCam.isometric.cc:getViewDirection()
-	viewDir = viewDir:mulScalar(-250.0)
-	viewDir.z = 125.0
+	viewDir = viewDir:mulScalar(-distance)
+	viewDir.z = distance/2
 	normalCam.isometric.cc:setPosition(player:getPosition() + viewDir)
 	return EventResult.Handled
 end
@@ -233,7 +242,7 @@ StateTransitions{
 
 StateTransitions{
 	parent = "/game",
-	{ from = "gameRunning", to = "__leave", condition = function() return InputHandler:wasTriggered(Key.Q) end }
+	{ from = "gameRunning", to = "__leave", condition = function() return InputHandler:wasTriggered(Key.Escape) end }
 }
 
 --
@@ -308,17 +317,17 @@ end
 
 player = GameObjectManager:createGameObject("player")
 player.rc = player:createRenderComponent()
-player.rc:setPath("data/models/Sphere_Wood.thModel")
+player.rc:setPath("data/models/Sphere/Sphere.thModel")
 player.pc = player:createPhysicsComponent()
 local cinfo = RigidBodyCInfo()
 cinfo.shape = PhysicsFactory:createSphere(1)
 cinfo.motionType = MotionType.Dynamic
 cinfo.mass = 100.0
 cinfo.restitution = 0.0
-cinfo.friction = 1.0
-cinfo.maxLinearVelocity = 5.0
+cinfo.friction = 10.0
+cinfo.maxLinearVelocity = 300.0
 cinfo.maxAngularVelocity = 2.0
-cinfo.linearDamping = 5.0
+--cinfo.linearDamping = 1.0
 cinfo.angularDamping = 10.0
 cinfo.position = Vec3(0.0, 0.0, 2.0)
 player.pc.rb = player.pc:createRigidBody(cinfo)

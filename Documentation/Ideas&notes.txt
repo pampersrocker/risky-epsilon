@@ -14,6 +14,7 @@ Materials - Sphere:
 - Magnet: very heavy, magnetic, cant roll on:  water, 
 - Soap bubble: very light, floats in the air, destroyed on collision
 - Ice: destroyed when collided, floats on water,  good friction on: wood, 
+- Plastic: light, destoryed by fire, small momentum, LEGO-mannequin walks inside 
 
 
 Materials - Ground:
@@ -39,6 +40,7 @@ Prios:
 - Wood
 - Stone
 - Ice
+- Plastic
 - Paper
 - Rubber
 - Magnetic
@@ -53,5 +55,5 @@ Balancing:
 - magnetic force( distance to source)
 - restitution
 - damping
-- camera distance borders
+- camera min/max distance 
 - 

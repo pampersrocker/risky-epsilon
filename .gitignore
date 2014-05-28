@@ -183,3 +183,6 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
+# Modelconverter
+Tools/ModelConverter/memoryleaks.log
