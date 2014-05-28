@@ -260,26 +260,24 @@ function playerUpdate(guid, elapsedTime)
 	if (InputHandler:isPressed(Key.Space)) then
 		player.pc.rb:applyLinearImpulse(Vec3(0.0,0.0,20.0))
 	elseif (InputHandler:isPressed(Key.W)) then
-		player.pc.rb:applyLinearImpulse(viewDir:mulScalar(moveSpeed))
+		player.pc.rb:applyTorque(elapsedTime, -player.currentAngularVelocityForward)
 	elseif (InputHandler:isPressed(Key.S)) then
-		player.pc.rb:applyLinearImpulse(viewDir:mulScalar(-moveSpeed))
+		player.pc.rb:applyTorque(elapsedTime, player.currentAngularVelocityForward)
 	end
+	
+	
+	
 	if (player.firstPersonMode) then
 		DebugRenderer:printText(Vec2(-0.01, 0.05), "X")
 		local rightDir = viewDir:cross(Vec3(0.0, 0.0, 1.0))
 		if (InputHandler:isPressed(Key.A) and InputHandler:isPressed(Key.D)) then
 			-- no sideways walking
 		elseif (InputHandler:isPressed(Key.A)) then
-			player.currentAngularVelocity = Vec3(0.0, 0.0, 2.5)
 			player.angularVelocitySwapped = false
-			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
+			player.pc.rb:applyTorque( elapsedTime, player.currentAngularVelocityLeft)
 		elseif (InputHandler:isPressed(Key.D)) then
-			player.currentAngularVelocity = Vec3(0.0, 0.0, -2.5)
 			player.angularVelocitySwapped = false
-			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
-			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
-		--elseif (InputHandler:isPressed(Key.D)) then
-			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+			player.pc.rb:applyTorque(elapsedTime, -player.currentAngularVelocityLeft)
 		end
 		local mouseDelta = InputHandler:getMouseDelta()
 		local angularVelocity = Vec3(0.0, 0.0, mouseDelta.x * -0.05 * elapsedTime)
@@ -293,22 +291,14 @@ function playerUpdate(guid, elapsedTime)
 			player.viewUpDown = -viewUpDownMax
 		end
 	else
-		if (InputHandler:isPressed(Key.A) and InputHandler:isPressed(Key.D)) then
-			if (not player.angularVelocitySwapped) then
-				player.currentAngularVelocity = player.currentAngularVelocity:mulScalar(-1.0)
-				player.angularVelocitySwapped = true
-			end
-			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
-		elseif (InputHandler:isPressed(Key.A)) then
+		if (InputHandler:isPressed(Key.A)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
-			player.currentAngularVelocity = Vec3(20.5,0.0,0.0)
 			player.angularVelocitySwapped = false
-			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
+			player.pc.rb:applyTorque(elapsedTime, player.currentAngularVelocityLeft)
 		elseif (InputHandler:isPressed(Key.D)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
-			player.currentAngularVelocity = Vec3(-20.5,0.0, 0.0)
 			player.angularVelocitySwapped = false
-			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
+			player.pc.rb:applyTorque(elapsedTime,-player.currentAngularVelocityLeft)
 		else
 			player.angularVelocitySwapped = false
 		end
@@ -339,6 +329,9 @@ player.firstPersonMode = false
 player.currentAngularVelocity = Vec3()
 player.angularVelocitySwapped = false
 player.viewUpDown = 0.0
+
+player.currentAngularVelocityLeft = Vec3(0.0, 0.0, 2.5)
+player.currentAngularVelocityForward = Vec3(20.5,0.0,0.0)
 
 logMessage("... finished initializing level_prototype/level_prototype.lua.")
 
