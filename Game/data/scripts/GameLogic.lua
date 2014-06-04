@@ -49,6 +49,7 @@ end
 -- Running State
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
+	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
 	return EventResult.Handled;
 end
 
@@ -71,6 +72,7 @@ end
 
 function GameLogic.updatePause( updateData )
 	-- body
+	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: pause")
 	logMessage("Updating Pause state");
 	return EventResult.Handled;
 end
@@ -93,11 +95,11 @@ end
 -- Transitions
 -------------------------------------------------------
 function GameLogic.checkPause()
-	return false;
+	return InputHandler:wasTriggered(Key.P);
 end
 
 function GameLogic.checkUnPause()
-	return false;
+	return InputHandler:wasTriggered(Key.P);
 end
 
 function GameLogic.canLeave()
