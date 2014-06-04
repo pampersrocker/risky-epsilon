@@ -28,6 +28,18 @@ function PlayerMeta:initializeGameObject( )
 end
 
 function PlayerMeta.update( guid, elapsedTime )
+	local player = GetGObyGUID(guid)
+	if (InputHandler:isPressed(Key.A)) then
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
+			player.go.angularVelocitySwapped = false
+			player.go.pc.rb:applyTorque(elapsedTime, player.go.currentAngularVelocityLeft)
+		elseif (InputHandler:isPressed(Key.D)) then
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+			player.go.angularVelocitySwapped = false
+			player.go.pc.rb:applyTorque(elapsedTime,-player.go.currentAngularVelocityLeft)
+		else
+			player.go.angularVelocitySwapped = false
+		end
 end
 
 function PlayerMeta.init( guid )
