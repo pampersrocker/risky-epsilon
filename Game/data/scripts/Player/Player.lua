@@ -11,9 +11,9 @@ function PlayerMeta:initializeGameObject( )
 	cinfo.restitution = 0.0
 	cinfo.friction = 10.0
 	cinfo.maxLinearVelocity = 300.0
-	cinfo.maxAngularVelocity = 2.0
+	cinfo.maxAngularVelocity = 200.0
 	--cinfo.linearDamping = 1.0
-	cinfo.angularDamping = 10.0
+	cinfo.angularDamping = 1.0
 	cinfo.position = Vec3(0.0, 0.0, 20.0)
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/sphere.thmodel")
@@ -34,7 +34,14 @@ function PlayerMeta.update( guid, elapsedTime )
 	viewDir = viewDir:normalized()
 	local rightDir = viewDir:cross(Vec3(0.0, 0.0, 1.0))
 	local mouseDelta = InputHandler:getMouseDelta()
-	if (InputHandler:isPressed(Key.A)) then
+	
+
+	if InputHandler:gamepad(0):isConnected() then
+		local leftTorque = player.currentAngularVelocityLeft:mulScalar(-InputHandler:gamepad(0):leftStick().x)
+		local rightTorque =player.currentAngularVelocityForward:mulScalar(InputHandler:gamepad(0):leftStick().y)
+		player.go.rb:applyTorque(elapsedTime, leftTorque + rightTorque)
+	else
+		if (InputHandler:isPressed(Key.A)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
 			player.go.angularVelocitySwapped = false
 			player.go.rb:applyTorque(elapsedTime, -viewDir:mulScalar(1000))
@@ -45,8 +52,7 @@ function PlayerMeta.update( guid, elapsedTime )
 		elseif (InputHandler:isPressed(Key.W)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,-rightDir:mulScalar(1000))
-		
+			player.go.rb:applyTorque(elapsedTime,player.currentAngularVelocityForward)
 		elseif (InputHandler:isPressed(Key.S)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
@@ -54,6 +60,7 @@ function PlayerMeta.update( guid, elapsedTime )
 		else
 			player.go.angularVelocitySwapped = false
 		end
+	end
 end
 
 function PlayerMeta.init( guid )
