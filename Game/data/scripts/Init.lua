@@ -12,7 +12,7 @@ function InitializeWorld(  )
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
-	--GameLogic.playerInstance.cb = CreateCollisionSphere("cb_player", 15, GameLogic.playerInstance.go.getWorldPosition())
+	GameLogic.playerInstance.cb = CreateCollisionSphere("cb_player", 15, GameLogic.playerInstance.go:getWorldPosition())
 	--create camera
 
 	distance = 50.0
