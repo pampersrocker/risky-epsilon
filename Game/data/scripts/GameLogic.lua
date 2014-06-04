@@ -4,39 +4,7 @@ function GameLogic.update( guid, elapsedTime )
 end
 
 function GameLogic.init( ... )
-	-- body
-	local cinfo = WorldCInfo()
-	cinfo.gravity = Vec3(0,0,-9.81)
-	cinfo.worldSize = 4000.0
-	local world = PhysicsFactory:createWorld(cinfo)
-	PhysicsSystem:setWorld(world)
-	PhysicsSystem:setDebugDrawingEnabled(true)
 
-	--create Level
-	logMessage("Creating Level")
-	GameLogic.level = CreateEmptyGameObject("TestLevel")
-	setmetatable(GameLogic.level, LevelMeta)
-	CreateScriptComponent(GameLogic.level, LevelMeta.initialize, LevelMeta.update, LevelMeta.destroy)
-
-	-- create player
-	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
-	setmetatable( GameLogic.playerInstance, PlayerMeta)
-	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
-
-	--create camera
-
-	distance = 50.0
-	distanceDelta = 5.0
-	distanceMin = 15.0
-	distanceMax = 200.0
-
-
-	isoCam = createDefaultCam("IsoCam")
-	isoCam.go.cc:look(Vec2(0.0, 20.0))
-
-	setmetatable( isoCam, IsoCamera)
-	CreateScriptComponent(isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
-	logMessage("GameLogic:init()")
 end
 
 

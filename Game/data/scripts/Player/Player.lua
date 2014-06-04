@@ -19,7 +19,7 @@ function PlayerMeta.init( guid )
 	cinfo.angularDamping = 10.0
 	cinfo.position = Vec3(0.0, 0.0, 2.0)
 	go = GetGObyGUID(guid)
-	CreatePhysicsComponent( go , cinfo )
+	--CreatePhysicsComponent( go , cinfo )
 	CreateRenderComponent(go, "data/models/ball.thmodel")
 	logMessage("PlayerMeta:init() end")
 
