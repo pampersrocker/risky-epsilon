@@ -1,8 +1,6 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gameapp_gpp", "gameapp_gpp\gameapp_gpp.vcxproj", "{39618CF4-78CD-4F15-BAE8-A92C5E434A59}"
 	ProjectSection(ProjectDependencies) = postProject
 		{09089A8F-4427-4248-8316-5121E31C4FCB} = {09089A8F-4427-4248-8316-5121E31C4FCB}

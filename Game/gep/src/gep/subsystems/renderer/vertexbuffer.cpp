@@ -21,9 +21,9 @@ const char* gep::Vertexbuffer::dataChannelToString(DataChannel channel)
     case DataChannel::TEXCOORD0:
         return "TEXCOORD";
     case DataChannel::BONE_INDICES:
-        return "BONE_INDICES";
+        return "BLENDINDICES";
     case DataChannel::BONE_WEIGHTS:
-        return "BONE_WEIGHTS";
+        return "BLENDWEIGHT";
     default:
         GEP_ASSERT(false, "value not handeled");
     }
@@ -54,11 +54,11 @@ void gep::Vertexbuffer::fillInputElementDesc(DataChannel channel, D3D11_INPUT_EL
         accumulatedOffset += 4 * sizeof(float);
         break;
     case DataChannel::BONE_INDICES:
-        desc.Format = DXGI_FORMAT_R32_UINT;
+        desc.Format = DXGI_FORMAT_R32G32B32A32_UINT;
         accumulatedOffset += 4 * sizeof(uint32);
         break;
     case DataChannel::BONE_WEIGHTS:
-        desc.Format = DXGI_FORMAT_R32_FLOAT;
+        desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
         accumulatedOffset += 4 * sizeof(float);
         break;
     default:

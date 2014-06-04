@@ -15,43 +15,40 @@ gep::Logging::~Logging()
 
 void gep::Logging::logMessage(const char* fmt, ...)
 {
-    char buffer[2048];
     va_list argptr;
     va_start(argptr, fmt);
-    vsprintf_s(buffer, fmt, argptr);
-    va_end(argptr);
+    SCOPE_EXIT{ va_end(argptr); });
+    auto msg = vformat(fmt, argptr);
     ScopedLock<Mutex> lock(m_sinkMutex);
-    for(ILogSink* sink : m_sinks)
+    for(auto pSink : m_sinks)
     {
-        sink->take(LogChannel::message, buffer);
+        pSink->take(LogChannel::message, msg.c_str());
     }
 }
 
 void gep::Logging::logWarning(const char* fmt, ...)
 {
-    char buffer[2048];
     va_list argptr;
     va_start(argptr, fmt);
-    vsprintf_s(buffer, fmt, argptr);
-    va_end(argptr);
+    SCOPE_EXIT{ va_end(argptr); });
+    auto msg = vformat(fmt, argptr);
     ScopedLock<Mutex> lock(m_sinkMutex);
-    for (ILogSink* sink : m_sinks)
+    for(auto pSink : m_sinks)
     {
-        sink->take(LogChannel::warning, buffer);
+        pSink->take(LogChannel::warning, msg.c_str());
     }
 }
 
 void gep::Logging::logError(const char* fmt, ...)
 {
-    char buffer[2048];
     va_list argptr;
     va_start(argptr, fmt);
-    vsprintf_s(buffer, fmt, argptr);
-    va_end(argptr);
+    SCOPE_EXIT{ va_end(argptr); });
+    auto msg = vformat(fmt, argptr);
     ScopedLock<Mutex> lock(m_sinkMutex);
-    for(ILogSink* sink : m_sinks)
+    for(auto pSink : m_sinks)
     {
-        sink->take(LogChannel::error, buffer);
+        pSink->take(LogChannel::error, msg.c_str());
     }
 }
 

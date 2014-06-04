@@ -243,6 +243,7 @@ namespace gep
                 }
                 catch (ScriptExecutionException& exception)
                 {
+                    // TODO: Don't use assert for exception handling
                     GEP_ASSERT(false, "Error calling event listener in lua.", exception.what());
                     throw exception;
                 }

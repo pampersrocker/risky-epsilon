@@ -321,7 +321,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName)d.pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>DbgHelp.lib;d3d11.lib;d3dx11.lib;freetype.lib;hkBase.lib;hkCompat.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;hkInternal.lib;hkGeometryUtilities.lib;hkcdInternal.lib;hkcdCollide.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;fmodL_vc.lib;fmodstudioL_vc.lib;D3DX11EffectsD.lib;d3dcompiler.lib;%(AdditionalDependencies);libluad.lib;hkaInternal.lib;hkaAnimation.lib;hkaPhysics2012Bridge.lib</AdditionalDependencies>
+      <AdditionalDependencies>DbgHelp.lib;d3d11.lib;d3dx11.lib;xinput.lib;freetype.lib;hkBase.lib;hkCompat.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;hkInternal.lib;hkGeometryUtilities.lib;hkcdInternal.lib;hkcdCollide.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;fmodL_vc.lib;fmodstudioL_vc.lib;D3DX11EffectsD.lib;d3dcompiler.lib;%(AdditionalDependencies);libluad.lib;hkaInternal.lib;hkaAnimation.lib;hkaPhysics2012Bridge.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib\lib$(PlatformArchitecture)\;$(FMOD_API)\api\lowlevel\lib;$(FMOD_API)\api\studio\lib;$(HAVOK_API)\Lib\win32_vs2012_win7\$(Configuration)_dll;$(HAVOK_API)\Lib\win32_vs2012_win8\$(Configuration)_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>..\lib\lib$(PlatformArchitecture)\$(TargetName).lib</ImportLibrary>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
@@ -345,7 +345,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName)d.pdb</ProgramDatabaseFile>
-      <AdditionalDependencies>DbgHelp.lib;d3d11.lib;d3dx11.lib;freetype.lib;hkBase.lib;hkCompat.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;hkInternal.lib;hkGeometryUtilities.lib;hkcdInternal.lib;hkcdCollide.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;fmodL64_vc.lib;fmodstudioL64_vc.lib;D3DX11EffectsD.lib;d3dcompiler.lib;%(AdditionalDependencies);libluad.lib</AdditionalDependencies>
+      <AdditionalDependencies>DbgHelp.lib;d3d11.lib;d3dx11.lib;xinput.lib;freetype.lib;hkBase.lib;hkCompat.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;hkInternal.lib;hkGeometryUtilities.lib;hkcdInternal.lib;hkcdCollide.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;fmodL64_vc.lib;fmodstudioL64_vc.lib;D3DX11EffectsD.lib;d3dcompiler.lib;%(AdditionalDependencies);libluad.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib\lib$(PlatformArchitecture)\;$(FMOD_API)\api\lowlevel\lib;$(FMOD_API)\api\studio\lib;$(HAVOK_API)\Lib\win32_vs2012_win7\$(Configuration)_dll;$(HAVOK_API)\Lib\win32_vs2012_win8\$(Configuration)_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>..\lib\lib$(PlatformArchitecture)\$(TargetName).lib</ImportLibrary>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
@@ -372,7 +372,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>DbgHelp.lib;d3d11.lib;d3dx11.lib;freetype.lib;hkBase.lib;hkCompat.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;hkInternal.lib;hkGeometryUtilities.lib;hkcdInternal.lib;hkcdCollide.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;fmodL_vc.lib;fmodstudioL_vc.lib;D3DX11Effects.lib;d3dcompiler.lib;%(AdditionalDependencies);liblua.lib;hkaInternal.lib;hkaAnimation.lib;hkaPhysics2012Bridge.lib</AdditionalDependencies>
+      <AdditionalDependencies>DbgHelp.lib;d3d11.lib;d3dx11.lib;xinput.lib;freetype.lib;hkBase.lib;hkCompat.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;hkInternal.lib;hkGeometryUtilities.lib;hkcdInternal.lib;hkcdCollide.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;fmodL_vc.lib;fmodstudioL_vc.lib;D3DX11Effects.lib;d3dcompiler.lib;%(AdditionalDependencies);liblua.lib;hkaInternal.lib;hkaAnimation.lib;hkaPhysics2012Bridge.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib\lib$(PlatformArchitecture)\;$(FMOD_API)\api\lowlevel\lib;$(FMOD_API)\api\studio\lib;$(HAVOK_API)\Lib\win32_vs2012_win7\$(Configuration)_dll;$(HAVOK_API)\Lib\win32_vs2012_win8\$(Configuration)_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>..\lib\lib$(PlatformArchitecture)\$(TargetName).lib</ImportLibrary>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
@@ -399,7 +399,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>DbgHelp.lib;d3d11.lib;d3dx11.lib;freetype.lib;hkBase.lib;hkCompat.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;hkInternal.lib;hkGeometryUtilities.lib;hkcdInternal.lib;hkcdCollide.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;fmodL64_vc.lib;fmodstudioL64_vc.lib;D3DX11Effects.lib;d3dcompiler.lib;%(AdditionalDependencies);liblua.lib</AdditionalDependencies>
+      <AdditionalDependencies>DbgHelp.lib;d3d11.lib;d3dx11.lib;xinput.lib;freetype.lib;hkBase.lib;hkCompat.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;hkInternal.lib;hkGeometryUtilities.lib;hkcdInternal.lib;hkcdCollide.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;fmodL64_vc.lib;fmodstudioL64_vc.lib;D3DX11Effects.lib;d3dcompiler.lib;%(AdditionalDependencies);liblua.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib\lib$(PlatformArchitecture)\;$(FMOD_API)\api\lowlevel\lib;$(FMOD_API)\api\studio\lib;$(HAVOK_API)\Lib\win32_vs2012_win7\$(Configuration)_dll;$(HAVOK_API)\Lib\win32_vs2012_win8\$(Configuration)_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>..\lib\lib$(PlatformArchitecture)\$(TargetName).lib</ImportLibrary>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>

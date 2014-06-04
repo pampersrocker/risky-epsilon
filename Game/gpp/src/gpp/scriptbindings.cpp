@@ -31,6 +31,8 @@
 #include "gpp/stateMachines/stateMachine.h"
 #include "gpp/stateMachines/stateMachineFactory.h"
 
+#include <Xinput.h>
+
 void gpp::Game::makeScriptBindings()
 {
     bindEnums();
@@ -48,9 +50,12 @@ void gpp::Game::bindOther()
     scripting->bind<gep::Quaternion>("_Quaternion");
     scripting->bind<gep::mat3>("Mat3");
     scripting->bind<gep::mat4>("Mat4");
+    scripting->bind<gep::ITransform>("Transform");
     scripting->bind<gep::Color>("Color");
 
     scripting->bind<gpp::Game>("Game", this);
+
+    
 
     // State machine related
     //////////////////////////////////////////////////////////////////////////
@@ -86,6 +91,7 @@ void gpp::Game::bindOther()
     scripting->bind<gpp::GameObject>("GameObject");
     scripting->bind<gpp::GameObjectManager>("GameObjectManager", &g_gameObjectManager);
 
+	scripting->bind<gep::IGamepad>("Gamepad");
     scripting->bind<gep::IInputHandler>("InputHandler", g_globalManager.getInputHandler());
     scripting->bind<gep::IPhysicsSystem>("PhysicsSystem", g_globalManager.getPhysicsSystem());
     scripting->bind<gep::IScriptingManager>("Scripting", g_globalManager.getScriptingManager());
@@ -103,6 +109,9 @@ void gpp::Game::bindOther()
     scripting->bind< gep::Event<gep::ContactPointArgs*> >("_ContactPointEvent");
     scripting->bind< gep::Event<gep::ScriptTableWrapper> >("_GenericEvent");
     scripting->bind< gep::IEventManager >("_EventManager", g_globalManager.getEventManager());
+
+    //Animation
+    scripting->bind< gep::IBone>("Bone");
 }
 
 
@@ -354,4 +363,22 @@ void gpp::Game::bindEnums()
         "Pa1", gep::Key::Pa1,
         "Oem_Clear", gep::Key::Oem_Clear,
         0);
+
+	// Bind gamepad button enum
+	scripting->bindEnum("Button",
+		"Up",			XINPUT_GAMEPAD_DPAD_UP,
+		"Down",			XINPUT_GAMEPAD_DPAD_DOWN,
+		"Left",			XINPUT_GAMEPAD_DPAD_LEFT,
+		"Right",		XINPUT_GAMEPAD_DPAD_RIGHT,
+		"Start",		XINPUT_GAMEPAD_START,
+		"Back",			XINPUT_GAMEPAD_BACK,
+		"LeftThumb",	XINPUT_GAMEPAD_LEFT_THUMB,
+		"RightThumb",	XINPUT_GAMEPAD_RIGHT_THUMB,
+		"LeftShoulder",	XINPUT_GAMEPAD_LEFT_SHOULDER,
+		"RightShoulder",XINPUT_GAMEPAD_RIGHT_SHOULDER,
+		"A",			XINPUT_GAMEPAD_A,
+		"B",			XINPUT_GAMEPAD_B,
+		"X",			XINPUT_GAMEPAD_X,
+		"Y",			XINPUT_GAMEPAD_Y,
+		0);
 }

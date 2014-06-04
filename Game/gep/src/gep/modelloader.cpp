@@ -390,6 +390,7 @@ memstat.boneDataArray.size += sizeof(BoneInfo)* numBoneInfos; // extend the exis
                 file.read(nodeIndex);
 
                 boneNode.node = &m_nodes[nodeIndex];
+                boneNode.node->bone = &boneNode;
             }
 
             file.endReadChunk();

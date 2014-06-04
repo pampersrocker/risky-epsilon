@@ -25,13 +25,13 @@ namespace gpp
         virtual void setRotation(const gep::Quaternion& rot) override;
         virtual void setScale(const gep::vec3& scale) override;
 
-        virtual gep::vec3 getPosition() override;
-        virtual gep::Quaternion getRotation() override;
-        virtual gep::vec3 getScale() override;
-        virtual gep::mat4 getTransformationMatrix() override;
-        virtual gep::vec3 getViewDirection() override;
-        virtual gep::vec3 getUpDirection() override;
-        virtual gep::vec3 getRightDirection() override;
+        virtual gep::vec3 getWorldPosition() const override;
+        virtual gep::Quaternion getWorldRotation() const override;
+        virtual gep::vec3 getWorldScale() const override;
+        virtual gep::mat4 getWorldTransformationMatrix() const override;
+        virtual gep::vec3 getViewDirection() const override;
+        virtual gep::vec3 getUpDirection() const override;
+        virtual gep::vec3 getRightDirection() const override;
 
         virtual void setBaseOrientation(const gep::Quaternion& viewDir) override; 
         virtual void setBaseViewDirection(const gep::vec3& direction) override;
@@ -59,7 +59,19 @@ namespace gpp
             // Component interface
             LUA_BIND_FUNCTION(setState)
             LUA_BIND_FUNCTION(getState)
-        LUA_BIND_REFERENCE_TYPE_END 
+        LUA_BIND_REFERENCE_TYPE_END; 
+
+        virtual gep::vec3 getScale() const override;
+
+        virtual gep::Quaternion getRotation() const override;
+
+        virtual gep::vec3 getPosition() const override;
+
+        virtual gep::mat4 getTransformationMatrix() const override;
+
+        virtual const gep::ITransform* getParent() override;
+
+        virtual void setParent(const gep::ITransform* parent) override;
 
         
 
@@ -72,6 +84,7 @@ namespace gpp
         gep::IWorld* m_pWorld;
         
         gep::Event<gep::ContactPointArgs*> m_event_contactPoint;
+        gep::Transform m_transform;
 
         void setRigidBody(gep::IRigidBody* rigidBody);
 
@@ -84,7 +97,7 @@ namespace gpp
     {
         static const char* name(){ return "PhysicsComponent"; }
         static const gep::int32 initializationPriority() { return 0; }
-        static const gep::int32 updatePriority() { return std::numeric_limits<gep::int32>::max(); }
+        static const gep::int32 updatePriority() { return 7; } //TODO: Figure out the correct value
         static PhysicsComponent* create(){ return new PhysicsComponent(); }
     };
 

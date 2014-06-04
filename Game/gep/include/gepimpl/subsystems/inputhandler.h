@@ -5,12 +5,57 @@
 
 namespace gep
 {
-    class InputHandler : public IInputHandler
+	class XInputGamepad : public IGamepad
+	{
+		friend class InputHandler;
+
+	public:
+		XInputGamepad();
+		virtual ~XInputGamepad();
+
+		virtual bool	isConnected() const override { return m_checkStateTimer <= 0; };
+		virtual int		buttonsPressed() const override { return m_buttonsPressed; };
+		virtual int		buttonsTriggered() const override { return m_buttonsTriggered; };
+		virtual int		buttonsReleased() const override { return m_buttonsReleased; };
+		virtual float	leftTrigger() const override { return m_leftTrigger; }
+		virtual float	rightTrigger() const override { return m_rightTrigger; }
+		virtual vec2	leftStick() const override { return m_leftStick; }
+		virtual vec2	rightStick() const override { return m_rightStick; }
+		virtual void	rumbleLeft(float intensity) override;
+		virtual void	rumbleLeftFor(float intensity, float time) override;
+		virtual void	rumbleRight(float intensity) override;
+		virtual void	rumbleRightFor(float intensity, float time) override;
+
+	private:
+		void			update(float elapsedTime, DWORD dwUserIndex);
+		vec2			clampStick(SHORT sThumbX, SHORT sThumbY, int deadzone, int maximum);
+		float			clampStickAxis(SHORT sThumbAxis, int deadzone, int maximum);
+		float			clampTrigger(BYTE trigger, int threshold, int maximum);
+		void			updateRumble(float elapsedTime);
+
+		XINPUT_STATE	m_XInputState;
+		DWORD			m_dwUserIndex;
+		float			m_checkStateTimer;
+		WORD			m_buttonsPressed;
+		WORD			m_buttonsPressedOld;
+		WORD			m_buttonsTriggered;
+		WORD			m_buttonsReleased;
+		float			m_leftTrigger;
+		float			m_rightTrigger;
+		vec2			m_leftStick;
+		vec2			m_rightStick;
+		float			m_leftMotorIntensity;
+		float			m_leftMotorTimer;
+		float			m_rightMotorIntensity;
+		float			m_rightMotorTimer;
+	};
+	
+	class InputHandler : public IInputHandler
     {
     private:
-        vec2 m_mouseDelta;
+        vec3 m_mouseDelta;
 
-        vec2 m_mouseSensitivity;
+        vec3 m_mouseSensitivity;
         uint32 m_currentFrame;
 
         struct KeyInfo
@@ -22,6 +67,8 @@ namespace gep
         };
         enum { MAX_NUM_KEYS = VK_OEM_CLEAR };
         KeyInfo m_keyMap[MAX_NUM_KEYS];
+
+		XInputGamepad m_pXInputGamepads[XUSER_MAX_COUNT];
 
     public:
         InputHandler();
@@ -36,6 +83,9 @@ namespace gep
         virtual bool wasTriggered(uint8 keyCode) override;
         /// \brief gets the mouse delta for this frame
         /// \return true if there was mouse movement, false otherwise
-        virtual bool getMouseDelta(vec2& mouseDelta) override;
+        virtual bool getMouseDelta(vec3& mouseDelta) override;
+
+		/// \return the gamepad connected to the given user index
+		virtual IGamepad* gamepad(int userIndex) override;
     };
 }

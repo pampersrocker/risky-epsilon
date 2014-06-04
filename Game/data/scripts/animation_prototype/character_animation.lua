@@ -23,6 +23,10 @@ end
 
 do -- Character
 	character = GameObjectManager:createGameObject("character")
+	
+	character.rc = character:createRenderComponent()
+	character.rc:setPath("data/models/barbarian/barbarianAnimated.thModel")
+	
 	character.ac = character:createAnimationComponent()
 	character.ac:setSkeletonFile("data/animations/Barbarian/Barbarian.hkt")
 	character.ac:setSkinFile("data/animations/Barbarian/Barbarian.hkt")
@@ -40,6 +44,8 @@ do -- Character
 	character.damping = 10.0
 	character.velocity = 0.0
 	character.maxVelocity = 10.0
+	
+	character.playbackSpeed = 1.0
 
 	character.attacks = { "Attack", "Attack2", "Attack3", "Attack4", "SpecialAttack" }
 	character.ac:addAnimationFile(character.attacks[1], "data/animations/Barbarian/Barbarian_Attack.hkt")
@@ -48,6 +54,12 @@ do -- Character
 	character.ac:addAnimationFile(character.attacks[4], "data/animations/Barbarian/Barbarian_Attack4.hkt")
 	character.ac:addAnimationFile(character.attacks[5], "data/animations/Barbarian/Barbarian_SpecialAttack.hkt")
 	character.activeAttack = 0 -- no attack
+end
+
+do --axe
+	axe = GameObjectManager:createGameObject("axe")
+	axe.rc = axe:createRenderComponent()
+	axe.rc:setPath("data/models/barbarian/barbarian_axe.thModel")
 end
 
 function idleEventListener(eventData)
@@ -105,6 +117,11 @@ function characterEnter()
 	end
 	
 	character.ac:setBoneDebugDrawingEnabled(true)
+
+	local bone = character.ac:getBoneByName("right_attachment_jnt")
+	local rot = Quaternion(Vec3(1,0,0), 90) * Quaternion(Vec3(0,1,0), 180)
+	axe:setParent(bone)
+	axe:setRotation(rot)
 end
 
 function defaultEnter(enterData)
@@ -117,15 +134,16 @@ end
 function cameraUpdate(elapsedTime)
 
 	local mouseDelta = InputHandler:getMouseDelta()
-
+	local rightStick = InputHandler:gamepad(0):rightStick():mulScalar(-10.0)
+	
 	-- rotation
 	local invDir = debugCam.cc:getViewDirection():mulScalar(-1.0)
-	local rotQuat = Quaternion(Vec3(0.0, 0.0, 1.0), mouseDelta.x * debugCam.rotSpeed * elapsedTime)
+	local rotQuat = Quaternion(Vec3(0.0, 0.0, 1.0), (mouseDelta.x + rightStick.x) * debugCam.rotSpeed * elapsedTime)
 	local rotMat = rotQuat:toMat3()
 	local rotInvDir = rotMat:mulVec3(invDir)
 
 	-- zoom
-	debugCam.zoom = debugCam.zoom + mouseDelta.y * debugCam.zoomSpeed * elapsedTime
+	debugCam.zoom = debugCam.zoom + (mouseDelta.y + rightStick.y) * debugCam.zoomSpeed * elapsedTime
 	if (debugCam.zoom > debugCam.maxZoom ) then debugCam.zoom = debugCam.maxZoom end
 	if (debugCam.zoom < debugCam.minZoom ) then debugCam.zoom = debugCam.minZoom end
 	
@@ -140,9 +158,11 @@ function characterUpdate(elapsedTime)
 	DebugRenderer:printText(Vec2(-0.9, 0.8), "character.activeIdle " .. character.idles[character.activeIdle])
 
 	-- walking forward
+	local leftStick = InputHandler:gamepad(0):leftStick():mulScalar(0.75)
 	if (InputHandler:isPressed(Key.Up)) then
 		character.velocity = character.velocity + character.acceleration * elapsedTime
 	end
+	character.velocity = character.velocity + character.acceleration * leftStick.y * elapsedTime
 	character.velocity = character.velocity - character.damping * elapsedTime
 	if (character.velocity > character.maxVelocity) then
 		character.velocity = character.maxVelocity
@@ -169,10 +189,26 @@ function characterUpdate(elapsedTime)
 	character.ac:setMasterWeight("Run", runWeight)
 	DebugRenderer:printText(Vec2(-0.9, 0.60), "runWeight " .. string.format("%6.3f", runWeight))
 	
+	-- walk and run speed
+	local leftTrigger = InputHandler:gamepad(0):leftTrigger()
+	local rightTrigger = InputHandler:gamepad(0):rightTrigger()
+	if (InputHandler:wasTriggered(Key.Right)) then
+		character.playbackSpeed = character.playbackSpeed + 0.1
+	elseif (InputHandler:wasTriggered(Key.Left)) then
+		character.playbackSpeed = character.playbackSpeed - 0.1
+	end
+	character.playbackSpeed = character.playbackSpeed - 0.5 * leftTrigger * elapsedTime
+	character.playbackSpeed = character.playbackSpeed + 0.5 * rightTrigger * elapsedTime
+	character.playbackSpeed = math.clamp(character.playbackSpeed, 0.1, 2.5)
+	character.ac:setPlaybackSpeed("Walk", character.playbackSpeed)
+	character.ac:setPlaybackSpeed("Run", character.playbackSpeed)
+	DebugRenderer:printText(Vec2(-0.9, 0.55), "character.playbackSpeed " .. string.format("%6.3f", character.playbackSpeed))
+	
 	-- attack
+	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
 	if (character.activeAttack == 0) then
-		DebugRenderer:printText(Vec2(-0.9, 0.50), "character.activeAttack none")
-		if (InputHandler:wasTriggered(Key.Space)) then
+		DebugRenderer:printText(Vec2(-0.9, 0.45), "character.activeAttack none")
+		if (InputHandler:wasTriggered(Key.Space) or bit32.btest(buttonsTriggered, Button.A)) then
 			character.activeAttack = math.random(1, #character.attacks)
 			character.ac:setLocalTimeNormalized(character.attacks[character.activeAttack], 0.0)
 			character.ac:easeIn(character.attacks[character.activeAttack], 0.25)
@@ -180,9 +216,16 @@ function characterUpdate(elapsedTime)
 			character.ac:easeOut("Run", 0.25)
 		end
 	else
-		DebugRenderer:printText(Vec2(-0.9, 0.50), "character.activeAttack " .. character.attacks[character.activeAttack])
+		DebugRenderer:printText(Vec2(-0.9, 0.45), "character.activeAttack " .. character.attacks[character.activeAttack])
 		local localTimeNormalized = character.ac:getLocalTimeNormalized(character.attacks[character.activeAttack])
-		DebugRenderer:printText(Vec2(-0.9, 0.45), "getLocalTimeNormalized " .. string.format("%6.3f", localTimeNormalized))
+		DebugRenderer:printText(Vec2(-0.9, 0.40), "getLocalTimeNormalized " .. string.format("%6.3f", localTimeNormalized))
+		if (localTimeNormalized > 0.3 and localTimeNormalized < 0.5) then
+			InputHandler:gamepad(0):rumbleLeft(0.75)
+			InputHandler:gamepad(0):rumbleRight(0.75)
+		else
+			InputHandler:gamepad(0):rumbleLeft(0.0)
+			InputHandler:gamepad(0):rumbleRight(0.0)
+		end
 		if (localTimeNormalized > 0.75) then
 			character.ac:easeOut(character.attacks[character.activeAttack], 0.25)
 			character.ac:easeIn("Walk", 0.25)
@@ -213,5 +256,10 @@ State{
 
 StateTransitions{
 	parent = "/game/gameRunning",
-	{ from = "__enter", to = "default" },
+	{ from = "__enter", to = "default" }
+}
+
+StateTransitions{
+	parent = "/game",
+	{ from = "gameRunning", to = "__leave", condition = function() return bit32.btest(InputHandler:gamepad(0):buttonsPressed(), bit32.bor(Button.Start, Button.Back)) end }
 }

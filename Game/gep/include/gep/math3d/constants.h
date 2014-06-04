@@ -26,6 +26,12 @@ namespace gep
         inline static int value() { return 0; }
     };
 
+    template <>
+    struct GetEpsilon<unsigned int>
+    {
+        inline static int value() { return 0; }
+    };
+
     template <typename T>
     struct GetPi
     {

@@ -24,6 +24,8 @@ do
 	barbarian.anim:addAnimationFile("stagger","data/animations/Barbarian/Barbarian_Stagger.HKT")
 
 	barbarian.anim:setBoneDebugDrawingEnabled(physicsDebugView)
+
+
 end
 
 -- Havok Girl
@@ -42,7 +44,8 @@ havokGirl.anim:setDebugDrawingScale(100.0)
 havokGirl:setPosition(Vec3(-250, 0, 0))
 
 Events.Update:registerListener(function(elapsedTime)
-
+	local bone = barbarian.anim:getBoneByName("left_attachment_jnt"):getWorldPosition()
+	print(bone.x .. "  " .. bone.y .. "	" .. bone.z)
 	if (InputHandler:wasTriggered(Key.Up)) then
 		walkweight = walkweight + 0.1		
 	end

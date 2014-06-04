@@ -26,13 +26,7 @@ namespace gpp
         virtual void setRotation(const gep::Quaternion& rot );
         virtual void setScale(const gep::vec3& scale );
 
-        virtual gep::vec3 getPosition() override;
-        virtual gep::Quaternion getRotation() override;
-        virtual gep::vec3 getScale() override;
-        virtual gep::mat4 getTransformationMatrix() override;
-        virtual gep::vec3 getViewDirection() override;
-        virtual gep::vec3 getUpDirection() override;
-        virtual gep::vec3 getRightDirection() override;
+
 
         virtual void setBaseOrientation(const gep::Quaternion& viewDir) override;
         virtual void setBaseViewDirection(const gep::vec3& direction) override;
@@ -54,12 +48,41 @@ namespace gpp
             LUA_BIND_FUNCTION(createCharacterRigidBody)
         LUA_BIND_REFERENCE_TYPE_END;
 
+        virtual const gep::ITransform* getParent() override;
+
+        virtual void setParent(const gep::ITransform* parent) override;
+
+        virtual gep::vec3 getRightDirection() const override;
+
+        virtual gep::vec3 getUpDirection() const override;
+
+        virtual gep::vec3 getViewDirection() const override;
+
+        virtual gep::vec3 getScale() const override;
+
+        virtual gep::Quaternion getRotation() const override;
+
+        virtual gep::vec3 getPosition() const override;
+
+        virtual gep::mat4 getTransformationMatrix() const override;
+
+        virtual gep::vec3 getWorldScale() const override;
+
+        virtual gep::Quaternion getWorldRotation() const override;
+
+        virtual gep::vec3 getWorldPosition() const override;
+
+        virtual gep::mat4 getWorldTransformationMatrix() const override;
+
+       
+
     private:
         gep::vec3 m_position;
         gep::Quaternion m_rotation;
         mutable gep::SmartPtr<gep::ICharacterRigidBody> m_pCharacterRigidBody;
         gep::IWorld* m_pWorld;
         gep::Quaternion m_baseOrientation;
+        gep::Transform m_transform;
     };
 
     template<>

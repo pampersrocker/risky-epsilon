@@ -54,9 +54,8 @@ namespace gep
 
         std::string constructFileName(const std::string& filename, LoadOptions::Enum loadOptions = LoadOptions::Default);
 
-        virtual void setState(State state) override { m_state = state; }
-
-        virtual State getState() const override { return m_state; }
+        virtual void setManagerState(State state) override { m_state = state; }
+        virtual State getManagerState() const override { return m_state; }
 
         virtual lua_State* getState() override { return m_L; }
     };

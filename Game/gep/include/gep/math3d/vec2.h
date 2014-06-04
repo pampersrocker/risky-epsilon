@@ -142,7 +142,11 @@ namespace gep
         /// \brief unary - operator
         inline const vec2_t<T> operator - () const
         {
+// "unary minus operator applied to unsigned type, result still unsigned"
+#pragma warning (push)
+#pragma warning (disable : 4146)
             return vec2_t<T>(-x, -y);
+#pragma warning (pop)
         }
 
         /// \brief comparing two instances with an epsilon
@@ -203,7 +207,7 @@ namespace gep
         LUA_BIND_VALUE_TYPE_MEMBERS
             LUA_BIND_MEMBER(x)
             LUA_BIND_MEMBER(y)
-         LUA_BIND_VALUE_TYPE_END
+        LUA_BIND_VALUE_TYPE_END;
 
         private:
             const vec2_t<T> negate(const vec2_t<T>& rh) const { return -*this; }
@@ -217,4 +221,5 @@ namespace gep
 
     typedef vec2_t<float> vec2;
     typedef vec2_t<int> ivec2;
+    typedef vec2_t<unsigned int> uvec2;
 };

@@ -15,7 +15,7 @@ void gep::ModelMaterial::setShader(ResourcePtr<Shader> pShader)
     m_viewMatrixConstant = ShaderConstant<mat4>("View", pShader);
     m_projectionMatrixConstant = ShaderConstant<mat4>("Projection", pShader);
     m_numBonesConstant = ShaderConstant<uint32>("NumBones", pShader);
-    m_bonesArrayConstant = ShaderConstant<mat4>("BonesArray", pShader);
+    m_bonesArrayConstant = ShaderConstant<mat4>("Bones", pShader);
 }
 
 void gep::ModelMaterial::addTexture(ShaderConstant<Texture2D> constant, ResourcePtr<Texture2D> pTexture)
@@ -37,8 +37,8 @@ gep::Model::Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext) :
     m_pDevice(pDevice),
     m_pDeviceContext(pContext),
     m_pLoader(nullptr),
-    m_debugDrawingEnabled(false),
-    m_bones(nullptr, 0)
+    m_debugDrawingEnabled(false)//,
+    //m_bones(nullptr, 0)
 {
     GEP_ASSERT(pDevice != nullptr);
     GEP_ASSERT(pContext != nullptr);
@@ -80,7 +80,7 @@ void gep::Model::doFindMinMax(mat4 transformation, const ModelLoader::NodeDrawDa
     }
 }
 
-void gep::Model::drawHelper(ID3D11DeviceContext* pContext, mat4 transformation, const ModelLoader::NodeDrawData* pNode, mat4& view, mat4& projection)
+void gep::Model::drawHelper(ID3D11DeviceContext* pContext, mat4 transformation, ArrayPtr<mat4> bones, const ModelLoader::NodeDrawData* pNode, mat4& view, mat4& projection)
 {
     GEP_ASSERT(pNode != nullptr,"pNode may not be null");
     transformation = transformation * pNode->transform;
@@ -92,6 +92,7 @@ void gep::Model::drawHelper(ID3D11DeviceContext* pContext, mat4 transformation, 
 
         drawData.vertexbuffer->use(pContext);
         material.getModelMatrixConstant().set(transformation);
+
         for(auto& slot : material.getTextures())
         {
             slot.constant.set(slot.texture);
@@ -102,7 +103,7 @@ void gep::Model::drawHelper(ID3D11DeviceContext* pContext, mat4 transformation, 
             material.getViewMatrixConstant().set(view);
             material.getProjectionMatrixConstant().set(projection);
             material.getNumBonesConstant().set(m_bones.length());
-            material.getBonesArrayConstant().setArray(m_bones);
+            material.getBonesArrayConstant().setArray(m_bones.toArray());
             m_pLastShader = material.getShader();
         }
         material.getShader()->use(pContext, drawData.vertexbuffer);
@@ -110,15 +111,16 @@ void gep::Model::drawHelper(ID3D11DeviceContext* pContext, mat4 transformation, 
     }
 
     for(auto child : pNode->children){
-        drawHelper(pContext, transformation, child, view, projection);
+        drawHelper(pContext, transformation, bones, child, view, projection);
     }
 }
 
-void gep::Model::draw(const mat4& modelMatrix, mat4& viewMatrix, mat4& projectionMatrix, ID3D11DeviceContext* pContext)
+// TODO: Mesh wird aus Gründen zweimal gezeichnet...
+void gep::Model::draw(const mat4& modelMatrix, ArrayPtr<mat4> bones, mat4& viewMatrix, mat4& projectionMatrix, ID3D11DeviceContext* pContext)
 {
     GEP_ASSERT(m_meshDrawData.length() > 0, "GenerateMeshes has not been called on this model");
-    mat4 transform = modelMatrix * mat4::identity().right2Left();
-    drawHelper(pContext, transform, m_modelLoader.getModelData().rootNode, viewMatrix, projectionMatrix);
+    mat4 transform = modelMatrix; //mat4::identity().right2Left();
+    drawHelper(pContext, transform, bones, m_modelLoader.getModelData().rootNode, viewMatrix, projectionMatrix);
     m_pLastShader = ResourcePtr<Shader>();
 }
 
@@ -379,8 +381,8 @@ void gep::Model::extract(IRendererExtractor& extractor, mat4 modelMatrix)
     auto& cmd = static_cast<RendererExtractor&>(extractor).makeCommand<CommandRenderModel>();
     cmd.model = this->makeResourcePtrFromThis<Model>();
     cmd.modelMatrix = modelMatrix;
-
-    // TODO implement debug drawing.
+    cmd.bones = GEP_NEW_ARRAY(extractor.getCurrentAllocator(), mat4, m_bones.length());
+    cmd.bones.copyFrom(m_bones.toArray());
 }
 
 void gep::Model::setDebugDrawingEnabled(bool value)
@@ -401,6 +403,61 @@ void gep::Model::toggleDebugDrawing()
 void gep::Model::setBones(const ArrayPtr<mat4>& transformations)
 {
     m_bones = transformations;
+
+    int index = 0;
+    for (auto& bone : m_modelLoader.getModelData().bones)
+    {
+        mat4 result = m_bones[index];
+
+        float f[16] = {1, 0, 0, 0,
+                       0, 1, 0, 0,
+                       0, 0, -1, 0,
+                       0, 0, 0, 1};
+        mat4 toggleY(f);
+        
+        float f2[16] = {1, 0, 0, 0,
+                        0, -1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
+        mat4 toggleZ(f2);
+
+        float f3[16] = {1, 0, 0, 0,
+                        0, 0, 1, 0,
+                        0, 1, 0, 0,
+                        0, 0, 0, 1};
+        mat4 toggleYZ(f3);
+
+        //m_bones[index] = m_bones[index] * toggleYZ;
+        //m_bones[index] = cummulatedOffsetMatrix(transformations, bone);
+        m_bones[index] = /*toggleY * toggleZ */ m_bones[index] * bone.offsetMatrix;
+        
+        //m_bones[index] = m_bones[index] * mat4::rotationMatrixXYZ(vec3(-90, 0, 0));
+        //m_bones[index] = m_bones[index]*cummulatedOffsetMatrix(trans, result);
+        index++;
+    }
+}
+
+// Use this method if you want to create the combined bone matrix by yourself.
+// Caution: You have to use bone transformations in local space, instead of modelspace, so
+// in model.cpp use "m_pPose->getBoneLocalSpace(index)"
+gep::mat4 gep::Model::accumulatedOffsetMatrix(const ArrayPtr<mat4>& transformations, const gep::ModelLoader::BoneNode& bone)
+{
+    mat4 result = mat4::identity();
+    auto parentNode = bone.node->parent;
+    while(parentNode != nullptr)
+    {
+        if (parentNode->bone != nullptr)
+        {
+            auto parentBoneId = parentNode->bone - m_modelLoader.getModelData().bones.getPtr();
+            result =  result * transformations[parentBoneId];
+        }
+        else
+        {
+            result = result * parentNode->transform;
+        }
+        parentNode = parentNode->parent;
+    }
+    return result;
 }
 
 gep::IResource* gep::IModelLoader::loadResource(IResource* pInPlace)
@@ -475,7 +532,6 @@ gep::Model* gep::ModelFileLoader::loadResource(Model* pInPlace)
 
 void gep::ModelFileLoader::postLoad(ResourcePtr<IResource> pResource)
 {
-
 }
 
 gep::ModelFileLoader* gep::ModelFileLoader::moveToHeap()
@@ -521,6 +577,17 @@ gep::Model* gep::ModelLoaderFromData::loadResource(Model* pInPlace)
     return pInPlace;
 }
 
+gep::DynamicArray<const char*> gep::Model::getBoneNames()
+{
+    gep::DynamicArray<const char*> names;
+
+    for(auto bone : m_modelLoader.getModelData().bones)
+    {
+        names.append(bone.node->data->name);
+    }
+    return names;
+}
+
 void gep::ModelLoaderFromData::postLoad(ResourcePtr<IResource> pResource)
 {
 
@@ -536,6 +603,7 @@ const char* gep::ModelLoaderFromData::getResourceId()
     return m_resourceID.c_str();
 }
 
+// TODO: Remove this old stuff
 void gep::Animation::update(float elapsedSeconds)
 {
     updateGlobalBoneTransforms(elapsedSeconds);

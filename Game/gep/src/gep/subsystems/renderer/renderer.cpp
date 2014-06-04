@@ -36,11 +36,9 @@ extern D3DPERF_EndEvent_Func D3DPREF_EndEvent = nullptr;
 extern D3DPERF_BeginEvent_Func D3DPREF_BeginEvent = nullptr;
 #endif
 
-gep::Renderer::Renderer(const settings::Video& settings) :
-    m_width(settings.screenResolution.x),
-    m_height(settings.screenResolution.y),
-    m_vsyncEnabled(settings.vsyncEnabled),
-    m_requestedVSyncState(settings.vsyncEnabled),
+gep::Renderer::Renderer(settings::Video& settings) :
+    m_settings(settings),
+    m_actualVSync(settings.vsyncEnabled),
     m_pd3dDevice(nullptr),
     m_pSwapChain(nullptr),
     m_pRenderTargetView(nullptr),
@@ -111,7 +109,8 @@ void gep::Renderer::initialize()
     m_fontColor = ShaderConstant<Color>("color", m_pFontShader);
     m_fontScreenSize = ShaderConstant<vec2>("targetSize", m_pFontShader);
     m_fontTexture = ShaderConstant<Texture2D>("diffuse", m_pFontShader);
-    m_fontScreenSize.set(vec2((float)m_width, (float)m_height));
+    m_fontScreenSize.set(vec2((float)m_settings.screenResolution.x,
+                              (float)m_settings.screenResolution.y));
 
     // text billboard
     m_pTextBillboardShader = g_globalManager.getResourceManager()->loadResource<Shader>(ShaderFileLoader("data/base/fontBillboard.fx"), LoadAsync::No);
@@ -121,9 +120,12 @@ void gep::Renderer::initialize()
     m_textBillboardColor = ShaderConstant<Color>("color", m_pTextBillboardShader);
     m_textBillboardTexture = ShaderConstant<Texture2D>("diffuse", m_pTextBillboardShader);
     m_textBillboardScreenSize = ShaderConstant<vec2>("targetSize", m_pTextBillboardShader);
-    m_textBillboardScreenSize.set(vec2((float)m_width, (float)m_height));
-
-    m_projection = mat4::projectionMatrix(60.0f, (float)m_height / (float)m_width, 0.1f, 10000.0f);
+    m_textBillboardScreenSize.set(vec2((float)m_settings.screenResolution.x,
+                                       (float)m_settings.screenResolution.y));
+    {
+        auto aspectRatio = float(m_settings.screenResolution.x) / float(m_settings.screenResolution.y);
+        m_projection = mat4::projectionMatrix(60.0f, aspectRatio, 0.1f, 10000.0f);
+    }
     m_view = mat4::lookAtMatrix(vec3(300, 0, 205), vec3(0, 0, 150), vec3(0,0,1));
 
     {
@@ -161,6 +163,7 @@ void gep::Renderer::initialize()
 
     //Loading additional resources
     m_pLightingShader = g_globalManager.getResourceManager()->loadResource<Shader>(ShaderFileLoader("data/shaders/lighting.fx"));
+    m_pLightingAnimatedShader = g_globalManager.getResourceManager()->loadResource<Shader>(ShaderFileLoader("data/shaders/lightingAnimated.fx"));
     m_pLinesShader = g_globalManager.getResourceManager()->loadResource<Shader>(ShaderFileLoader("data/base/lines.fx"));
     m_pWireframeShader = g_globalManager.getResourceManager()->loadResource<Shader>(ShaderFileLoader("data/shaders/wireframe.fx"));
     m_lineColor = ShaderConstant<Color>("Color", m_pLinesShader);
@@ -170,7 +173,8 @@ void gep::Renderer::initialize()
     m_pLines2DShader = g_globalManager.getResourceManager()->loadResource<Shader>(ShaderFileLoader("data/base/lines2D.fx"));
     m_line2DColor = ShaderConstant<Color>("Color", m_pLines2DShader);
     m_lines2DScreenSize = ShaderConstant<vec2>("targetSize", m_pLines2DShader);
-    m_lines2DScreenSize.set(vec2((float)m_width, (float)m_height));
+    m_lines2DScreenSize.set(vec2((float)m_settings.screenResolution.x,
+                                 (float)m_settings.screenResolution.y));
 
     #ifdef _DEBUG
     const GUID ID_ID3DUserDefinedAnnotation = { 0xb2daad8b, 0x03d4, 0x4dbf, { 0x95, 0xeb,  0x32,  0xab,  0x4b,  0x63,  0xd0,  0xab } };
@@ -262,7 +266,7 @@ void gep::Renderer::update(float elapsedTime)
     EndDebugMarker();
 
     render();
-    m_vsyncEnabled = m_requestedVSyncState;
+    m_actualVSync = m_settings.vsyncEnabled;
 }
 
 void gep::Renderer::createWindow()
@@ -292,7 +296,7 @@ void gep::Renderer::createWindow()
     //
     // Create window
     //
-    RECT rc = { 0, 0, m_width, m_height };
+    RECT rc = { 0, 0, m_settings.screenResolution.x, m_settings.screenResolution.y };
     AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
     m_hWnd = CreateWindow( szWindowClass, L"Game Engine Programming", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL,
@@ -321,8 +325,8 @@ void gep::Renderer::initD3DDevice()
     GetClientRect( m_hWnd, &rc );
     UINT width = rc.right - rc.left;
     UINT height = rc.bottom - rc.top;
-    GEP_ASSERT(width == m_width);
-    GEP_ASSERT(height == m_height);
+    GEP_ASSERT(width == m_settings.screenResolution.x);
+    GEP_ASSERT(height == m_settings.screenResolution.y);
 
     UINT createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -447,20 +451,23 @@ void gep::Renderer::render()
         m_pLinesBuffer->upload(m_pDeviceContext);
         m_pLines2DBuffer->upload(m_pDeviceContext);
 
-        m_fontScreenSize.set(vec2((float)m_width, (float)m_height));
-        m_textBillboardScreenSize.set(vec2((float)m_width, (float)m_height));
-        m_lines2DScreenSize.set(vec2((float)m_width, (float)m_height));
+        m_fontScreenSize.set(vec2((float)m_settings.screenResolution.x,
+                                  (float)m_settings.screenResolution.y));
+        m_textBillboardScreenSize.set(vec2((float)m_settings.screenResolution.x,
+                                           (float)m_settings.screenResolution.y));
+        m_lines2DScreenSize.set(vec2((float)m_settings.screenResolution.x,
+                                     (float)m_settings.screenResolution.y));
 
         // Just clear the backbuffer
-        float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; //red,green,blue,alpha
-        m_pDeviceContext->ClearRenderTargetView( m_pRenderTargetView, ClearColor );
+        auto clearColor = m_settings.clearColor;
+        m_pDeviceContext->ClearRenderTargetView( m_pRenderTargetView, clearColor.data );
         m_pDeviceContext->ClearDepthStencilView( m_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0, 0 );
 
         executeCommands(extractor, firstCommand);
         execute2DCommands(extractor, firstCommand);
     }
 
-    m_pSwapChain->Present( m_vsyncEnabled ? 1 : 0, 0 );
+    m_pSwapChain->Present(m_actualVSync ? 1 : 0, 0);
 }
 
 void gep::Renderer::prepareCommands(RendererExtractor& extractor, CommandBase* currentCommand)
@@ -547,7 +554,18 @@ void gep::Renderer::executeCommands(RendererExtractor& extractor, CommandBase* c
         case CommandType::RenderModel:
             {
                 auto cmd = RendererExtractor::command_cast<CommandRenderModel>(currentCommand);
-                cmd->model->draw(cmd->modelMatrix, m_view, m_projection, m_pDeviceContext);
+                
+                // We have to use different transformations for animated/static models
+                // since havok's combined matrices are in another space...
+                // TODO: Find a better way to process havok's transformations correctly
+                if(cmd->model->hasBones())
+                {
+                    cmd->model->draw(cmd->modelMatrix, cmd->bones, m_view, m_projection, m_pDeviceContext);
+                }
+                else
+                {
+                    cmd->model->draw(cmd->modelMatrix.right2Left() * mat4::rotationMatrixXYZ(vec3(0, 180, 0)), cmd->bones, m_view, m_projection, m_pDeviceContext);
+                }
             }
             break;
     
@@ -732,10 +750,21 @@ gep::ResourcePtr<gep::IModel> gep::Renderer::loadModel(const char* path)
     if(model == m_pDummyModel)
         return model;
     uint32 matId = 0;
-    auto diffuseConstant = ShaderConstant<Texture2D>("diffuse", m_pLightingShader);
+
+    gep::ResourcePtr<Shader> shader;
+    if (model->hasBones())
+    {
+        shader = m_pLightingAnimatedShader;
+    }
+    else
+    {
+        shader = m_pLightingShader;
+    }
+
+    auto diffuseConstant = ShaderConstant<Texture2D>("diffuse", shader);
     for(auto& matInfo : model->getMaterialInfo())
     {
-        model->getMaterial(matId).setShader(m_pLightingShader);
+        model->getMaterial(matId).setShader(shader);
         for(auto& tex : matInfo.textures)
         {
             if(tex.semantic == TextureType::DIFFUSE)
@@ -773,8 +802,8 @@ gep::ivec2 gep::Renderer::toAbsoluteScreenPosition(const vec2& screenPosNormaliz
     GEP_ASSERT(screenPosNormalized.x >= -1.0f && screenPosNormalized.x <= 1.0f);
     GEP_ASSERT(screenPosNormalized.y >= -1.0f && screenPosNormalized.y <= 1.0f);
 
-    auto x( m_width * ((screenPosNormalized.x + 1.0f) / 2.0f) );
-    auto y( m_height * (1.0f - ((screenPosNormalized.y + 1.0f) / 2.0f)) );
+    auto x(m_settings.screenResolution.x * ((screenPosNormalized.x + 1.0f) / 2.0f));
+    auto y(m_settings.screenResolution.y * (1.0f - ((screenPosNormalized.y + 1.0f) / 2.0f)));
 
     ivec2 result(static_cast<ivec2::component_t>(x), static_cast<ivec2::component_t>(y));
     return result;
@@ -782,11 +811,11 @@ gep::ivec2 gep::Renderer::toAbsoluteScreenPosition(const vec2& screenPosNormaliz
 
 gep::vec2 gep::Renderer::toNormalizedScreenPosition(const ivec2& screenPos) const
 {
-    GEP_ASSERT(screenPos.x >= 0 && uint32(screenPos.x) <= m_width);
-    GEP_ASSERT(screenPos.y >= 0 && uint32(screenPos.y) <= m_height);
+    GEP_ASSERT(screenPos.x >= 0 && uint32(screenPos.x) <= m_settings.screenResolution.x);
+    GEP_ASSERT(screenPos.y >= 0 && uint32(screenPos.y) <= m_settings.screenResolution.y);
 
-    auto x( screenPos.x * 2.0f / m_width - 1.0f );
-    auto y( 1.0f - 2.0f * screenPos.y / m_height );
+    auto x(screenPos.x * 2.0f / m_settings.screenResolution.y - 1.0f);
+    auto y(1.0f - 2.0f * screenPos.y / m_settings.screenResolution.x);
 
     vec2 result(static_cast<vec2::component_t>(x), static_cast<vec2::component_t>(y));
     return result;

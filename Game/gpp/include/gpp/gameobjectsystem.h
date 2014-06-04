@@ -54,8 +54,8 @@ namespace gpp
         GameObjectManager();
         virtual ~GameObjectManager();
     private:
-        gep::Hashmap<std::string, GameObject*, gep::StringHashPolicy> m_gameObjects;
-        State::Enum m_state;
+       gep::Hashmap<std::string, GameObject*, gep::StringHashPolicy> m_gameObjects;
+       State::Enum m_state;
         gep::StackAllocator m_tempAllocator;
     };
 
@@ -87,6 +87,7 @@ namespace gpp
 
         virtual       GameObject* getParentGameObject()       = 0;
         virtual const GameObject* getParentGameObject() const = 0;
+        virtual gep::uint32 getPriority() const = 0;
 
     protected:
         virtual void setParentGameObject(GameObject* object) = 0;
@@ -104,6 +105,7 @@ namespace gpp
 
         virtual void setState(State::Enum state) override { m_state = state; }
         virtual State::Enum getState() const override { return m_state; }
+        virtual gep::uint32 getPriority() const override { return 1; };
 
     protected:
         GameObject* m_pParentGameObject;
@@ -150,29 +152,31 @@ namespace gpp
         template<typename T>
         T* getComponent()
         {
-            if(m_components.exists(ComponentMetaInfo<T>::name()))
-            {
-                return static_cast<T*>(m_components[ComponentMetaInfo<T>::name()].component);
+            T* pComponent = nullptr;
+            auto name = ComponentMetaInfo<T>::name();
+            m_components.ifExists(name, [&](const ComponentWrapper& wrapper){
+                pComponent = static_cast<T*>(wrapper.component);
+            });
+            return pComponent;
             }
-            else
-            {
-                return nullptr;
-            }
-            
-        }
 
         virtual void setPosition(const gep::vec3& pos) override;
         virtual void setRotation(const gep::Quaternion& rot) override;
         virtual void setScale(const gep::vec3& scale) override;
 
-        virtual gep::vec3 getPosition() override;
-        virtual gep::Quaternion getRotation() override;
-        virtual gep::vec3 getScale() override;
-        virtual gep::mat4 getTransformationMatrix() override;
+        virtual gep::vec3 getWorldPosition() const override;
+        virtual gep::Quaternion getWorldRotation() const override;
+        virtual gep::vec3 getWorldScale() const override;
+        virtual gep::mat4 getWorldTransformationMatrix() const override;
 
-        virtual gep::vec3 getViewDirection() override;
-        virtual gep::vec3 getUpDirection() override;
-        virtual gep::vec3 getRightDirection() override;
+        virtual gep::vec3 getScale() const override;
+        virtual gep::Quaternion getRotation() const override;
+        virtual gep::vec3 getPosition() const override;
+        virtual gep::mat4 getTransformationMatrix() const override;
+
+        virtual gep::vec3 getViewDirection() const override;
+        virtual gep::vec3 getUpDirection() const override;
+        virtual gep::vec3 getRightDirection() const override;
         virtual void setBaseOrientation(const gep::Quaternion& viewDir) override;
         virtual void setBaseViewDirection(const gep::vec3& direction) override;
 
@@ -183,6 +187,11 @@ namespace gpp
         inline       gep::ITransform& getTransform()       { return *m_transform; }
         inline const gep::ITransform& getTransform() const { return *m_transform; }
         inline void setTransform(gep::ITransform& transform) { m_transform = &transform; }
+
+
+
+        virtual const gep::ITransform* getParent() override;
+        virtual void setParent(const gep::ITransform* parent) override;
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION_NAMED(createComponent<CameraComponent>, "createCameraComponent")
@@ -196,16 +205,20 @@ namespace gpp
             LUA_BIND_FUNCTION_NAMED(getComponent<ScriptComponent>, "getScriptComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<AnimationComponent>, "getAnimationComponent")
             LUA_BIND_FUNCTION(setPosition)
-            LUA_BIND_FUNCTION(getPosition)
+            LUA_BIND_FUNCTION(getWorldPosition)
             LUA_BIND_FUNCTION(setRotation)
-            LUA_BIND_FUNCTION(getRotation)
+            LUA_BIND_FUNCTION(getWorldRotation)
             LUA_BIND_FUNCTION(getViewDirection)
+            LUA_BIND_FUNCTION(setScale)
+            LUA_BIND_FUNCTION(getScale)
+            LUA_BIND_FUNCTION(getWorldScale)
             LUA_BIND_FUNCTION(getUpDirection)
             LUA_BIND_FUNCTION(getRightDirection)
             LUA_BIND_FUNCTION(setComponentStates)
             LUA_BIND_FUNCTION(setBaseOrientation)
             LUA_BIND_FUNCTION(setBaseViewDirection)
-        LUA_BIND_REFERENCE_TYPE_END
+            LUA_BIND_FUNCTION(setParent)
+        LUA_BIND_REFERENCE_TYPE_END;
 
     private:
         std::string m_name;

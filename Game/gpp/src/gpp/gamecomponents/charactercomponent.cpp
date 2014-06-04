@@ -17,9 +17,10 @@ gpp::CharacterComponent::CharacterComponent():
     Component(),
     m_position(0.0f, 0.0f, 0.0f),
     m_rotation(),
-    m_pCharacterRigidBody(nullptr)
+    m_pCharacterRigidBody(nullptr),
+    m_transform()
 {
-
+    m_transform.setParent(m_pParentGameObject);
 }
 
 gpp::CharacterComponent::~CharacterComponent()
@@ -117,27 +118,14 @@ void gpp::CharacterComponent::setScale(const gep::vec3& scale )
     GEP_ASSERT(false, "The engine currently doesn't support scaling of rigid bodies!");
 }
 
-gep::mat4 gpp::CharacterComponent::getTransformationMatrix()
-{
-    //TODO: Extend for scale
-    return gep::mat4::translationMatrix(m_position) * m_rotation.toMat4();
-}
 
-gep::vec3 gpp::CharacterComponent::getPosition()
-{
-    return m_position;
-}
 
-gep::Quaternion gpp::CharacterComponent::getRotation()
-{
-    return m_rotation;
-}
-
-gep::vec3 gpp::CharacterComponent::getScale()
+gep::vec3 gpp::CharacterComponent::getWorldScale() const
 {
     GEP_ASSERT(false, "The engine currently doesn't support scaling of rigid bodies!");
     return gep::vec3(1,1,1);
 }
+
 
 void gpp::CharacterComponent::createCharacterRigidBody(gep::CharacterRigidBodyCInfo cinfo)
 {
@@ -167,18 +155,23 @@ void gpp::CharacterComponent::move(const gep::vec3& in_delta)
 
 
 
-gep::vec3 gpp::CharacterComponent::getViewDirection()
+gep::vec3 gpp::CharacterComponent::getViewDirection() const
 {
     return (m_rotation * m_baseOrientation).toMat3() * gep::vec3(0,1,0);
 }
-gep::vec3 gpp::CharacterComponent::getUpDirection()
+
+gep::vec3 gpp::CharacterComponent::getUpDirection() const
 {
     return  (m_rotation * m_baseOrientation).toMat3()  * gep::vec3(0,0,1);
 }
-gep::vec3 gpp::CharacterComponent::getRightDirection()
+
+
+
+gep::vec3 gpp::CharacterComponent::getRightDirection() const
 {
     return  (m_rotation * m_baseOrientation).toMat3()  * gep::vec3(1,0,0);
 }
+
 
 
 void gpp::CharacterComponent::setBaseOrientation(const gep::Quaternion& viewDir)
@@ -190,6 +183,51 @@ void gpp::CharacterComponent::setBaseOrientation(const gep::Quaternion& viewDir)
 void gpp::CharacterComponent::setBaseViewDirection(const gep::vec3& direction)
 {
    m_baseOrientation = gep::Quaternion(direction, gep::vec3(0,1,0));
+}
+
+gep::mat4 gpp::CharacterComponent::getWorldTransformationMatrix() const 
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+
+gep::vec3 gpp::CharacterComponent::getWorldPosition() const 
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+
+gep::Quaternion gpp::CharacterComponent::getWorldRotation() const 
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+
+gep::mat4 gpp::CharacterComponent::getTransformationMatrix() const 
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+
+gep::vec3 gpp::CharacterComponent::getPosition() const 
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+
+gep::Quaternion gpp::CharacterComponent::getRotation() const 
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+
+gep::vec3 gpp::CharacterComponent::getScale() const 
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+
+void gpp::CharacterComponent::setParent(const gep::ITransform* parent)
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+
+const gep::ITransform* gpp::CharacterComponent::getParent()
+{
+    throw std::logic_error("The method or operation is not implemented.");
 }
 
 

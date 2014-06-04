@@ -11,6 +11,8 @@
 #include "gep/container/DynamicArray.h"
 #include "gep/memory/allocators.h"
 
+#include "gep/settings.h"
+
 typedef int (WINAPI * D3DPERF_EndEvent_Func)();
 typedef int (WINAPI * D3DPERF_BeginEvent_Func)(DWORD, LPCWSTR);
 struct ID3DUserDefinedAnnotation;
@@ -38,7 +40,6 @@ namespace gep
     struct CommandBase;
     struct LineInfo;
     struct LineInfo2D;
-    namespace settings { struct Video; }
 
     struct RenderTextInfo
     {
@@ -57,9 +58,8 @@ namespace gep
     {
     private:
         IDebugRenderer* m_pDebugRenderer;
-        uint32 m_width, m_height;
-        bool m_vsyncEnabled;
-        bool m_requestedVSyncState;
+        settings::Video& m_settings;
+        bool m_actualVSync;
 
         void createWindow();
         void destroyWindow();
@@ -99,8 +99,9 @@ namespace gep
         Vertexbuffer* m_pLinesBuffer;
         Vertexbuffer* m_pLines2DBuffer;
         bool m_isFontBufferOutOfDate;
-
+        
         ResourcePtr<Shader> m_pLightingShader;
+        ResourcePtr<Shader> m_pLightingAnimatedShader;
         ResourcePtr<Shader> m_pLinesShader;
         ResourcePtr<Shader> m_pWireframeShader;
         ShaderConstant<Color> m_lineColor;
@@ -130,7 +131,7 @@ namespace gep
 
 
     public:
-        Renderer(const settings::Video& settings);
+        Renderer(settings::Video& settings);
 
         // ISubsystem interface
         virtual void initialize() override;
@@ -155,11 +156,11 @@ namespace gep
 
         virtual ResourcePtr<IResource> createGeneratedTexture(uint32 width, uint32 height, const char* resourceId, std::function<void(ArrayPtr<uint8>)> generatorFunction) override;
 
-        virtual uint32 getScreenWidth() const override { return m_width; }
-        virtual uint32 getScreenHeight() const override { return m_height; }
+        virtual uint32 getScreenWidth() const override { return m_settings.screenResolution.x; }
+        virtual uint32 getScreenHeight() const override { return m_settings.screenResolution.y; }
 
-        virtual bool getVSyncEnabled() const override { return m_vsyncEnabled; }
-        virtual void setVSyncEnabled(bool value) override { m_requestedVSyncState = value; }
+        virtual bool getVSyncEnabled() const override { return m_settings.vsyncEnabled; }
+        virtual void setVSyncEnabled(bool value) override { m_settings.vsyncEnabled = value; }
 
 
         virtual ivec2 toAbsoluteScreenPosition(const vec2& screenPosNormalized) const override;

@@ -132,14 +132,18 @@ GEP_API std::string lua::utils::traceback(lua_State* L)
 {
     StackCleaner cleaner(L, 0);
 
-    lua_getglobal(L, "__builtins");
-    lua_getfield(L, -1, "debug");
-    lua_getfield(L, -1, "traceback");
-    lua_pushnil(L);
-    lua_pushinteger(L, 1);
-    lua_call(L, 2, 1);
+    lua_getglobal(L, "debug");
+    // If global 'debug' is a table, everything is file
+    if (lua_istable(L, -1))
+    {
+        lua_getfield(L, -1, "traceback");
+        lua_pushnil(L);
+        lua_pushinteger(L, 1);
+        lua_call(L, 2, 1);
 
-    return lua_tostring(L, -1);
+        return lua_tostring(L, -1);
+    }
+    return "<Global 'debug' is not a table!>";
 }
 
 //////////////////////////////////////////////////////////////////////////

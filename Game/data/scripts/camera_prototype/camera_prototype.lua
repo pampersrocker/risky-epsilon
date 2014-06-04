@@ -26,15 +26,15 @@ end
 --
 scene = {}
 scene.sponza = GameObjectManager:createGameObject("sponza")
-scene.sponza.rc = scene.sponza:createRenderComponent()
-scene.sponza.rc:setPath("data/sponza/sponza.thModel")
+--scene.sponza.rc = scene.sponza:createRenderComponent()
+--scene.sponza.rc:setPath("data/sponza/sponza.thModel")
 scene.ground = createCollisionBox("ground", Vec3(1750.0, 1000.0, 10.0), Vec3(0.0, 0.0, -10.0))
 scene.ground = createCollisionBox("wallRight", Vec3(1000.0, 40.0, 200.0), Vec3(-60.0, 280.0, 200.0))
 
 function createDefaultCam(guid)
 	local cam = GameObjectManager:createGameObject(guid)
 	cam.cc = cam:createCameraComponent()
-	cam.cc:setPosition(Vec3(0.0, 0.0, 0.0))
+	cam:setPosition(Vec3(0.0, 0.0, 0.0))
 	cam.cc:setViewDirection(Vec3(1.0, 0.0, 0.0))
 	cam.baseViewDir = Vec3(1.0, 0.0, 0.0)
 	cam.cc:setBaseViewDirection(cam.baseViewDir)
@@ -76,7 +76,7 @@ function debugCamUpdate(updateData)
 	end
 	debugCam.cc:move(moveVec)
 	
-	local pos = debugCam.cc:getPosition()
+	local pos = debugCam.cc:getWorldPosition()
 	DebugRenderer:printText(Vec2(-0.9, 0.80), "  pos: " .. string.format("%5.2f", pos.x) .. ", " .. string.format("%5.2f", pos.y) .. ", " .. string.format("%5.2f", pos.z))
 	local dir = debugCam:getViewDirection()
 	DebugRenderer:printText(Vec2(-0.9, 0.75), "  dir: " .. string.format("%5.2f", dir.x) .. ", " .. string.format("%5.2f", dir.y) .. ", " .. string.format("%5.2f", dir.z))
@@ -108,8 +108,8 @@ end
 
 function normalCamFirstPersonUpdate(updateData)
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "firstPerson")
-	local camPos = player:getPosition() + Vec3(0.0, 0.0, 10.0)
-	normalCam.firstPerson.cc:setPosition(camPos)
+	local camPos = player:getWorldPosition() + Vec3(0.0, 0.0, 10.0)
+	normalCam.firstPerson:setPosition(camPos)
 	normalCam.firstPerson.cc:lookAt(camPos + player:getViewDirection():mulScalar(100.0) + Vec3(0.0, 0.0, player.viewUpDown))
 	return EventResult.Handled
 end
@@ -133,24 +133,26 @@ cinfo.gravityFactor = 0.0
 normalCam.thirdPerson.pc.rb = normalCam.thirdPerson.pc:createRigidBody(cinfo)
 normalCam.thirdPerson.pc:setState(ComponentState.Inactive)
 normalCam.thirdPerson.calcPosTo = function()
-	return player:getPosition() + player:getViewDirection():mulScalar(-150.0) + Vec3(0.0, 0.0, 50.0)
+	return player:getWorldPosition() + player:getViewDirection():mulScalar(-150.0) + Vec3(0.0, 0.0, 50.0)
 end
 
 function normalCamThirdPersonEnter(enterData)
 	normalCam.thirdPerson:setPosition(normalCam.thirdPerson.calcPosTo())
 	normalCam.thirdPerson:setComponentStates(ComponentState.Active)
+	normalCam.thirdPerson.cc:setViewTarget(player)
+	normalCam.thirdPerson.cc:setViewTargetPositionOffset(Vec3(0,0,30.0))
 	return EventResult.Handled
 end
 
 function normalCamThirdPersonUpdate(updateData)
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "thirdPerson")
 	local camPosTo = normalCam.thirdPerson.calcPosTo()
-	local camPosIs = normalCam.thirdPerson:getPosition()
+	local camPosIs = normalCam.thirdPerson:getWorldPosition()
 	local camPosVel = camPosTo - camPosIs
 	if (camPosVel:length() > 1.0 ) then
 		normalCam.thirdPerson.pc.rb:setLinearVelocity(camPosVel:mulScalar(2.5))
 	end
-	normalCam.thirdPerson.cc:lookAt(player:getPosition() + Vec3(0.0, 0.0, 30.0))
+	--normalCam.thirdPerson.cc:lookAt(player:getWorldPosition() + Vec3(0.0, 0.0, 30.0))
 	return EventResult.Handled
 end
 
@@ -172,7 +174,7 @@ function normalCamIsometricUpdate(updateData)
 	local viewDir = normalCam.isometric.cc:getViewDirection()
 	viewDir = viewDir:mulScalar(-250.0)
 	viewDir.z = 125.0
-	normalCam.isometric.cc:setPosition(player:getPosition() + viewDir)
+	normalCam.isometric:setPosition(player:getWorldPosition() + viewDir)
 	return EventResult.Handled
 end
 
@@ -227,7 +229,7 @@ StateTransitions{
 -- player
 --
 function playerUpdate(guid, elapsedTime)
-	local position = player:getPosition()
+	local position = player:getWorldPosition()
 	local viewDir = player:getViewDirection()
 	DebugRenderer:drawArrow(position, position + viewDir:mulScalar(25.0))
 	local moveSpeed = 1200.0
