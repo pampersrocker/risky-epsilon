@@ -10,15 +10,13 @@ function InitializeWorld(  )
 
 	-- create player
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
-	if PlayerMeta == nil then
-		logMessage("FUUUUUU")
-	end
+
 	PlayerMeta.__index = PlayerMeta
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
 	GameLogic.playerInstance:initializeGameObject()
 
-	GameLogic.playerInstance.cb = CreateCollisionSphere("cb_player", 15, GameLogic.playerInstance.go:getWorldPosition())
+	--GameLogic.playerInstance.cb = CreateCollisionSphere("cb_player", 15, GameLogic.playerInstance.go:getWorldPosition())
 	--create camera
 
 	distance = 50.0
@@ -37,9 +35,11 @@ function InitializeWorld(  )
 	--create Level
 	logMessage("Creating Level")
 	GameLogic.level = CreateEmptyGameObject("TestLevel")
+	LevelMeta.__index = LevelMeta
 	setmetatable(GameLogic.level, LevelMeta)
-	CreateScriptComponent(GameLogic.level, LevelMeta.initialize, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.level.cb = CreateCollisionBox("cb_ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
+	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	--GameLogic.level.cb = CreateCollisionBox("cb_ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
+	GameLogic.level:initializeGameObject()
 end
 
 InitializeWorld()
