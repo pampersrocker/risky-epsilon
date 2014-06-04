@@ -64,7 +64,7 @@ function createDefaultCam(guid)
 	return cam
 end
 
---[[
+
 function CreateCollisionBox(guid, halfExtends, position)
 	local box = GameObjectManager:createGameObject(guid)
 	box.pc = box:createPhysicsComponent()
@@ -75,7 +75,17 @@ function CreateCollisionBox(guid, halfExtends, position)
 	box.pc.rb = box.pc:createRigidBody(cinfo)
 	return box
 end
-]]
+
+function CreateCollisionSphere(guid, radius, position)
+	local box = GameObjectManager:createGameObject(guid)
+	box.pc = box:createPhysicsComponent()
+	local cinfo = RigidBodyCInfo()
+	cinfo.shape = PhysicsFactory:createSphere(radius)
+	cinfo.motionType = MotionType.Fixed
+	cinfo.position = position
+	box.pc.rb = box.pc:createRigidBody(cinfo)
+	return box
+end
 
 local GameObjects = {}
 
