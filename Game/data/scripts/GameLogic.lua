@@ -46,6 +46,7 @@ end
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
 	-- body
+	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
 	logMessage("Updating running state");
 	return EventResult.Handled;
 end
@@ -69,6 +70,7 @@ end
 
 function GameLogic.updatePause( updateData )
 	-- body
+	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: pause")
 	logMessage("Updating Pause state");
 	return EventResult.Handled;
 end
