@@ -325,8 +325,8 @@ void gep::Renderer::initD3DDevice()
     GetClientRect( m_hWnd, &rc );
     UINT width = rc.right - rc.left;
     UINT height = rc.bottom - rc.top;
-    GEP_ASSERT(width == m_settings.screenResolution.x);
-    GEP_ASSERT(height == m_settings.screenResolution.y);
+    //GEP_ASSERT(width == m_settings.screenResolution.x);
+    //GEP_ASSERT(height == m_settings.screenResolution.y);
 
     UINT createDeviceFlags = 0;
 #ifdef _DEBUG
