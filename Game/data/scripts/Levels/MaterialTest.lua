@@ -5,7 +5,7 @@ LevelMeta = {}
 function LevelMeta:initializeGameObject()
 	logMessage("LevelMeta:init() start ")
 	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:createBox(Vec3(100,100,1))
+	cinfo.shape = PhysicsFactory:createBox(Vec3(1000,1000,1))
 	cinfo.motionType = MotionType.Fixed
 	--cinfo.mass = 100.0
 	cinfo.restitution = 0.0
