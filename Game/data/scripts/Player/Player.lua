@@ -15,7 +15,7 @@ function PlayerMeta:initializeGameObject( )
 	--cinfo.linearDamping = 1.0
 	cinfo.angularDamping = 10.0
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
-	--CreatePhysicsComponent( go , cinfo )
+	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/sphere.thmodel")
 	logMessage("PlayerMeta:init() end")
 
