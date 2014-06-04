@@ -18,6 +18,15 @@ end
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
 	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
+	
+	if (InputHandler:isPressed(Key._1)) then
+		local go = GetGObyGUID("playerInstance")
+		ChangePlayer(go)
+	elseif (InputHandler:isPressed(Key._2)) then
+		local go = GetGObyGUID("playerInstanceStone")
+		ChangePlayer(go)
+	end
+	
 	return EventResult.Handled;
 end
 

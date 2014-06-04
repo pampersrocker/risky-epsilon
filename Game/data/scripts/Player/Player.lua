@@ -13,7 +13,7 @@ function PlayerMeta:initializeGameObject( )
 	cinfo.maxLinearVelocity = 300.0
 	cinfo.maxAngularVelocity = 100.0
 	--cinfo.linearDamping = 1.0
-	cinfo.angularDamping = 10.0
+	cinfo.angularDamping = 1.0
 	cinfo.position = Vec3(0.0, 0.0, 20.0)
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/sphere.thmodel")
@@ -25,6 +25,25 @@ function PlayerMeta:initializeGameObject( )
 
 	--self.ac:addAnimationFile("FOO","data/animations/barbarian/barbarian_walk.hkt")
 
+end
+
+
+function PlayerMeta:initializeGameObjectStone( )
+	logMessage("PlayerMeta:initStone() start ")
+	local cinfo = RigidBodyCInfo()
+	cinfo.shape = PhysicsFactory:createSphere(15)
+	cinfo.motionType = MotionType.Dynamic
+	cinfo.mass = 3000.0
+	cinfo.restitution = 0.0
+	cinfo.friction = 100.0
+	cinfo.maxLinearVelocity = 300.0
+	cinfo.maxAngularVelocity = 200.0
+	--cinfo.linearDamping = 1.0
+	cinfo.angularDamping = 1.0
+	cinfo.position = Vec3(0.0, 0.0, 20.0)
+	CreatePhysicsComponent( self , cinfo )
+	CreateRenderComponent(self, "data/models/Sphere/Fracture001.thmodel")
+	logMessage("PlayerMeta:initStone() end")
 end
 
 function PlayerMeta.update( guid, elapsedTime )
@@ -66,8 +85,6 @@ end
 function PlayerMeta.init( guid )
 	-- body
 	local go = GetGObyGUID(guid)
-	go.currentAngularVelocityForward = Vec3(0.0, 250, 0.0)
-	go.currentAngularVelocityLeft = Vec3(-250,0.0,0.0)
 end
 
 function PlayerMeta.destroy( ... )

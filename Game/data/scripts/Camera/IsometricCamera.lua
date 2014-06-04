@@ -27,7 +27,7 @@ function IsoCamera.update( guid, elapsedTime )
 	viewDir.z = distance/2
 	--TODO: get guid from player the right way!!
 	-- by cam.trackingobject = playerobject in gamelogic.lua
-	cam.go.cc:setPosition(GetGObyGUID("playerInstance").go:getWorldPosition() + viewDir)
+	cam.go.cc:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition() + viewDir)
 end
 
 function IsoCamera.init( ... )

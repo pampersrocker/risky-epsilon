@@ -96,3 +96,17 @@ end
 function SetGObyGUID( guid , instance )
 	GameObjects[guid] = instance
 end
+
+function ChangePlayer( newGo )
+	-- inactivate current player
+	GameLogic.isoCam.trackingObject.go:setComponentStates(ComponentState.Inactive)
+	
+	-- activate newGo player
+	newGo.go.rb:setAngularVelocity(GameLogic.isoCam.trackingObject.go.rb:getAngularVelocity())
+	newGo.go.rb:setLinearVelocity(GameLogic.isoCam.trackingObject.go.rb:getLinearVelocity())
+	newGo.go:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
+	newGo.go:setComponentStates(ComponentState.Active)
+	-- change cam-lockAT
+	GameLogic.isoCam.trackingObject = newGo
+	
+end
