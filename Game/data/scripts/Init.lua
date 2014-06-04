@@ -2,7 +2,7 @@ function InitializeWorld(  )
 
 	-- body
 	local cinfo = WorldCInfo()
-	cinfo.gravity = Vec3(0,0,-9.81)
+	cinfo.gravity = Config.world.gravity
 	cinfo.worldSize = 4000.0
 	local world = PhysicsFactory:createWorld(cinfo)
 	PhysicsSystem:setWorld(world)
@@ -25,14 +25,8 @@ function InitializeWorld(  )
 	GameLogic.playerInstanceStone.go:setComponentStates(ComponentState.Inactive)
 	
 	--create camera
-	distance = 50.0
-	distanceDelta = 5.0
-	distanceMin = 15.0
-	distanceMax = 300000.0
-
-
 	isoCam = createDefaultCam("IsoCam")
-	isoCam.go.cc:look(Vec2(0.0, 20.0))
+	isoCam.go.cc:look(Config.camera.initLook)
 	isoCam.trackingObject = GetGObyGUID("playerInstance")
 	
 	setmetatable( isoCam, IsoCamera)

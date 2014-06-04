@@ -5,11 +5,11 @@ LevelMeta = {}
 function LevelMeta:initializeGameObject()
 	logMessage("LevelMeta:init() start ")
 	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:createBox(Vec3(1000,1000,1))
+	cinfo.shape = PhysicsFactory:createBox(Vec3(800,800,1))
 	cinfo.motionType = MotionType.Fixed
 	--cinfo.mass = 100.0
-	cinfo.restitution = 0.0
-	cinfo.friction = 10.0
+	cinfo.restitution = Config.materials.wood.restitution
+	cinfo.friction = Config.materials.wood.friction
 	--cinfo.maxLinearVelocity = 300.0
 	--cinfo.maxAngularVelocity = 2.0
 	----cinfo.linearDamping = 1.0

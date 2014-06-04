@@ -7,14 +7,14 @@ function PlayerMeta:initializeGameObject( )
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:createSphere(15)
 	cinfo.motionType = MotionType.Dynamic
-	cinfo.mass = 100.0
-	cinfo.restitution = 0.0
-	cinfo.friction = 10.0
-	cinfo.maxLinearVelocity = 300.0
-	cinfo.maxAngularVelocity = 100.0
-	--cinfo.linearDamping = 1.0
-	cinfo.angularDamping = 1.0
-	cinfo.position = Vec3(0.0, 0.0, 20.0)
+	cinfo.mass = Config.materials.wood.mass
+	cinfo.restitution = Config.materials.wood.restitution
+	cinfo.friction = Config.materials.wood.friction
+	cinfo.maxLinearVelocity = Config.player.maxLinearVelocity 
+	cinfo.maxAngularVelocity = Config.player.maxAngularVelocity
+	--cinfo.linearDamping = Config.materials.wood.linearDamping
+	cinfo.angularDamping = Config.materials.wood.angularDamping 
+	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/sphere.thmodel")
 	logMessage("PlayerMeta:init() end")
@@ -24,7 +24,6 @@ function PlayerMeta:initializeGameObject( )
 	--self.ac:setSkeletonFile("data/animations/barbarian/barbarian.hkt")
 
 	--self.ac:addAnimationFile("FOO","data/animations/barbarian/barbarian_walk.hkt")
-
 end
 
 
@@ -33,14 +32,14 @@ function PlayerMeta:initializeGameObjectStone( )
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:createSphere(15)
 	cinfo.motionType = MotionType.Dynamic
-	cinfo.mass = 3000.0
-	cinfo.restitution = 0.0
-	cinfo.friction = 100.0
-	cinfo.maxLinearVelocity = 300.0
-	cinfo.maxAngularVelocity = 200.0
-	--cinfo.linearDamping = 1.0
-	cinfo.angularDamping = 1.0
-	cinfo.position = Vec3(0.0, 0.0, 20.0)
+	cinfo.mass = Config.materials.stone.mass 
+	cinfo.restitution = Config.materials.stone.restitution
+	cinfo.friction = Config.materials.stone.friction
+	cinfo.maxLinearVelocity = Config.player.maxLinearVelocity 
+	cinfo.maxAngularVelocity = Config.player.maxAngularVelocity
+	--cinfo.linearDamping = Config.materials.wood.linearDamping
+	cinfo.angularDamping = Config.materials.wood.angularDamping 
+	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/Fracture001.thmodel")
 	logMessage("PlayerMeta:initStone() end")
@@ -56,26 +55,26 @@ function PlayerMeta.update( guid, elapsedTime )
 	
 
 	if InputHandler:gamepad(0):isConnected() then
-		local leftTorque = viewDir:mulScalar(1000):mulScalar(-InputHandler:gamepad(0):leftStick().x)
-		local rightTorque = rightDir:mulScalar(1000):mulScalar(InputHandler:gamepad(0):leftStick().y)
+		local leftTorque = viewDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().x)
+		local rightTorque = rightDir:mulScalar(Config.player.torqueMulScalar):mulScalar(InputHandler:gamepad(0):leftStick().y)
 		player.go.rb:applyTorque(elapsedTime, leftTorque + rightTorque)
 	else
-		if (InputHandler:isPressed(Key.A)) then
+		if (InputHandler:isPressed(Config.keys.left)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime, -viewDir:mulScalar(1000))
-		elseif (InputHandler:isPressed(Key.D)) then
+			player.go.rb:applyTorque(elapsedTime, -viewDir:mulScalar(Config.player.torqueMulScalar))
+		elseif (InputHandler:isPressed(Config.keys.right)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,viewDir:mulScalar(1000))
-		elseif (InputHandler:isPressed(Key.W)) then
+			player.go.rb:applyTorque(elapsedTime,viewDir:mulScalar(Config.player.torqueMulScalar))
+		elseif (InputHandler:isPressed(Config.keys.forward)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,-rightDir:mulScalar(1000))
-		elseif (InputHandler:isPressed(Key.S)) then
+			player.go.rb:applyTorque(elapsedTime,-rightDir:mulScalar(Config.player.torqueMulScalar))
+		elseif (InputHandler:isPressed(Config.keys.backward)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,rightDir:mulScalar(1000))
+			player.go.rb:applyTorque(elapsedTime,rightDir:mulScalar(Config.player.torqueMulScalar))
 		else
 			player.go.angularVelocitySwapped = false
 		end
