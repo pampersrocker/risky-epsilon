@@ -32,11 +32,11 @@ function PlayerMeta.update( guid, elapsedTime )
 	if (InputHandler:isPressed(Key.A)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.pc.rb:applyTorque(elapsedTime, player.go.currentAngularVelocityLeft)
+			player.go.rb:applyTorque(elapsedTime, player.go.currentAngularVelocityLeft)
 		elseif (InputHandler:isPressed(Key.D)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.pc.rb:applyTorque(elapsedTime,-player.go.currentAngularVelocityLeft)
+			player.go.rb:applyTorque(elapsedTime,-player.go.currentAngularVelocityLeft)
 		else
 			player.go.angularVelocitySwapped = false
 		end
