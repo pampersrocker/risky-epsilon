@@ -3,7 +3,6 @@ PlayerMeta = {}
 
 
 function PlayerMeta.update( guid, elapsedTime )
-	logMessage("UPDATE!")
 end
 
 function PlayerMeta.init( guid )
@@ -19,10 +18,11 @@ function PlayerMeta.init( guid )
 	--cinfo.linearDamping = 1.0
 	cinfo.angularDamping = 10.0
 	cinfo.position = Vec3(0.0, 0.0, 2.0)
-	logWarning(guid)
 	go = GetGObyGUID(guid)
 	CreatePhysicsComponent( go , cinfo )
+	CreateRenderComponent(go, "data/models/ball.thmodel")
 	logMessage("PlayerMeta:init() end")
+
 end
 
 function PlayerMeta.destroy( ... )

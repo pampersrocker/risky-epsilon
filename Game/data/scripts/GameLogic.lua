@@ -1,7 +1,6 @@
 GameLogic = CreateEmptyGameObject("GameLogic123")
 
 function GameLogic.update( guid, elapsedTime )
-	logMessage("UPDATE!")
 end
 
 function GameLogic.init( ... )
@@ -12,23 +11,29 @@ function GameLogic.init( ... )
 	local world = PhysicsFactory:createWorld(cinfo)
 	PhysicsSystem:setWorld(world)
 	PhysicsSystem:setDebugDrawingEnabled(true)
-	
-	-- create player 
-	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance") 
+
+	--create Level
+	logMessage("Creating Level")
+	GameLogic.level = CreateEmptyGameObject("TestLevel")
+	setmetatable(GameLogic.level, LevelMeta)
+	CreateScriptComponent(GameLogic.level, LevelMeta.initialize, LevelMeta.update, LevelMeta.destroy)
+
+	-- create player
+	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
-	
+
 	--create camera
-	
+
 	distance = 50.0
 	distanceDelta = 5.0
 	distanceMin = 15.0
 	distanceMax = 200.0
-	
-	
+
+
 	isoCam = createDefaultCam("IsoCam")
 	isoCam.go.cc:look(Vec2(0.0, 20.0))
-	
+
 	setmetatable( isoCam, IsoCamera)
 	CreateScriptComponent(isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
 	logMessage("GameLogic:init()")
@@ -44,8 +49,7 @@ end
 -- Running State
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
-	-- body
-	logMessage("Updating running state");
+	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
 	return EventResult.Handled;
 end
 
@@ -68,6 +72,7 @@ end
 
 function GameLogic.updatePause( updateData )
 	-- body
+	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: pause")
 	logMessage("Updating Pause state");
 	return EventResult.Handled;
 end
@@ -90,11 +95,11 @@ end
 -- Transitions
 -------------------------------------------------------
 function GameLogic.checkPause()
-	return false;
+	return InputHandler:wasTriggered(Key.P);
 end
 
 function GameLogic.checkUnPause()
-	return false;
+	return InputHandler:wasTriggered(Key.P);
 end
 
 function GameLogic.canLeave()
