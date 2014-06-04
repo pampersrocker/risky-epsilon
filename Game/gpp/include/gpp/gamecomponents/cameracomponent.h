@@ -23,13 +23,27 @@ namespace gpp
 
         virtual void setRotation(const gep::Quaternion& rot) override;
         
-        virtual gep::vec3 getPosition() override;
+        virtual gep::vec3 getWorldPosition() const override;
 
-        virtual gep::Quaternion getRotation() override;
+        virtual gep::Quaternion getWorldRotation() const  override;
         
-        void lookAt(const gep::vec3& target);
+        virtual gep::vec3 getWorldScale() const  override;
+        
+        virtual gep::mat4 getWorldTransformationMatrix() const override;
 
+        virtual gep::vec3 getScale() const override;
+
+        virtual gep::Quaternion getRotation()const override;
+
+        virtual gep::vec3 getPosition() const override;
+
+        virtual gep::mat4 getTransformationMatrix() const override;
+
+        void lookAt(const gep::vec3& target);
+        
         void setViewDirection(const gep::vec3& vector);
+        
+        void setUpDirection(const gep::vec3& vector);
 
         void setActive();
 
@@ -56,27 +70,50 @@ namespace gpp
         void setAspectRatio(float ratio){m_pCamera->setAspectRatio(ratio);}
 
 
-        virtual gep::vec3 getRightDirection() override;
-        virtual gep::vec3 getUpDirection() override;
-        virtual gep::vec3 getViewDirection() override;
-        virtual gep::vec3 getScale() override;
-        virtual gep::mat4 getTransformationMatrix() override;
+        virtual gep::vec3 getRightDirection() const override;
+        
+        virtual gep::vec3 getUpDirection() const override;
+        
+        virtual gep::vec3 getViewDirection() const override;
+        
         virtual void setBaseViewDirection(const gep::vec3& direction) override;
+        
         virtual void setBaseOrientation(const gep::Quaternion& orientation) override;
+        
         virtual void setScale(const gep::vec3& scale) override;
 
-
         virtual void setState(State::Enum state) override;
+
+        virtual const gep::ITransform* getParent() override;
+
+        virtual void setParent(const gep::ITransform* parent) override;
+        
+        void setViewTarget(const gep::ITransform* view);
+        void setUpTarget(const gep::ITransform* view);
+        
+        void unsetViewTarget() { m_viewTarget.setParent(nullptr); };
+        void unsetUpTarget() { m_upTarget.setParent(nullptr); };
+        
+        void setViewTargetPositionOffset(const gep::vec3& positionOffset) { 
+            m_viewTarget.setPosition(positionOffset); 
+        };
+        void setUpTargetPositionOffset(const gep::vec3& positionOffset) { m_upTarget.setPosition(positionOffset); };
+
     
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(setPosition)
             LUA_BIND_FUNCTION(lookAt)
+            LUA_BIND_FUNCTION(getViewDirection)
             LUA_BIND_FUNCTION(setViewDirection)
             LUA_BIND_FUNCTION(getRightDirection)
             LUA_BIND_FUNCTION(getUpDirection)
-            LUA_BIND_FUNCTION(getViewDirection)
-            LUA_BIND_FUNCTION(getPosition)
-            LUA_BIND_FUNCTION(getRotation)
+            LUA_BIND_FUNCTION(setUpDirection)
+            LUA_BIND_FUNCTION(getWorldPosition)
+            LUA_BIND_FUNCTION(getWorldRotation)
+            LUA_BIND_FUNCTION(setViewTarget)
+            LUA_BIND_FUNCTION(setUpTarget)
+            LUA_BIND_FUNCTION(setViewTargetPositionOffset)
+            LUA_BIND_FUNCTION(setUpTargetPositionOffset)
             LUA_BIND_FUNCTION(setRotation)
             LUA_BIND_FUNCTION(setBaseOrientation)
             LUA_BIND_FUNCTION(setBaseViewDirection)
@@ -92,12 +129,16 @@ namespace gpp
             LUA_BIND_FUNCTION(getFar)
             LUA_BIND_FUNCTION(setAspectRatio)
             LUA_BIND_FUNCTION(getAspectRatio)
-        LUA_BIND_REFERENCE_TYPE_END 
+            LUA_BIND_FUNCTION(unsetUpTarget)
+            LUA_BIND_FUNCTION(unsetViewTarget)
+        LUA_BIND_REFERENCE_TYPE_END ;
 
     private:
         gep::CameraLookAtHorizon* m_pCamera;
-        gep::Quaternion m_baseOrientation;
         gep::vec3 m_lookAt;
+        gep::Transform m_transform;
+        gep::Transform m_viewTarget;
+        gep::Transform m_upTarget;
 
     };
 

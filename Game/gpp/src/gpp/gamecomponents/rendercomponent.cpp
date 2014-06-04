@@ -56,21 +56,29 @@ void gpp::RenderComponent::destroy()
 
 void gpp::RenderComponent::extract(gep::IRendererExtractor& extractor)
 {
-    m_pModel->extract(extractor, m_pParentGameObject->getTransformationMatrix());
+    m_pModel->extract(extractor, m_pParentGameObject->getWorldTransformationMatrix());
 }
 
-
-void gpp::RenderComponent::applyBoneTransformations(const gep::ArrayPtr<gep::BoneTransform>& transformations)
+gep::DynamicArray<const char*> gpp::RenderComponent::getBoneNames()
 {
-    m_bones.clear();
-    m_bones.reserve(transformations.length());
+    return m_pModel->getBoneNames();
+}
 
-    int i =0;
-    for (auto& trans :transformations)
+void gpp::RenderComponent::setBoneMapping(const gep::DynamicArray<gep::uint32>& boneIds)
+{
+    m_boneMapping = boneIds;
+}
+
+void gpp::RenderComponent::applyBoneTransformations(const gep::ArrayPtr<gep::mat4>& transformations)
+{
+    GEP_ASSERT(m_boneMapping.length() <= transformations.length(), "Bonemapping does not match transformations");
+    m_bones.resize(transformations.length());
+
+    int i = 0;
+    for (auto index :m_boneMapping)
     {
-        gep::mat4 transformation = gep::mat4::translationMatrix(trans.translation);
-        transformation.setRotationPart(trans.rotation.toMat3());
-        m_bones.append(transformation);
+        m_bones[i] = transformations[index];
+        i++;
     }
     m_pModel->setBones(m_bones.toArray());
 }

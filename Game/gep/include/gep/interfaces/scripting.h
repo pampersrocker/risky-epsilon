@@ -47,8 +47,8 @@ namespace gep
 
         virtual void loadScript(const std::string& filename, LoadOptions::Enum loadOptions = LoadOptions::Default) = 0;
 
-        virtual void setState(State state) = 0;
-        virtual State getState() const = 0;
+        virtual void setManagerState(State state) = 0;
+        virtual State getManagerState() const = 0;
 
         /// \brief Used to register scripts that will be loaded as regular user scripts.
         ///        Should be called in an initialization script (e.g. initialize.lua)

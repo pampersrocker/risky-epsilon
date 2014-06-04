@@ -7,6 +7,7 @@
 #include "gep/memory/leakDetection.h"
 #include "gep/globalManager.h"
 #include "gep/interfaces/logging.h"
+#include "gep/settings.h"
 
 namespace gep
 {
@@ -43,8 +44,19 @@ namespace gep
     {
         auto luaMessage = lua_tostring(L, -1);
         lua_pop(L, 1);
-        auto callStack = lua::utils::traceback(L);
-        auto stackDump = lua::utils::dumpStack(L);
+
+        std::string callStack = "stack <disabled in settings>";
+        if(g_globalManager.getSettings()->getLuaSettings().callstackTracebackEnabled)
+        {
+            callStack = lua::utils::traceback(L);
+        }
+
+        std::string stackDump = "<disabled in settings>";
+        if(g_globalManager.getSettings()->getLuaSettings().callstackTracebackEnabled)
+        {
+            stackDump = lua::utils::dumpStack(L);
+        }
+        
         auto fmt = "in Lua: %s\n"
                    "Lua call%s\n"
                    "Lua stack dump %s";

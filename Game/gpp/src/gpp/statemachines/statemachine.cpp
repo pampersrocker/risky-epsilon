@@ -173,11 +173,6 @@ gpp::sm::State::ConditionCheckResult gpp::sm::StateMachine::checkConditions() co
     return m_pLeaveState->checkConditions();
 }
 
-void gpp::sm::StateMachine::updateCurrentState()
-{
-
-}
-
 gpp::sm::NameInfo& gpp::sm::StateMachine::getNameInfo()
 {
     return State::getNameInfo();

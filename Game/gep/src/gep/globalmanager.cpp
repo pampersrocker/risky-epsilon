@@ -35,6 +35,7 @@ gep::GlobalManager::GlobalManager() :
     m_pTimer(nullptr)
     , m_pInputHandler(nullptr)
     , m_pTaskQueue(nullptr)
+    , m_pSoundSystem(nullptr)
     , m_pPhysicsSystem(nullptr)
     , m_pScriptingManager(nullptr)
     , m_pEventManager(nullptr)

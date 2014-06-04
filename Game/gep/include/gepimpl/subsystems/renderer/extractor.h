@@ -48,6 +48,7 @@ namespace gep
         static const CommandType TYPE = CommandType::RenderModel;
         ResourcePtr<Model> model;
         mat4 modelMatrix;
+        ArrayPtr<mat4> bones;
     };
 
     struct LineInfo {

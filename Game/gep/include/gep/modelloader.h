@@ -50,7 +50,9 @@ namespace gep
             TexCoord0  = 0x0010,
             TexCoord1  = 0x0020,
             TexCoord2  = 0x0040,
-            TexCoord3  = 0x0080
+            TexCoord3  = 0x0080,
+            BoneIds    = 0x0400,
+            BoneWeights= 0x0800
         };
     };
 
@@ -73,9 +75,17 @@ namespace gep
                 Bones      = 0x0400,
                 Everything = 0xFFFF
             };
+
         };
         struct BoneInfo;
         struct BoneNode;
+
+        struct BoneData
+        {
+            const char* name;
+            mat4 offsetMatrix;
+        };
+
 
         struct FaceData
         {
@@ -106,18 +116,7 @@ namespace gep
             ArrayPtr<vec3> bitangents;
             ArrayPtr<vec2> texcoords[4];
             ArrayPtr<BoneInfo> boneInfos;
-            BoneNode* rootBone;
-        };
-
-        struct NodeData;
-
-        struct NodeDrawData
-        {
-            mat4 transform;
-            NodeDrawData* parent;
-            ArrayPtr<NodeDrawData*> children;
-            ArrayPtr<uint32> meshes;
-            NodeData* data;
+            BoneNode* rootBone; // TODO: We need an array of all bones which influence this mesh
         };
 
         struct NodeData
@@ -126,10 +125,21 @@ namespace gep
             ArrayPtr<MeshData*> meshData;
         };
 
+        struct NodeDrawData
+        {
+            mat4 transform;
+            NodeDrawData* parent;
+            ArrayPtr<NodeDrawData*> children;
+            ArrayPtr<uint32> meshes;
+            NodeData* data;
+            BoneNode* bone;
+        };
+
+
+
         struct BoneInfo
         {
             enum { NUM_SUPPORTED_BONES = 4 };
-
             uint32 boneIds[NUM_SUPPORTED_BONES];
             float weights[NUM_SUPPORTED_BONES];
         };

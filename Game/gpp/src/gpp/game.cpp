@@ -78,8 +78,8 @@ void gpp::Game::initialize()
         scripting->loadScript("setup.lua", IScriptingManager::LoadOptions::IsImportantScript);
 
         // initialize.lua
-        scripting->setState(IScriptingManager::State::AcceptingScriptRegistration);
-        SCOPE_EXIT { scripting->setState(IScriptingManager::State::NotAcceptingScriptRegistration); });
+        scripting->setManagerState(IScriptingManager::State::AcceptingScriptRegistration);
+        SCOPE_EXIT { scripting->setManagerState(IScriptingManager::State::NotAcceptingScriptRegistration); });
 
         scripting->loadScript("initialize.lua", IScriptingManager::LoadOptions::IsImportantScript);
     }

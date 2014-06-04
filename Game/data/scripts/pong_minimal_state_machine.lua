@@ -181,6 +181,13 @@ cameraComponent:lookAt(Vec3(0,0,0))
 cameraComponent:setState(ComponentState.Active)
 
 
+animgo = GameObjectManager:createGameObject("animgo")
+animcomp = animgo:createAnimationComponent()
+animcomp:setSkeletonFile("data/animations/HavokGirl/hkRig_L4101.hkx")
+animcomp:setSkinFile("data/animations/HavokGirl/hkLowResSkinWithEyesPS2_L4101.hkx")
+animcomp:addAnimationFile("test", "data/animations/HavokGirl/hkRunTurnRLoop_L4101.hkx")
+
+
 local myGameState = State{
 	name = "A",
 	parent = "/game/gameRunning",

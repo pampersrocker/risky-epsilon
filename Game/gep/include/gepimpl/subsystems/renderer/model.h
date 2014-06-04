@@ -190,14 +190,15 @@ namespace gep
         ID3D11DeviceContext* m_pDeviceContext;
         IModelLoader* m_pLoader;
         ResourcePtr<Shader> m_pLastShader;
-        ArrayPtr<mat4> m_bones;
+        DynamicArray<mat4> m_bones;
 
         bool m_debugDrawingEnabled;
 
-        void drawHelper(ID3D11DeviceContext* pContext, mat4 transformation, const ModelLoader::NodeDrawData* pNode, mat4& view, mat4& projection);
+        void drawHelper(ID3D11DeviceContext* pContext, mat4 transformation, ArrayPtr<mat4> bones, const ModelLoader::NodeDrawData* pNode, mat4& view, mat4& projection);
         void doFindMinMax(mat4 transformation, const ModelLoader::NodeDrawData* pNode, vec3& min, vec3& max);
 
         void doPrintNodes(const ModelLoader::NodeDrawData* node, int depth = 0);
+        gep::mat4 accumulatedOffsetMatrix(const ArrayPtr<mat4>& transformations, const gep::ModelLoader::BoneNode& node);
 
     public:
 
@@ -211,8 +212,11 @@ namespace gep
         ~Model();
 
         void setBones(const ArrayPtr<mat4>& transformations);
+        
+        bool hasBones() { return m_modelLoader.getModelData().bones.length() > 0; }
+        
         /// \brief draws the model
-        void draw(const mat4& modelMatrix, mat4& viewMatrix, mat4& projectionMatrix, ID3D11DeviceContext* pContext);
+        void draw(const mat4& modelMatrix, ArrayPtr<mat4> bones, mat4& viewMatrix, mat4& projectionMatrix, ID3D11DeviceContext* pContext);
 
         /// \brief loads the model from a file
         void loadFile(const char* filename);
@@ -281,8 +285,9 @@ namespace gep
             return m_modelLoader.getFilename();
         }
 
-        inline ArrayPtr<mat4> getBones() { return m_bones; }
-        inline const ArrayPtr<mat4> getBones() const { return m_bones; }
+        inline ArrayPtr<mat4> getBones() { return m_bones.toArray(); }
+        inline const ArrayPtr<mat4> getBones() const { return m_bones.toArray(); }
+        gep::DynamicArray<const char*> getBoneNames();
 
         //IResource interface
         virtual IResource* getSuperResource() override;

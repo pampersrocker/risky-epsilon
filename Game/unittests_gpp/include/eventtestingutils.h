@@ -78,8 +78,8 @@ public:
 class TestScriptingManager : public gep::IScriptingManager
 {
     virtual void loadScript(const std::string& filename, LoadOptions::Enum loadOptions = LoadOptions::Default) override {}
-    virtual void setState(State state) override {}
-    virtual State getState() const override
+    virtual void setManagerState(State state) override {}
+    virtual State getManagerState() const override
     {
         return State::AcceptingScriptRegistration;
     }

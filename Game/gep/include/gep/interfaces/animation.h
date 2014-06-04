@@ -5,6 +5,7 @@
 
 #include "gep/math3d/vec3.h"
 #include "gep/math3d/quaternion.h"
+#include "gep/math3d/transform.h"
 
 namespace gep
 {
@@ -68,31 +69,39 @@ namespace gep
         virtual float ease(const float duration, const bool easeInIfTrue) =0;
     };
 
+    class IBone : public Transform
+    {
+    public:
+        virtual ~IBone() = 0 {};
+
+        LUA_BIND_REFERENCE_TYPE_BEGIN
+            LUA_BIND_FUNCTION(getPosition)
+            LUA_BIND_FUNCTION(getRotation)
+            LUA_BIND_FUNCTION(getScale)
+            LUA_BIND_FUNCTION(getWorldPosition)
+            LUA_BIND_FUNCTION(getWorldRotation)
+            LUA_BIND_FUNCTION(getWorldScale)
+            LUA_BIND_FUNCTION(getViewDirection)
+            LUA_BIND_FUNCTION(getRightDirection)
+            LUA_BIND_FUNCTION(getUpDirection)
+            LUA_BIND_FUNCTION(setParent)
+        LUA_BIND_REFERENCE_TYPE_END;
+    };
+
+
     class IAnimatedSkeleton
     {
     public:
         virtual  ~IAnimatedSkeleton() = 0 {};
         virtual void update( float elapsedMS ) = 0;
         virtual IAnimationControl* addAnimationControl(ResourcePtr<IAnimationResource> anim) = 0;
-        virtual void getBoneTransformations(DynamicArray<BoneTransform>& result) = 0;
+        virtual gep::uint32 findBoneForName(const char* name) = 0;
+        virtual void getBoneTransformations(DynamicArray<mat4>& result) = 0;
         virtual void setBoneDebugDrawingEnabled(const bool enabled) = 0;
         virtual void setParentTransform(ITransform* parent) =0;
         virtual void setReferencePoseWeightThreshold(const float threshold) = 0;
         virtual void setBoneDebugDrawingScale(const float scale) = 0;
-    };
-
-    struct BoneTransform
-    {
-        int boneId;
-        vec3 translation;
-        Quaternion rotation;
-
-        BoneTransform(int boneId, vec3 translation, Quaternion rotation):
-            boneId(boneId),
-            translation(translation),
-            rotation(rotation)
-        {
-        }
+        virtual IBone* getBoneByName(std:: string name) = 0;
     };
 
 }

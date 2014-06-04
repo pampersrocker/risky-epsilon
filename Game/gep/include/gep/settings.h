@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gep/math3d/vec2.h"
+#include "gep/math3d/color.h"
 
 #include "gep/interfaces/scripting.h"
 
@@ -10,12 +11,14 @@ namespace gep
     {
         struct Video
         {
-            ivec2 screenResolution;
+            uvec2 screenResolution;
             bool vsyncEnabled;
+            Color clearColor;
 
             Video() :
                 screenResolution(1280, 720),
-                vsyncEnabled(true)
+                vsyncEnabled(true),
+                clearColor(0.0f, 0.125f, 0.3f, 1.0f)
             {
             }
         };
@@ -23,9 +26,19 @@ namespace gep
         struct Lua
         {
             size_t maxStackDumpLevel;
+            bool callstackTracebackEnabled;
+            bool stackDumpEnabled;
 
             Lua() :
-                maxStackDumpLevel(2)
+                maxStackDumpLevel(2),
+#ifdef _DEBUG
+                callstackTracebackEnabled(true),
+                stackDumpEnabled(true)
+#else
+                callstackTracebackEnabled(false),
+                stackDumpEnabled(false)
+#endif // _DEBUG
+
             {
             }
         };

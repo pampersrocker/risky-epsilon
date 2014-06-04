@@ -33,7 +33,9 @@ namespace gpp
         inline void setPath(const std::string& path){ m_path = path; }
         inline const std::string& getPath() const { return m_path; }
         inline std::string getPathCopy() const { return m_path; }
-        virtual void applyBoneTransformations(const gep::ArrayPtr<gep::BoneTransform>& transformations);
+        gep::DynamicArray<const char*> getBoneNames();
+        void setBoneMapping(const gep::DynamicArray<gep::uint32>& boneIds);
+        void applyBoneTransformations(const gep::ArrayPtr<gep::mat4>& transformations);
 
         virtual void setState(State::Enum state) override;
 
@@ -44,7 +46,9 @@ namespace gpp
         LUA_BIND_REFERENCE_TYPE_END
 
     private:
+        // TODO: No raw pointers to ressources
         gep::IModel* m_pModel;
+        gep::DynamicArray<gep::uint32> m_boneMapping;
 
         std::string m_path;
         gep::CallbackId m_extractionCallbackId;

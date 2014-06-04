@@ -175,6 +175,7 @@ namespace gep
         /// (usually drawing its wireframe, bones, etc).
         virtual void toggleDebugDrawing() = 0;
         virtual void setBones(const ArrayPtr<gep::mat4>& transformations) = 0;
+        virtual DynamicArray<const char*> getBoneNames() = 0;
     };
 
     class IAnimation

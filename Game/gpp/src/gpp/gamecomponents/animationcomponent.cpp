@@ -60,7 +60,11 @@ void gpp::AnimationComponent::initalize()
     }
 
     m_AnimatedSkeleton->setParentTransform(this->getParentGameObject());
-
+    RenderComponent* rc = m_pParentGameObject->getComponent<RenderComponent>();
+    if (rc != nullptr)
+    {
+        rc->setBoneMapping(getBoneMapping(rc->getBoneNames().toArray()));
+    }
     setState(State::Active);
 }
 
@@ -212,4 +216,26 @@ float gpp::AnimationComponent::easeOut(const std::string& animName, const float 
 {
     GEP_ASSERT(m_animationControls.exists(animName), "The animationName provided does not exist!" )
     return m_animationControls[animName]->ease(duration, false);
+}
+
+gep::IBone* gpp::AnimationComponent::getBoneByName(const std::string& boneName)
+{
+    auto bone = m_AnimatedSkeleton->getBoneByName(boneName);
+    bone->setParent(m_pParentGameObject);
+    return bone;
+}
+
+gep::DynamicArray<gep::uint32> gpp::AnimationComponent::getBoneMapping(gep::ArrayPtr<const char*> boneNames)
+{
+    gep::DynamicArray<gep::uint32> result;
+
+    //result.resize(boneNames.length());
+
+    for(auto name :boneNames)
+    {
+
+        result.append(m_AnimatedSkeleton->findBoneForName(name));
+    }
+
+    return result;
 }

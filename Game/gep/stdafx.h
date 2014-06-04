@@ -43,6 +43,8 @@
 #include <d3d11.h>
 #include <D3DX11.h>
 
+#include <XInput.h>
+
 
 // Some havok configuration stuff.
 #include "gepimpl/havok/config.h"

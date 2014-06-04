@@ -80,7 +80,6 @@ namespace gpp { namespace sm  {
         void hookIntoUpdateFramework(gep::IUpdateFramework* ufx);
         virtual ConditionCheckResult checkConditions() const override;
         virtual NameInfo& getNameInfo() override;
-        void updateCurrentState();
     };
 }} // namespace gpp::sm
 
