@@ -5,7 +5,8 @@ Config = {
 		distanceMin = 35.0,
 		distanceMax = 30000.0,
 		hightFactor = 0.5, -- 0..1 factor for hight of camera
-		initLook = Vec2(0.0, 20.0)
+		initLook = Vec2(0.0, 20.0),
+		rotationSpeedFactor = 0.05
 	},
 	
 	player = {
