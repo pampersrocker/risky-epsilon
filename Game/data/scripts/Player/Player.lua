@@ -50,4 +50,3 @@ function PlayerMeta.destroy( ... )
 	-- body
 	logMessage("DESTROY!")
 end
-
