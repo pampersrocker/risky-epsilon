@@ -11,26 +11,26 @@ function IsNull(x)
 	else
 		return false
 	end
-	
-	
+
+
 end
 
 function CreateEmptyGameObject( name )
 	local go = GameObjectManager:getGameObject(name)
 	if IsNull(go) then
-	
+
 		local instance = {}
 		logMessage("Create new gameObject")
 		instance.go = GameObjectManager:createGameObject(name);
 		SetGObyGUID(name,instance)
 		return instance
 	else
-	
+
 		logMessage("return existing gameObject"..name)
 		return GetGObyGUID(name)
 	end
-	
-	
+
+
 end
 
 function CreateScriptComponent( gameObject, initFunction , updateFunction, destroyFunction )

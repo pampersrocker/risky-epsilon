@@ -1,7 +1,6 @@
 GameLogic = CreateEmptyGameObject("GameLogic123")
 
 function GameLogic.update( guid, elapsedTime )
-	logMessage("UPDATE!")
 end
 
 function GameLogic.init( ... )
@@ -13,9 +12,14 @@ function GameLogic.init( ... )
 	PhysicsSystem:setWorld(world)
 	PhysicsSystem:setDebugDrawingEnabled(true)
 
+	--create Level
+	logMessage("Creating Level")
+	GameLogic.level = CreateEmptyGameObject("TestLevel")
+	setmetatable(GameLogic.level, LevelMeta)
+	CreateScriptComponent(GameLogic.level, LevelMeta.initialize, LevelMeta.update, LevelMeta.destroy)
+
 	-- create player
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
-	logMessage("Creates player")
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
 
@@ -45,8 +49,6 @@ end
 -- Running State
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
-	-- body
-	logMessage("Updating running state");
 	return EventResult.Handled;
 end
 
