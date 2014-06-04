@@ -91,11 +91,11 @@ end
 -- Transitions
 -------------------------------------------------------
 function GameLogic.checkPause()
-	return false;
+	return InputHandler:wasTriggered(Key.P);
 end
 
 function GameLogic.checkUnPause()
-	return false;
+	return InputHandler:wasTriggered(Key.P);
 end
 
 function GameLogic.canLeave()
