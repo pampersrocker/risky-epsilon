@@ -12,23 +12,24 @@ function GameLogic.init( ... )
 	local world = PhysicsFactory:createWorld(cinfo)
 	PhysicsSystem:setWorld(world)
 	PhysicsSystem:setDebugDrawingEnabled(true)
-	
-	-- create player 
-	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance") 
+
+	-- create player
+	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
+	logMessage("Creates player")
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
-	
+
 	--create camera
-	
+
 	distance = 50.0
 	distanceDelta = 5.0
 	distanceMin = 15.0
 	distanceMax = 200.0
-	
-	
+
+
 	isoCam = createDefaultCam("IsoCam")
 	isoCam.go.cc:look(Vec2(0.0, 20.0))
-	
+
 	setmetatable( isoCam, IsoCamera)
 	CreateScriptComponent(isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
 	logMessage("GameLogic:init()")
