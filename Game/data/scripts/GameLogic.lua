@@ -72,11 +72,11 @@ end
 -- Transitions
 -------------------------------------------------------
 function GameLogic.checkPause()
-	return InputHandler:wasTriggered(Key.P);
+	return InputHandler:wasTriggered(Config.keys.pause);
 end
 
 function GameLogic.checkUnPause()
-	return InputHandler:wasTriggered(Key.P);
+	return InputHandler:wasTriggered(Config.keys.pause);
 end
 
 function GameLogic.canLeave()
