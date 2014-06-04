@@ -32,11 +32,20 @@ function PlayerMeta.update( guid, elapsedTime )
 	if (InputHandler:isPressed(Key.A)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime, player.go.currentAngularVelocityLeft)
+			player.go.rb:applyTorque(elapsedTime, player.currentAngularVelocityLeft)
 		elseif (InputHandler:isPressed(Key.D)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,-player.go.currentAngularVelocityLeft)
+			player.go.rb:applyTorque(elapsedTime,-player.currentAngularVelocityLeft)
+		elseif (InputHandler:isPressed(Key.W)) then
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+			player.go.angularVelocitySwapped = false
+			player.go.rb:applyTorque(elapsedTime,player.currentAngularVelocityForward)
+		
+		elseif (InputHandler:isPressed(Key.S)) then
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+			player.go.angularVelocitySwapped = false
+			player.go.rb:applyTorque(elapsedTime,-player.currentAngularVelocityForward)
 		else
 			player.go.angularVelocitySwapped = false
 		end
@@ -44,6 +53,9 @@ end
 
 function PlayerMeta.init( guid )
 	-- body
+	local go = GetGObyGUID(guid)
+	go.currentAngularVelocityForward = Vec3(0.0, 250, 0.0)
+	go.currentAngularVelocityLeft = Vec3(-250,0.0,0.0)
 end
 
 function PlayerMeta.destroy( ... )
