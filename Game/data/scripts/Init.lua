@@ -10,15 +10,20 @@ function InitializeWorld(  )
 
 	-- create player
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
+	if PlayerMeta == nil then
+		logMessage("FUUUUUU")
+	end
+	PlayerMeta.__index = PlayerMeta
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
+	GameLogic.playerInstance:initializeGameObject()
 
 	--create camera
 
 	distance = 50.0
 	distanceDelta = 5.0
 	distanceMin = 15.0
-	distanceMax = 200.0
+	distanceMax = 300000.0
 
 
 	isoCam = createDefaultCam("IsoCam")
@@ -29,10 +34,10 @@ function InitializeWorld(  )
 	logMessage("GameLogic:init()")
 
 	--create Level
-	logMessage("Creating Level")
-	GameLogic.level = CreateEmptyGameObject("TestLevel")
-	setmetatable(GameLogic.level, LevelMeta)
-	CreateScriptComponent(GameLogic.level, LevelMeta.initialize, LevelMeta.update, LevelMeta.destroy)
+	--logMessage("Creating Level")
+	--GameLogic.level = CreateEmptyGameObject("TestLevel")
+	--setmetatable(GameLogic.level, LevelMeta)
+	--CreateScriptComponent(GameLogic.level, LevelMeta.initialize, LevelMeta.update, LevelMeta.destroy)
 end
 
 InitializeWorld()
