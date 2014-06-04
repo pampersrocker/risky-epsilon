@@ -20,13 +20,13 @@ function CreateEmptyGameObject( name )
 	if IsNull(go) then
 
 		local instance = {}
-		logMessage("Create new gameObject")
+		logMessage("Create new gameObject with name " .. name)
 		instance.go = GameObjectManager:createGameObject(name);
 		SetGObyGUID(name,instance)
 		return instance
 	else
 
-		logMessage("return existing gameObject"..name)
+		logMessage("return existing gameObject " .. name )
 		return GetGObyGUID(name)
 	end
 
