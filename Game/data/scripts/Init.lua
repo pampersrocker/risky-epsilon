@@ -30,6 +30,7 @@ function InitializeWorld(  )
 
 	setmetatable( isoCam, IsoCamera)
 	CreateScriptComponent(isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
+	GameLogic.isoCam = isoCam
 	logMessage("GameLogic:init()")
 
 	--create Level

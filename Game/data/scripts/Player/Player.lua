@@ -29,23 +29,28 @@ end
 
 function PlayerMeta.update( guid, elapsedTime )
 	local player = GetGObyGUID(guid)
+	local viewDir = GameLogic.isoCam.go.cc:getViewDirection()
+	viewDir.z = 0
+	viewDir = viewDir:normalized()
+	local rightDir = viewDir:cross(Vec3(0.0, 0.0, 1.0))
+	local mouseDelta = InputHandler:getMouseDelta()
 	if (InputHandler:isPressed(Key.A)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime, player.currentAngularVelocityLeft)
+			player.go.rb:applyTorque(elapsedTime, -viewDir:mulScalar(1000))
 		elseif (InputHandler:isPressed(Key.D)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,-player.currentAngularVelocityLeft)
+			player.go.rb:applyTorque(elapsedTime,viewDir:mulScalar(1000))
 		elseif (InputHandler:isPressed(Key.W)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,player.currentAngularVelocityForward)
+			player.go.rb:applyTorque(elapsedTime,-rightDir:mulScalar(1000))
 		
 		elseif (InputHandler:isPressed(Key.S)) then
 			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,-player.currentAngularVelocityForward)
+			player.go.rb:applyTorque(elapsedTime,rightDir:mulScalar(1000))
 		else
 			player.go.angularVelocitySwapped = false
 		end

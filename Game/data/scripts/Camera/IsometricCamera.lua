@@ -15,6 +15,7 @@ function IsoCamera.update( guid, elapsedTime )
 		end
 	end
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "isometric")
+	DebugRenderer:printText(Vec2(-0.9, 0.80), "distance:" .. distance)
 	local rotationSpeed = 0.05 * elapsedTime
 	local mouseDelta = InputHandler:getMouseDelta()
 	mouseDelta.x = mouseDelta.x * rotationSpeed
