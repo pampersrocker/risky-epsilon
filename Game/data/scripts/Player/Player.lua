@@ -15,7 +15,7 @@ function PlayerMeta:initializeGameObject( )
 	--cinfo.linearDamping = 1.0
 	cinfo.angularDamping = 10.0
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
-	--CreatePhysicsComponent( go , cinfo )
+	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/sphere.thmodel")
 	logMessage("PlayerMeta:init() end")
 
@@ -28,6 +28,18 @@ function PlayerMeta:initializeGameObject( )
 end
 
 function PlayerMeta.update( guid, elapsedTime )
+	local player = GetGObyGUID(guid)
+	if (InputHandler:isPressed(Key.A)) then
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
+			player.go.angularVelocitySwapped = false
+			player.go.pc.rb:applyTorque(elapsedTime, player.go.currentAngularVelocityLeft)
+		elseif (InputHandler:isPressed(Key.D)) then
+			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+			player.go.angularVelocitySwapped = false
+			player.go.pc.rb:applyTorque(elapsedTime,-player.go.currentAngularVelocityLeft)
+		else
+			player.go.angularVelocitySwapped = false
+		end
 end
 
 function PlayerMeta.init( guid )
