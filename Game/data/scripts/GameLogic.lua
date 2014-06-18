@@ -18,6 +18,9 @@ end
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
 	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
+	
+	IsoCamera.update( updateData:getElapsedTime() )
+	
 	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
 	if (InputHandler:isPressed(Key._1) or bit32.btest(buttonsTriggered, Button.X)) then
 		local go = GetGObyGUID("playerInstance")
@@ -52,6 +55,12 @@ end
 function GameLogic.updatePause( updateData )
 	-- body
 	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: pause")
+	
+	for i=-1,1,0.05 do
+		for j=-1,1,0.1 do
+			DebugRenderer:printTextColor(Vec2(j, i), "PAUSE!!! ",Color(math.abs(i), 0.0, math.abs(j), 1.0))
+		end
+	end
 	logMessage("Updating Pause state");
 	return EventResult.Handled;
 end
@@ -59,10 +68,8 @@ end
 function GameLogic.enterPause( updateData )
 	-- body
 	logMessage("Entering Pause state");
-
 	local go = GameLogic.isoCam.trackingObject
 	go.go.pc:setState(ComponentState.Inactive)
-
 	return EventResult.Handled;
 end
 

@@ -33,13 +33,12 @@ function InitializeWorld(  )
 	GameLogic.playerInstancePaper.go:setComponentStates(ComponentState.Inactive)
 
 	--create camera
-	isoCam = createDefaultCam("IsoCam")
-	isoCam.go.cc:look(Config.camera.initLook)
-	isoCam.trackingObject = GetGObyGUID("playerInstance")
-
-	setmetatable( isoCam, IsoCamera)
-	CreateScriptComponent(isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
-	GameLogic.isoCam = isoCam
+	GameLogic.isoCam = createDefaultCam("IsoCam")
+	GameLogic.isoCam.go.cc:look(Config.camera.initLook)
+	GameLogic.isoCam.trackingObject = GetGObyGUID("playerInstance")
+	setmetatable( GameLogic.isoCam, IsoCamera)
+	--CreateScriptComponent(GameLogic.isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
+	GameLogic.isoCam.isEnabled = true
 	logMessage("GameLogic:init()")
 
 	--create Level

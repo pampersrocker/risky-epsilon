@@ -54,7 +54,8 @@ namespace gep
             Color colorZ = Color::blue()) = 0;
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
-            LUA_BIND_FUNCTION_NAMED(scripting_printText, "printText")
+			LUA_BIND_FUNCTION_NAMED(scripting_printText, "printText")
+			LUA_BIND_FUNCTION_NAMED(scripting_printTextColor, "printTextColor")
             LUA_BIND_FUNCTION_NAMED(scripting_drawLine3D, "drawLine3D")
             LUA_BIND_FUNCTION_NAMED(scripting_drawLine3DColor, "drawLine3DColor")
             LUA_BIND_FUNCTION_NAMED(scripting_drawLine2D, "drawLine2D")
@@ -67,6 +68,11 @@ namespace gep
         {
             printText(screenPositionNormalized, text);
         }
+		void scripting_printTextColor(const vec2& screenPositionNormalized, const char* text, const Color& color)
+		{
+
+			printText(screenPositionNormalized, text, color);
+		}
         void scripting_drawLine3D(const vec3& start, const vec3& end)
         {
             drawLine(start, end, Color::green());
