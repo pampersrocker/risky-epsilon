@@ -5,15 +5,16 @@ PlayerMeta = {}
 function PlayerMeta:initializeGameObjectWood( )
 	logMessage("PlayerMeta:init() start ")
 	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:createSphere(15)
+	local materialTable = Config.materials.wood
+	cinfo.shape = PhysicsFactory:createSphere(materialTable.radius)
 	cinfo.motionType = MotionType.Dynamic
-	cinfo.mass = Config.materials.wood.mass
-	cinfo.restitution = Config.materials.wood.restitution
-	cinfo.friction = Config.materials.wood.friction
+	cinfo.mass = materialTable.mass
+	cinfo.restitution = materialTable.restitution
+	cinfo.friction = materialTable.friction
 	cinfo.maxLinearVelocity = Config.player.maxLinearVelocity
 	cinfo.maxAngularVelocity = Config.player.maxAngularVelocity
-	--cinfo.linearDamping = Config.materials.wood.linearDamping
-	cinfo.angularDamping = Config.materials.wood.angularDamping
+	--cinfo.linearDamping = materialTable.linearDamping
+	cinfo.angularDamping = materialTable.angularDamping
 	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/SphereWood.thmodel")
@@ -30,15 +31,16 @@ end
 function PlayerMeta:initializeGameObjectStone( )
 	logMessage("PlayerMeta:initStone() start ")
 	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:createSphere(15)
+	local materialTable = Config.materials.stone
+	cinfo.shape = PhysicsFactory:createSphere(materialTable.radius)
 	cinfo.motionType = MotionType.Dynamic
-	cinfo.mass = Config.materials.stone.mass 
-	cinfo.restitution = Config.materials.stone.restitution
-	cinfo.friction = Config.materials.stone.friction
+	cinfo.mass = materialTable.mass 
+	cinfo.restitution = materialTable.restitution
+	cinfo.friction = materialTable.friction
 	cinfo.maxLinearVelocity = Config.player.maxLinearVelocity 
 	cinfo.maxAngularVelocity = Config.player.maxAngularVelocity
-	--cinfo.linearDamping = Config.materials.wood.linearDamping
-	cinfo.angularDamping = Config.materials.stone.angularDamping 
+	--cinfo.linearDamping = materialTable.linearDamping
+	cinfo.angularDamping = materialTable.angularDamping 
 	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/SphereMarble.thmodel")
@@ -48,15 +50,16 @@ end
 function PlayerMeta:initializeGameObjectPaper( )
 	logMessage("PlayerMeta:initPaper() start ")
 	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:createSphere(15)
+	local materialTable = Config.materials.paper
+	cinfo.shape = PhysicsFactory:createSphere(materialTable.radius)
 	cinfo.motionType = MotionType.Dynamic
-	cinfo.mass = Config.materials.paper.mass 
-	cinfo.restitution = Config.materials.paper.restitution
-	cinfo.friction = Config.materials.paper.friction
+	cinfo.mass = materialTable.mass 
+	cinfo.restitution = materialTable.restitution
+	cinfo.friction = materialTable.friction
 	cinfo.maxLinearVelocity = Config.player.maxLinearVelocity 
 	cinfo.maxAngularVelocity = Config.player.maxAngularVelocity
-	--cinfo.linearDamping = Config.materials.wood.linearDamping
-	cinfo.angularDamping = Config.materials.paper.angularDamping 
+	--cinfo.linearDamping = materialTable.linearDamping
+	cinfo.angularDamping = materialTable.angularDamping 
 	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/SpherePaper.thmodel")

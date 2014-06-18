@@ -25,7 +25,7 @@ function GameLogic.updateRunning( updateData )
 	elseif (InputHandler:isPressed(Key._2) or bit32.btest(buttonsTriggered, Button.Y)) then
 		local go = GetGObyGUID("playerInstanceStone")
 		ChangePlayer(go)
-	elseif (InputHandler:isPressed(Key._3)) then
+	elseif (InputHandler:isPressed(Key._3) or bit32.btest(buttonsTriggered, Button.A)) then
 		local go = GetGObyGUID("playerInstancePaper")
 		ChangePlayer(go)
 	end

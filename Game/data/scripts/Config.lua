@@ -23,21 +23,24 @@ Config = {
 			friction = 10.0,
 			angularDamping = 1.0,
 			linearDamping = 1.0,
-			restitution = 0.0
+			restitution = 0.0,
+			radius = 0.5
 		},
 		stone = {
 			mass = 3000.0,
 			friction = 100.0,
 			angularDamping = 1.0,
 			linearDamping = 1.0,
-			restitution = 0.0
+			restitution = 0.0,
+			radius = 0.5
 		},
 		paper = {
 			mass = 100.0,
 			friction = 1.0,
 			angularDamping = 1.0,
 			linearDamping = 1.0,
-			restitution = 0.0
+			restitution = 0.0,
+			radius = 0.5
 		}
 	},
 
