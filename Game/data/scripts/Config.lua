@@ -21,7 +21,7 @@ Config = {
 	materials = {
 		wood = {
 			mass = 360.0,
-			friction = 10.0,
+			friction = 50.0,
 			angularDamping = 0.0,
 			linearDamping = 0.0,
 			restitution = 0.0,
@@ -29,17 +29,17 @@ Config = {
 		},
 		stone = {
 			mass = 1370.0,
-			friction = 10.0,
+			friction = 30.0,
 			angularDamping = 0.0,
 			linearDamping = 0.0,
 			restitution = 0.0,
 			radius = 0.5
 		},
 		paper = {
-			mass = 3.09,
-			friction = 10.0,
-			angularDamping = 0.0,
-			linearDamping = 0.0,
+			mass = 30.09,
+			friction = 30.0,
+			angularDamping = 10.0,
+			linearDamping = 3.0,
 			restitution = 0.0,
 			radius = 0.5
 		}
