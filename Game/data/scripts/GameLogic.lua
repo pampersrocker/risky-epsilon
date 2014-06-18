@@ -55,10 +55,22 @@ end
 function GameLogic.updatePause( updateData )
 	-- body
 	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: pause")
+	local red = 1
+	local green = 0
+	local blue =0
 	
 	for i=-1,1,0.05 do
-		for j=-1,1,0.1 do
-			DebugRenderer:printTextColor(Vec2(j, i), "PAUSE!!! ",Color(math.abs(i), 0.0, math.abs(j), 1.0))
+		if (i < -0.5) then
+			green = green + 0.1
+		elseif (i > -0.5 and i <0) then
+			red = red - 0.1
+		elseif (i > 0 and i <0.5) then
+			blue = blue + 0.1
+		elseif (i > 0.5 and i <1) then
+			green = green - 0.1
+		end
+		for j=-1,1,0.1 do			
+			DebugRenderer:printTextColor(Vec2(j, i), "PAUSE!!! ",Color(red, green, blue, 1.0))
 		end
 	end
 	logMessage("Updating Pause state");
