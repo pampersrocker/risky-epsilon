@@ -35,12 +35,18 @@ Config = {
 	},
 
 	keys = {
-		forward = Key.W,
-		backward = Key.S,
-		left = Key.A,
-		right = Key.D,
-		pause = Key.P,
-		restart = Key.R
+		keyboard = {
+			forward = Key.W,
+			backward = Key.S,
+			left = Key.A,
+			right = Key.D,
+			pause = Key.P,
+			restart = Key.R
+		},
+		gamepad = {
+			restart = Button.Back,
+			pause = Button.Start
+		}
 	},
 
 	world = {
