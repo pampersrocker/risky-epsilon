@@ -53,6 +53,11 @@ function PlayerMeta.update( guid, elapsedTime )
 	local rightDir = viewDir:cross(Vec3(0.0, 0.0, 1.0))
 	local mouseDelta = InputHandler:getMouseDelta()
 	
+	if(InputHandler:isPressed(Config.keys.restart)) then
+		GameLogic.isoCam.trackingObject.go:setPosition(Config.player.spawnPosition)
+		GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
+		GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
+	end
 
 	if InputHandler:gamepad(0):isConnected() then
 		local leftTorque = viewDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().x)
