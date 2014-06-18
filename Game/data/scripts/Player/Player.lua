@@ -60,8 +60,8 @@ function PlayerMeta.update( guid, elapsedTime )
 	end
 
 	if InputHandler:gamepad(0):isConnected() then
-		local leftTorque = viewDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().x)
-		local rightTorque = rightDir:mulScalar(Config.player.torqueMulScalar):mulScalar(InputHandler:gamepad(0):leftStick().y)
+		local leftTorque = viewDir:mulScalar(Config.player.torqueMulScalar):mulScalar(InputHandler:gamepad(0):leftStick().x)
+		local rightTorque = rightDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().y)
 		player.go.rb:applyTorque(elapsedTime, leftTorque + rightTorque)
 	else
 		if (InputHandler:isPressed(Config.keys.left)) then
