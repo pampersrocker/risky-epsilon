@@ -25,6 +25,9 @@ function GameLogic.updateRunning( updateData )
 	elseif (InputHandler:isPressed(Key._2)) then
 		local go = GetGObyGUID("playerInstanceStone")
 		ChangePlayer(go)
+	elseif (InputHandler:isPressed(Key._3)) then
+		local go = GetGObyGUID("playerInstancePaper")
+		ChangePlayer(go)
 	end
 	
 	return EventResult.Handled;
