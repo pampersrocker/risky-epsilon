@@ -16,7 +16,7 @@ function PlayerMeta:initializeGameObject( )
 	cinfo.angularDamping = Config.materials.wood.angularDamping
 	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
-	CreateRenderComponent(self, "data/models/Sphere/sphere.thmodel")
+	CreateRenderComponent(self, "data/models/Sphere/SphereWood.thmodel")
 	logMessage("PlayerMeta:init() end")
 
 	--self.ac = self.go:createAnimationComponent()
@@ -41,7 +41,7 @@ function PlayerMeta:initializeGameObjectStone( )
 	cinfo.angularDamping = Config.materials.wood.angularDamping
 	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
-	CreateRenderComponent(self, "data/models/Sphere/Fracture001.thmodel")
+	CreateRenderComponent(self, "data/models/Sphere/SphereMarble.thmodel")
 	logMessage("PlayerMeta:initStone() end")
 end
 
