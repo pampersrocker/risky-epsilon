@@ -6,4 +6,5 @@ __builtins = {
 	type = type,
 	print = print,
 	io = io,
+	tostring = tostring,
 }

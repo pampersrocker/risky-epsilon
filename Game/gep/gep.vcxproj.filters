@@ -339,9 +339,6 @@
     <ClInclude Include="include\gepimpl\subsystems\physics\havok\manager.h">
       <Filter>Header Files\gepimpl\subsystems\physics\havok</Filter>
     </ClInclude>
-    <ClInclude Include="include\gepimpl\subsystems\physics\havok\shape.h">
-      <Filter>Header Files\gepimpl\subsystems\physics\havok</Filter>
-    </ClInclude>
     <ClInclude Include="include\gepimpl\subsystems\physics\havok\world.h">
       <Filter>Header Files\gepimpl\subsystems\physics\havok</Filter>
     </ClInclude>
@@ -519,6 +516,9 @@
     <ClInclude Include="include\gep\math3d\transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\gepimpl\subsystems\physics\havok\havokPhysicsShape.h">
+      <Filter>Header Files\gepimpl\subsystems\physics\havok</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp">
@@ -690,6 +690,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\gep\subsystems\animation\havok\animationFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gep\subsystems\physics\havok\havokPhysicsShape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

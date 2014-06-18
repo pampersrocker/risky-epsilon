@@ -13,6 +13,7 @@
 
 #include "gep/interfaces/physics/contact.h"
 #include "gep/interfaces/physics/characterController.h"
+#include "gep/interfaces/physics/entity.h"
 
 #include "gep/math3d/vec2.h"
 #include "gep/math3d/vec3.h"
@@ -35,6 +36,7 @@
 
 void gpp::Game::makeScriptBindings()
 {
+    g_globalManager.getLogging()->logMessage("Making script bindings...");
     bindEnums();
     bindOther();
 }
@@ -70,14 +72,22 @@ void gpp::Game::bindOther()
     scripting->bind<gpp::sm::StateMachineFactory>("StateMachineFactory");
 
     scripting->bind<gep::WorldCInfo>("WorldCInfo");
+    scripting->bind<gep::ICollisionFilter>("CollisionFilter");
     scripting->bind<gep::IWorld>("World");
     scripting->bind<gep::IShape>("Shape");
-    scripting->bind<gep::BoxShape>("BoxShape");
+    scripting->bind<gep::IBoxShape>("BoxShape");
     scripting->bind<gep::SphereShape>("SphereShape");
+    scripting->bind<gep::Event<gep::IRigidBody*>>("PhantomCallbackShape");
+    scripting->bind<gep::BoundingVolumeShape>("BoundingVolumeShape");
+    scripting->bind<gep::IPhantomCallbackShape>("PhantomCallbackShape");
     scripting->bind<gep::RigidBodyCInfo>("RigidBodyCInfo");
+    scripting->bind<gep::ITriggerEventArgs>("TriggerEventArgs");
     scripting->bind<gep::IRigidBody>("RigidBody");
     scripting->bind<gpp::PhysicsComponent>("PhysicsComponent");
+    scripting->bind<gep::CollisionArgs>("CollisionArgs");
     scripting->bind<gep::ContactPointArgs>("ContactPointArgs");
+    scripting->bind<gep::RayCastInput>("RayCastInput");
+    scripting->bind<gep::RayCastOutput>("RayCastOutput");
 
     scripting->bind<gpp::ScriptComponent>("ScriptComponent");
     scripting->bind<gpp::RenderComponent>("RenderComponent");
@@ -91,13 +101,14 @@ void gpp::Game::bindOther()
     scripting->bind<gpp::GameObject>("GameObject");
     scripting->bind<gpp::GameObjectManager>("GameObjectManager", &g_gameObjectManager);
 
-	scripting->bind<gep::IGamepad>("Gamepad");
+    scripting->bind<gep::IGamepad>("Gamepad");
     scripting->bind<gep::IInputHandler>("InputHandler", g_globalManager.getInputHandler());
     scripting->bind<gep::IPhysicsSystem>("PhysicsSystem", g_globalManager.getPhysicsSystem());
     scripting->bind<gep::IScriptingManager>("Scripting", g_globalManager.getScriptingManager());
     scripting->bind<gep::IPhysicsFactory>("PhysicsFactory", g_globalManager.getPhysicsSystem()->getPhysicsFactory());
     scripting->bind<gep::ILogging>("Logging", g_globalManager.getLogging());
-    scripting->bind<gep::IRenderer>("Renderer", g_globalManager.getRenderer());
+    //scripting->bind<gep::IRenderer>("Renderer", g_globalManager.getRenderer());
+
     //Cam
     scripting->bind<gep::FreeCamera>("Cam", m_pDummyCam);
 
@@ -108,6 +119,7 @@ void gpp::Game::bindOther()
     scripting->bind< gep::Event<float> >("_UpdateEvent");
     scripting->bind< gep::Event<gep::ContactPointArgs*> >("_ContactPointEvent");
     scripting->bind< gep::Event<gep::ScriptTableWrapper> >("_GenericEvent");
+    scripting->bind< gep::Event<gep::ITriggerEventArgs*> >("_TriggerEvent");
     scripting->bind< gep::IEventManager >("_EventManager", g_globalManager.getEventManager());
 
     //Animation
@@ -122,6 +134,13 @@ void gpp::Game::bindEnums()
 
     // Enums
     //////////////////////////////////////////////////////////////////////////
+    scripting->bindEnum("TriggerEventType",
+                        "Entered",         gep::ITriggerEventArgs::Type::Entered,
+                        "Left",            gep::ITriggerEventArgs::Type::Left,
+                        "EnteredAndLeft",  gep::ITriggerEventArgs::Type::EnteredAndLeft,
+                        "TriggerBodyLeft", gep::ITriggerEventArgs::Type::TriggerBodyLeft,
+                        0);
+
     scripting->bindEnum("StateUpdateStepBehavior",
         "Continue",                   gpp::sm::UpdateStepBehavior::Continue,
         "Leave",                      gpp::sm::UpdateStepBehavior::Leave,
@@ -364,21 +383,21 @@ void gpp::Game::bindEnums()
         "Oem_Clear", gep::Key::Oem_Clear,
         0);
 
-	// Bind gamepad button enum
-	scripting->bindEnum("Button",
-		"Up",			XINPUT_GAMEPAD_DPAD_UP,
-		"Down",			XINPUT_GAMEPAD_DPAD_DOWN,
-		"Left",			XINPUT_GAMEPAD_DPAD_LEFT,
-		"Right",		XINPUT_GAMEPAD_DPAD_RIGHT,
-		"Start",		XINPUT_GAMEPAD_START,
-		"Back",			XINPUT_GAMEPAD_BACK,
-		"LeftThumb",	XINPUT_GAMEPAD_LEFT_THUMB,
-		"RightThumb",	XINPUT_GAMEPAD_RIGHT_THUMB,
-		"LeftShoulder",	XINPUT_GAMEPAD_LEFT_SHOULDER,
-		"RightShoulder",XINPUT_GAMEPAD_RIGHT_SHOULDER,
-		"A",			XINPUT_GAMEPAD_A,
-		"B",			XINPUT_GAMEPAD_B,
-		"X",			XINPUT_GAMEPAD_X,
-		"Y",			XINPUT_GAMEPAD_Y,
-		0);
+    // Bind gamepad button enum
+    scripting->bindEnum("Button",
+        "Up",			XINPUT_GAMEPAD_DPAD_UP,
+        "Down",			XINPUT_GAMEPAD_DPAD_DOWN,
+        "Left",			XINPUT_GAMEPAD_DPAD_LEFT,
+        "Right",		XINPUT_GAMEPAD_DPAD_RIGHT,
+        "Start",		XINPUT_GAMEPAD_START,
+        "Back",			XINPUT_GAMEPAD_BACK,
+        "LeftThumb",	XINPUT_GAMEPAD_LEFT_THUMB,
+        "RightThumb",	XINPUT_GAMEPAD_RIGHT_THUMB,
+        "LeftShoulder",	XINPUT_GAMEPAD_LEFT_SHOULDER,
+        "RightShoulder",XINPUT_GAMEPAD_RIGHT_SHOULDER,
+        "A",			XINPUT_GAMEPAD_A,
+        "B",			XINPUT_GAMEPAD_B,
+        "X",			XINPUT_GAMEPAD_X,
+        "Y",			XINPUT_GAMEPAD_Y,
+        0);
 }

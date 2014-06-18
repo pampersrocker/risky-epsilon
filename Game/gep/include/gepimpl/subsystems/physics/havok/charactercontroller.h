@@ -14,6 +14,7 @@ namespace gep
 
         hkpCharacterRigidBody* m_pHkCharacterRigidBody;
         hkpCharacterContext* m_pHkCharacterContext;
+
     public:
         HavokCharacterRigidBody(const CharacterRigidBodyCInfo& cinfo);
         ~HavokCharacterRigidBody();

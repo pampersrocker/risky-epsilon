@@ -7,7 +7,6 @@
 
 namespace gpp 
 {
-    // TODO inherit from ITransform
     class CameraComponent : public Component, public gep::ITransform
     {
     public:
@@ -64,11 +63,12 @@ namespace gpp
         void setFar(float farValue){m_pCamera->setFar(farValue);}
 
         float getFar(){return m_pCamera->getFar();}
-
+        
         float getAspectRatio(){return m_pCamera->getAspectRatio();}
-
         void setAspectRatio(float ratio){m_pCamera->setAspectRatio(ratio);}
 
+        void setOrthographic(const bool orthographic);
+        bool isOrthographic();
 
         virtual gep::vec3 getRightDirection() const override;
         
@@ -108,7 +108,9 @@ namespace gpp
             LUA_BIND_FUNCTION(getRightDirection)
             LUA_BIND_FUNCTION(getUpDirection)
             LUA_BIND_FUNCTION(setUpDirection)
+            LUA_BIND_FUNCTION(getPosition)
             LUA_BIND_FUNCTION(getWorldPosition)
+            LUA_BIND_FUNCTION(getRotation)
             LUA_BIND_FUNCTION(getWorldRotation)
             LUA_BIND_FUNCTION(setViewTarget)
             LUA_BIND_FUNCTION(setUpTarget)
@@ -129,6 +131,8 @@ namespace gpp
             LUA_BIND_FUNCTION(getFar)
             LUA_BIND_FUNCTION(setAspectRatio)
             LUA_BIND_FUNCTION(getAspectRatio)
+            LUA_BIND_FUNCTION(isOrthographic)
+            LUA_BIND_FUNCTION(setOrthographic)
             LUA_BIND_FUNCTION(unsetUpTarget)
             LUA_BIND_FUNCTION(unsetViewTarget)
         LUA_BIND_REFERENCE_TYPE_END ;

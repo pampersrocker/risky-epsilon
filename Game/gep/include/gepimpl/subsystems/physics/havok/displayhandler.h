@@ -3,13 +3,19 @@
 #include "gep/container/hashmap.h"
 #include "gep/container/DynamicArray.h"
 #include "gep/math3d/vec3.h"
-#include "gep/interfaces/renderer.h" 
+#include "gep/interfaces/renderer.h"
 #include "gep/interfaces/updateFramework.h"
 
 namespace gep
 {
     class HavokDisplayManager : public hkDebugDisplayHandler
     {
+        struct DisplayGeometryInfo
+        {
+            ResourcePtr< IModel > pModel;
+            mat4 transform;
+        };
+
     public:
 
         HavokDisplayManager();
@@ -74,7 +80,7 @@ namespace gep
     private:
         CallbackId m_extractionCallbackId;
 
-        Hashmap<hkUlong,DynamicArray<ResourcePtr<IModel>>> m_geometries;
-        Hashmap<hkUlong,mat4> m_transformations;
+        Hashmap<hkUlong, DynamicArray<DisplayGeometryInfo>> m_geometries;
+        Hashmap<hkUlong, mat4> m_transformations;
     };
 }

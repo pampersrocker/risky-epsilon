@@ -16,6 +16,8 @@ namespace gep
     class ICollisionMesh;
     class IShape;
 
+    class ICollisionFilter;
+
     //////////////////////////////////////////////////////////////////////////
 
     class IPhysicsFactory
@@ -40,14 +42,23 @@ namespace gep
         virtual ResourcePtr<ICollisionMesh> loadCollisionMesh(const char* path) = 0;
         virtual IShape* loadCollisionMeshFromLua(const char* path) = 0;
 
-        BoxShape* createBox(vec3 halfExtends){ return GEP_NEW(g_stdAllocator, BoxShape)(halfExtends); }
-        SphereShape* createSphere(float radius){ return GEP_NEW(g_stdAllocator, SphereShape)(radius); }
+        virtual ICollisionFilter* createCollisionFilter_Simple() = 0;
+
+        virtual IBoxShape* createBox(const vec3& halfExtends) = 0;
+        SphereShape* createSphere(float radius) { return GEP_NEW(g_stdAllocator, SphereShape)(radius); }
+        ConvexTranslateShape* createConvexTranslateShape(IShape* pShape, const vec3& translation) { return GEP_NEW(g_stdAllocator, ConvexTranslateShape)(pShape, translation); }
+        BoundingVolumeShape* createBoundingVolumeShape(IShape* pBounding, IShape* pChild) { return GEP_NEW(g_stdAllocator, BoundingVolumeShape)(pBounding, pChild); }
+        virtual IPhantomCallbackShape* createPhantomCallbackShape() = 0;
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(createWorld)
             LUA_BIND_FUNCTION(createRigidBody)
+            LUA_BIND_FUNCTION(createCollisionFilter_Simple)
             LUA_BIND_FUNCTION(createBox)
             LUA_BIND_FUNCTION(createSphere)
+            LUA_BIND_FUNCTION(createConvexTranslateShape)
+            LUA_BIND_FUNCTION(createBoundingVolumeShape)
+            LUA_BIND_FUNCTION(createPhantomCallbackShape)
             LUA_BIND_FUNCTION_NAMED(loadCollisionMeshFromLua, "loadCollisionMesh")
         LUA_BIND_REFERENCE_TYPE_END
     };

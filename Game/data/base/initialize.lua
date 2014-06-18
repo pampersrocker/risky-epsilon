@@ -1,9 +1,23 @@
 
-print("Initializing from lua...")
+logMessage("-> registering scripts...")
 
---Scripting:registerScript("defaults.lua")
-Scripting:registerScript("animation_prototype/character_animation.lua")
+local function include(oneOrMoreScriptNames)
+	if type(oneOrMoreScriptNames) == "string" then
+		Scripting:registerScript(oneOrMoreScriptNames)
+	else
+		for _,scriptName in ipairs(oneOrMoreScriptNames) do
+			include(scriptName)
+		end
+	end
+end
 
--- Scripting:registerScript("camera_prototype/camera_prototype.lua")
+include{
+	-- utils
+	"utils/timedStatusDisplay.lua",
 
-print("Finished initializing from lua.")
+	-- main scripts
+	"melee_prototype/helper.lua",
+	"melee_prototype/main.lua",
+}
+
+logMessage("<- Finished registering scripts.")

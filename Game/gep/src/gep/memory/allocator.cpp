@@ -99,11 +99,18 @@ void gep::StdAllocator::destroyInstance()
         #ifdef TRACK_MEMORY_LEAKS
         auto temp = (LeakDetectorAllocatorStatistics*)s_globalInstance;
         auto wrapped = (StdAllocator*)temp->getWrapped();
-        if(temp->hasLeaks())
         {
+            // Will empty the file if it already existed.
             std::ofstream leakfile("memoryLeaks.log", std::ios_base::trunc);
-            temp->findLeaks(leakfile);
-            GEP_ASSERT(0, "you have memory leaks, check 'memoryLeaks.log' for details");
+            if(temp->hasLeaks())
+            {
+                temp->findLeaks(leakfile);
+                GEP_ASSERT(false, "you have memory leaks, check 'memoryLeaks.log' for details");
+            }
+            else
+            {
+                leakfile << "No leaks detected." << std::endl;
+            }
         }
         temp->~LeakDetectorAllocatorStatistics();
         wrapped->~StdAllocator();
@@ -118,4 +125,10 @@ void gep::StdAllocator::destroyInstance()
 gep::IAllocatorStatistics* gep::StdAllocatorPolicy::getAllocator()
 {
     return &StdAllocator::globalInstance();
+}
+
+gep::IAllocator* gep::MallocAllocatorPolicy::getAllocator()
+{
+    static MallocAllocator allocator;
+    return &allocator;
 }

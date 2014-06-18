@@ -15,6 +15,7 @@
 
 gpp::CharacterComponent::CharacterComponent():
     Component(),
+    m_scale(1.0f, 1.0f, 1.0f),
     m_position(0.0f, 0.0f, 0.0f),
     m_rotation(),
     m_pCharacterRigidBody(nullptr),

@@ -77,6 +77,7 @@ namespace gpp
        
 
     private:
+        gep::vec3 m_scale;
         gep::vec3 m_position;
         gep::Quaternion m_rotation;
         mutable gep::SmartPtr<gep::ICharacterRigidBody> m_pCharacterRigidBody;
