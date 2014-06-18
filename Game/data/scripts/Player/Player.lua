@@ -73,7 +73,7 @@ function PlayerMeta.update( guid, elapsedTime )
 	viewDir = viewDir:normalized()
 	local rightDir = viewDir:cross(Vec3(0.0, 0.0, 1.0))
 	local mouseDelta = InputHandler:getMouseDelta()
-	
+
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
 		PlayerMeta.restart()
 	end
@@ -85,26 +85,25 @@ function PlayerMeta.update( guid, elapsedTime )
 		local leftTorque = viewDir:mulScalar(Config.player.torqueMulScalar):mulScalar(InputHandler:gamepad(0):leftStick().x)
 		local rightTorque = rightDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().y)
 		player.go.rb:applyTorque(elapsedTime, leftTorque + rightTorque)
+	end
+	if (InputHandler:isPressed(Config.keys.keyboard.left)) then
+		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
+		player.go.angularVelocitySwapped = false
+		player.go.rb:applyTorque(elapsedTime, -viewDir:mulScalar(Config.player.torqueMulScalar))
+	elseif (InputHandler:isPressed(Config.keys.keyboard.right)) then
+		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+		player.go.angularVelocitySwapped = false
+		player.go.rb:applyTorque(elapsedTime,viewDir:mulScalar(Config.player.torqueMulScalar))
+	elseif (InputHandler:isPressed(Config.keys.keyboard.forward)) then
+		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+		player.go.angularVelocitySwapped = false
+		player.go.rb:applyTorque(elapsedTime,-rightDir:mulScalar(Config.player.torqueMulScalar))
+	elseif (InputHandler:isPressed(Config.keys.keyboard.backward)) then
+		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+		player.go.angularVelocitySwapped = false
+		player.go.rb:applyTorque(elapsedTime,rightDir:mulScalar(Config.player.torqueMulScalar))
 	else
-		if (InputHandler:isPressed(Config.keys.keyboard.left)) then
-			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
-			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime, -viewDir:mulScalar(Config.player.torqueMulScalar))
-		elseif (InputHandler:isPressed(Config.keys.keyboard.right)) then
-			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
-			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,viewDir:mulScalar(Config.player.torqueMulScalar))
-		elseif (InputHandler:isPressed(Config.keys.keyboard.forward)) then
-			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
-			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,-rightDir:mulScalar(Config.player.torqueMulScalar))
-		elseif (InputHandler:isPressed(Config.keys.keyboard.backward)) then
-			--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
-			player.go.angularVelocitySwapped = false
-			player.go.rb:applyTorque(elapsedTime,rightDir:mulScalar(Config.player.torqueMulScalar))
-		else
-			player.go.angularVelocitySwapped = false
-		end
+		player.go.angularVelocitySwapped = false
 	end
 end
 
