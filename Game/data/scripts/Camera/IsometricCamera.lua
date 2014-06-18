@@ -5,14 +5,13 @@ IsoCamera = {}
 ]]
 
 function IsoCamera.update( guid, elapsedTime )
-	if (InputHandler:isPressed(Key.Oem_Minus)) then
-		if ( Config.camera.initialDistance > Config.camera.distanceMin) then
-			Config.camera.initialDistance = Config.camera.initialDistance - Config.camera.distanceDelta
-		end
-	elseif (InputHandler:isPressed(Key.Oem_Plus)) then
-		if ( Config.camera.initialDistance < Config.camera.distanceMax) then
-			Config.camera.initialDistance = Config.camera.initialDistance + Config.camera.distanceDelta
-		end
+	elapsedTime = elapsedTime/1000
+	DebugRenderer:printText(Vec2(-0.9, 0.75), "elapsedTime: "..elapsedTime)
+	if (InputHandler:isPressed(Config.keys.keyboard.zoomin) ) then
+		Config.camera.initialDistance = Config.camera.initialDistance - Config.camera.distanceDelta*elapsedTime
+	elseif (InputHandler:isPressed(Config.keys.keyboard.zoomout)) then
+		Config.camera.initialDistance = Config.camera.initialDistance + Config.camera.distanceDelta*elapsedTime
+		
 	end
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "isometric")
 	DebugRenderer:printText(Vec2(-0.9, 0.80), "Camera distance:" .. Config.camera.initialDistance)
@@ -23,9 +22,13 @@ function IsoCamera.update( guid, elapsedTime )
 	cam = GetGObyGUID(guid)
 	if InputHandler:gamepad(0):isConnected() then
 		cameraDelta.x = cameraDelta.x + InputHandler:gamepad(0):rightStick().x * Config.camera.rotationSpeedFactorGamePad * elapsedTime
+		local zoomvalue = InputHandler:gamepad(0):rightStick().y
+		
+		Config.camera.initialDistance = Config.camera.initialDistance - zoomvalue*Config.camera.zoomfactorgamepad * elapsedTime		
 	end
 	cam.go.cc:look(cameraDelta)
 	local viewDir = cam.go.cc:getViewDirection()
+	Config.camera.initialDistance = math.Clamp(Config.camera.initialDistance,Config.camera.distanceMin,Config.camera.distanceMax)
 	viewDir = viewDir:mulScalar(-Config.camera.initialDistance)
 	viewDir.z = Config.camera.initialDistance * Config.camera.hightFactor
 	--TODO: get guid from player the right way!!
