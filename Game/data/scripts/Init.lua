@@ -13,9 +13,9 @@ function InitializeWorld(  )
 	PlayerMeta.__index = PlayerMeta
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
-	GameLogic.playerInstance:initializeGameObject()
+	GameLogic.playerInstance:initializeGameObjectWood()
 	--GameLogic.playerInstance.go:setComponentStates(ComponentState.Inactive)
-	
+
 	-- create playerStone
 	GameLogic.playerInstanceStone = CreateEmptyGameObject("playerInstanceStone")
 	PlayerMeta.__index = PlayerMeta
@@ -23,12 +23,20 @@ function InitializeWorld(  )
 	CreateScriptComponent(GameLogic.playerInstanceStone, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
 	GameLogic.playerInstanceStone:initializeGameObjectStone()
 	GameLogic.playerInstanceStone.go:setComponentStates(ComponentState.Inactive)
-	
+
+	-- create playerStone
+	GameLogic.playerInstancePaper = CreateEmptyGameObject("playerInstancePaper")
+	PlayerMeta.__index = PlayerMeta
+	setmetatable( GameLogic.playerInstancePaper, PlayerMeta)
+	CreateScriptComponent(GameLogic.playerInstancePaper, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
+	GameLogic.playerInstancePaper:initializeGameObjectPaper()
+	GameLogic.playerInstancePaper.go:setComponentStates(ComponentState.Inactive)
+
 	--create camera
 	isoCam = createDefaultCam("IsoCam")
 	isoCam.go.cc:look(Config.camera.initLook)
 	isoCam.trackingObject = GetGObyGUID("playerInstance")
-	
+
 	setmetatable( isoCam, IsoCamera)
 	CreateScriptComponent(isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
 	GameLogic.isoCam = isoCam
