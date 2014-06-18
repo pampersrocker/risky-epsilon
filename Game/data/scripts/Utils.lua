@@ -15,6 +15,12 @@ function IsNull(x)
 
 end
 
+function math.Clamp(val, lower, upper)
+    assert(val and lower and upper, "not very useful error message here")
+    if lower > upper then lower, upper = upper, lower end -- swap if boundaries supplied the wrong way
+    return math.max(lower, math.min(upper, val))
+end
+
 function CreateEmptyGameObject( name )
 	local go = GameObjectManager:getGameObject(name)
 	if IsNull(go) then
@@ -100,7 +106,7 @@ end
 function ChangePlayer( newGo )
 	-- inactivate current player
 	GameLogic.isoCam.trackingObject.go:setComponentStates(ComponentState.Inactive)
-	
+
 	-- activate newGo player
 	newGo.go.rb:setAngularVelocity(GameLogic.isoCam.trackingObject.go.rb:getAngularVelocity())
 	newGo.go.rb:setLinearVelocity(GameLogic.isoCam.trackingObject.go.rb:getLinearVelocity())
@@ -108,5 +114,5 @@ function ChangePlayer( newGo )
 	newGo.go:setComponentStates(ComponentState.Active)
 	-- change cam-lockAT
 	GameLogic.isoCam.trackingObject = newGo
-	
+
 end
