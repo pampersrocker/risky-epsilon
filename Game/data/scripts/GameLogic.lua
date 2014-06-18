@@ -18,11 +18,11 @@ end
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
 	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
-	
-	if (InputHandler:isPressed(Key._1)) then
+	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
+	if (InputHandler:isPressed(Key._1) or bit32.btest(buttonsTriggered, Button.X)) then
 		local go = GetGObyGUID("playerInstance")
 		ChangePlayer(go)
-	elseif (InputHandler:isPressed(Key._2)) then
+	elseif (InputHandler:isPressed(Key._2) or bit32.btest(buttonsTriggered, Button.Y)) then
 		local go = GetGObyGUID("playerInstanceStone")
 		ChangePlayer(go)
 	elseif (InputHandler:isPressed(Key._3)) then
@@ -75,11 +75,11 @@ end
 -- Transitions
 -------------------------------------------------------
 function GameLogic.checkPause()
-	return InputHandler:wasTriggered(Config.keys.pause);
+	return (InputHandler:wasTriggered(Config.keys.keyboard.pause) or bit32.btest(InputHandler:gamepad(0):buttonsTriggered(), Config.keys.gamepad.pause))
 end
 
 function GameLogic.checkUnPause()
-	return InputHandler:wasTriggered(Config.keys.pause);
+	return (InputHandler:wasTriggered(Config.keys.keyboard.pause) or bit32.btest(InputHandler:gamepad(0):buttonsTriggered(), Config.keys.gamepad.pause))
 end
 
 function GameLogic.canLeave()
