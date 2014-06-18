@@ -12,7 +12,7 @@
   </asset>
   <library_images>
     <image id="PaperCrumpled_dds" name="PaperCrumpled_dds">
-      <init_from>/C:/Projects/Git/risky-epsilon/Assets/Source/data/Textures/PaperCrumpled.dds</init_from>
+      <init_from>data/Textures/PaperCrumpled.dds</init_from>
     </image>
   </library_images>
   <library_effects>

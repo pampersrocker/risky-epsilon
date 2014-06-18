@@ -12,7 +12,7 @@
   </asset>
   <library_images>
     <image id="MarbleTiles_dds" name="MarbleTiles_dds">
-      <init_from>/C:/Projects/Git/risky-epsilon/Assets/Source/data/Textures/MarbleTiles.dds</init_from>
+      <init_from>data/Textures/MarbleTiles.dds</init_from>
     </image>
   </library_images>
   <library_effects>
