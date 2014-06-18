@@ -169,6 +169,16 @@ gep::vec3 gpp::CameraComponent::getRightDirection() const
     return m_pCamera->getRightDirection();
 }
 
+void gpp::CameraComponent::setOrthographic(const bool orthographic)
+{
+    m_pCamera->setOrthographic(orthographic);
+}
+
+bool gpp::CameraComponent::isOrthographic()
+{
+    return m_pCamera->isOrthographic();
+}
+
 void gpp::CameraComponent::move(const gep::vec3& delta)
 {
     gep::vec3 pos =m_transform.getWorldPosition();

@@ -173,9 +173,4 @@ cameraComponent:setPosition(Vec3(-300,0,0))
 cameraComponent:lookAt(Vec3(0,0,0))
 cameraComponent:setState(ComponentState.Active)
 
-
-anim = p1:createAnimationComponent()
-anim:setSkeletonFile("data/animations/HavokGirl/hkRig_L4101.hkx")
-anim:setAnimationFile("running","data/animations/HavokGirl/hkRunLoop_L4101.hkx")
-anim:setSkinFile("data/animations/HavokGirl/hkLowResSkin_L4101.hkx")
 --// strip-end

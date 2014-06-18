@@ -87,6 +87,11 @@ function idleEventListener(eventData)
 	return EventResult.Handled
 end
 
+--function attackEventListener(eventData)
+--
+--	return EventResult.Handled
+--end
+
 function characterEnter()
 
 	character.ac:setReferencePoseWeightThreshold(0.1)
@@ -214,6 +219,12 @@ function characterUpdate(elapsedTime)
 			character.ac:easeIn(character.attacks[character.activeAttack], 0.25)
 			character.ac:easeOut("Walk", 0.25)
 			character.ac:easeOut("Run", 0.25)
+
+	-- dummy delayed event
+--	local attackEvent = Events.create()
+--	attackEvent:registerListener(attackEventListener)
+--	attackEvent:delayedTrigger(1.0, {})
+
 		end
 	else
 		DebugRenderer:printText(Vec2(-0.9, 0.45), "character.activeAttack " .. character.attacks[character.activeAttack])

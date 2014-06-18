@@ -3,7 +3,7 @@
 
 #include "gepimpl/subsystems/physics/havok/manager.h"
 #include "gepimpl/subsystems/physics/havok/world.h"
-#include "gepimpl/subsystems/physics/havok/shape.h"
+#include "gepimpl/subsystems/physics/havok/havokPhysicsShape.h"
 #include "gepimpl/subsystems/physics/havok/entity.h"
 
 // Conversion functions

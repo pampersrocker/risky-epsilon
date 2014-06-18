@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "gepimpl/subsystems/physics/havok/factory.h"
+#include "gepimpl/subsystems/physics/havok/conversion/transformation.h"
 #include "gep/memory/allocator.h"
 
 
 gep::CollisionMesh::CollisionMesh() :
-    m_pShape(nullptr)
+    m_pShape(nullptr),
+    m_pTransform(nullptr)
 {
 }
 
@@ -15,6 +17,11 @@ gep::CollisionMesh::~CollisionMesh()
 void gep::CollisionMesh::setShape(IShape* shape)
 {
     m_pShape = shape;
+}
+
+void gep::CollisionMesh::setTransform(Transform* transform)
+{
+    m_pTransform = transform;
 }
 
 gep::IShape* gep::CollisionMesh::getShape()
@@ -141,9 +148,29 @@ gep::CollisionMesh* gep::CollisionMeshFileLoader::loadResource(CollisionMesh* pI
             GEP_ASSERT(physicsSystems.getSize() == 1, "Wrong number of physics systems!");
             auto* body = physicsSystems[0]->getRigidBodies()[0];
             const auto* hkShape = body->getCollidable()->getShape();
-            IShape* shape = conversion::hk::from(const_cast<hkpShape*>(hkShape));
+
+            auto shape = conversion::hk::from(const_cast<hkpShape*>(hkShape));
+
+            auto type = shape->getShapeType();
+            if ( type == hkcdShapeType::TRIANGLE || 
+                 type == hkcdShapeType::BV_COMPRESSED_MESH ||
+                 type == hkcdShapeType::CONVEX_VERTICES )
+            {
+                auto transform = body->getTransform();
+                auto meshShape = static_cast<HavokMeshShape*>(shape);
+                Transform* tempTrans = new Transform();
+                conversion::hk::from(transform, *tempTrans);
+                
+                // Since havok content tools are buggy (?) and no custom transformation can be applied,
+                // we have to convert into our engine's space by hand.
+                // TODO: Ensure, that this transformation is correct in every case
+                tempTrans->setRotation(tempTrans->getRotation() * Quaternion(vec3(1,0,0),180));
+                meshShape->setTransform(tempTrans);
+            }
+
 
             result->setShape(shape);
+            
         }
 
     }
@@ -164,6 +191,7 @@ gep::HavokPhysicsFactory::HavokPhysicsFactory(IAllocator* allocator) :
 
 gep::HavokPhysicsFactory::~HavokPhysicsFactory()
 {
+    m_pAllocator = nullptr;
 }
 
 
@@ -187,13 +215,13 @@ void gep::HavokPhysicsFactory::setAllocator(IAllocator* allocator)
     m_pAllocator = allocator;
 }
 
-gep::IWorld* gep::HavokPhysicsFactory::createWorld(const WorldCInfo& cinfo) const 
+gep::IWorld* gep::HavokPhysicsFactory::createWorld(const WorldCInfo& cinfo) const
 {
     GEP_ASSERT(m_pAllocator, "Allocator cannot be nullptr!");
     return GEP_NEW(m_pAllocator, HavokWorld)(cinfo);
 }
 
-gep::IRigidBody* gep::HavokPhysicsFactory::createRigidBody(const RigidBodyCInfo& cinfo) const 
+gep::IRigidBody* gep::HavokPhysicsFactory::createRigidBody(const RigidBodyCInfo& cinfo) const
 {
     GEP_ASSERT(m_pAllocator, "Allocator cannot be nullptr!");
     HavokRigidBody* rb = GEP_NEW(m_pAllocator, HavokRigidBody)(cinfo);
@@ -201,7 +229,7 @@ gep::IRigidBody* gep::HavokPhysicsFactory::createRigidBody(const RigidBodyCInfo&
     return rb;
 }
 
-gep::ICharacterRigidBody* gep::HavokPhysicsFactory::createCharacterRigidBody(const CharacterRigidBodyCInfo& cinfo) const 
+gep::ICharacterRigidBody* gep::HavokPhysicsFactory::createCharacterRigidBody(const CharacterRigidBodyCInfo& cinfo) const
 {
     GEP_ASSERT(m_pAllocator, "Allocator cannot be nullptr!");
     return GEP_NEW(m_pAllocator, HavokCharacterRigidBody)(cinfo);
@@ -215,4 +243,22 @@ gep::ResourcePtr<gep::ICollisionMesh> gep::HavokPhysicsFactory::loadCollisionMes
 gep::IShape* gep::HavokPhysicsFactory::loadCollisionMeshFromLua(const char* path)
 {
     return loadCollisionMesh(path).get()->getShape();
+}
+
+gep::IBoxShape* gep::HavokPhysicsFactory::createBox(const vec3& halfExtends)
+{
+    return GEP_NEW(m_pAllocator, HavokShape_Box)(halfExtends);
+}
+
+gep::IPhantomCallbackShape* gep::HavokPhysicsFactory::createPhantomCallbackShape()
+{
+    return GEP_NEW(m_pAllocator, HavokPhantomCallbackShapeGep)();
+}
+
+gep::ICollisionFilter* gep::HavokPhysicsFactory::createCollisionFilter_Simple()
+{
+    auto pHkFilter = new HavokCollisionFilter_Simple();
+    auto pFilterWrapper = GEP_NEW(m_pAllocator, HavokCollisionFilterWrapper)(pHkFilter);
+    pHkFilter->removeReference();
+    return pFilterWrapper;
 }

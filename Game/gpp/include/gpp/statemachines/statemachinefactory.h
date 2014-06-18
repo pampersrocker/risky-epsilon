@@ -24,6 +24,8 @@ namespace gpp { namespace sm {
         void destroy();
 
         StateMachine* create(const std::string& name);
+        gep::Result destroy(const std::string& name);
+        gep::Result destroy(StateMachine* pInstance);
 
         /// \brief Gets a state machine by its fully qualified name.
         ///
@@ -34,6 +36,7 @@ namespace gpp { namespace sm {
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(create)
+            LUA_BIND_FUNCTION_PTR(static_cast<gep::Result(StateMachineFactory::*)(const std::string&)>(&destroy), "destroy")
             LUA_BIND_FUNCTION(get)
         LUA_BIND_REFERENCE_TYPE_END;
 

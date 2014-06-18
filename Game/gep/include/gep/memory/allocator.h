@@ -86,6 +86,11 @@ namespace gep
     {
         GEP_API static IAllocatorStatistics* getAllocator();
     };
+
+    struct MallocAllocatorPolicy
+    {
+        GEP_API static IAllocator* getAllocator();
+    };
 }
 
 #define g_stdAllocator (::gep::StdAllocator::globalInstance())
@@ -163,15 +168,17 @@ namespace gep
         static void* newHelper(A* pAllocator)
         {
             GEP_ASSERT(pAllocator != nullptr);
-            ReferenceCounted* pObj = static_cast<ReferenceCounted*>(static_cast<T*>(pAllocator->allocateMemory(sizeof(T))));
-            pObj->setAllocator(pAllocator);
-            return pObj;
+            return newHelper(*pAllocator);
         }
 
-        static void* newHelper(A& pAllocator)
+        static void* newHelper(A& allocator)
         {
-            ReferenceCounted* pObj = static_cast<ReferenceCounted*>(static_cast<T*>(pAllocator.allocateMemory(sizeof(T))));
-            pObj->setAllocator(&pAllocator);
+            auto pMem = allocator.allocateMemory(sizeof(T));
+#ifdef _DEBUG
+            memset(pMem, 0, sizeof(T));
+#endif // _DEBUG
+            ReferenceCounted* pObj = static_cast<ReferenceCounted*>(static_cast<T*>(pMem));
+            pObj->setAllocator(&allocator);
             return pObj;
         }
 

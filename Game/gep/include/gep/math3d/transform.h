@@ -60,7 +60,7 @@ namespace gep
     public:
         Transform():
             m_position(),
-            m_scale(),
+            m_scale(1,1,1),
             m_rotation(),
             m_baseOrientation(),
             m_pParent(nullptr)
@@ -105,13 +105,13 @@ namespace gep
         {
             if (m_pParent)
             {
-                return  m_pParent->getWorldTransformationMatrix() * ( gep::mat4::translationMatrix(m_position) * m_rotation .toMat4());
+                return  m_pParent->getWorldTransformationMatrix() * ( gep::mat4::scaleMatrix(m_scale) * gep::mat4::translationMatrix(m_position) * m_rotation .toMat4());
             }
-            return gep::mat4::translationMatrix(m_position) * m_rotation .toMat4() ; 
+            return gep::mat4::scaleMatrix(m_scale) * gep::mat4::translationMatrix(m_position) * m_rotation .toMat4() ; 
         }
-        virtual gep::vec3 getViewDirection() const override {return (m_rotation * m_baseOrientation).toMat3() * gep::vec3(0,1,0);}
-        virtual gep::vec3 getUpDirection() const override {return  (m_rotation * m_baseOrientation).toMat3() * gep::vec3(0,0,1);}
-        virtual gep::vec3 getRightDirection() const override {return (m_rotation * m_baseOrientation).toMat3() * gep::vec3(1,0,0);}
+        virtual gep::vec3 getViewDirection() const override {return getWorldRotation().toMat3() * gep::vec3(0,1,0);}
+        virtual gep::vec3 getUpDirection() const override {return  getWorldRotation().toMat3() * gep::vec3(0,0,1);}
+        virtual gep::vec3 getRightDirection() const override {return getWorldRotation().toMat3() * gep::vec3(1,0,0);}
 
         virtual void setParent(const gep::ITransform* parent) override
         {
