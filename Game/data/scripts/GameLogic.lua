@@ -30,6 +30,16 @@ function GameLogic.updateRunning( updateData )
 		ChangePlayer(go)
 	end
 	
+	--testing of disable physics component
+	if (InputHandler:isPressed(Key.L) or bit32.btest(buttonsTriggered, Button.RightShoulder)) then
+		local go = GetGObyGUID("playerInstance")
+		if(go.go.pc:getState() == ComponentState.Inactive) then
+			go.go.pc:setState(ComponentState.Active)
+		elseif(go.go.pc:getState() == ComponentState.Active) then
+			go.go.pc:setState(ComponentState.Inactive)
+		end
+	end
+	
 	return EventResult.Handled;
 end
 

@@ -67,7 +67,10 @@ function PlayerMeta:initializeGameObjectPaper( )
 end
 
 function PlayerMeta.update( guid, elapsedTime )
+
 	local player = GetGObyGUID(guid)
+	
+	DebugRenderer:printText(Vec2(-0.9, 0.65), "Velocity:" .. player.go.rb:getLinearVelocity():length())
 	local viewDir = GameLogic.isoCam.go.cc:getViewDirection()
 	viewDir.z = 0
 	viewDir = viewDir:normalized()

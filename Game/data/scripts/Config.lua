@@ -1,7 +1,7 @@
 Config = {
 	camera = {
 		initialDistance = 5.0, -- initial distance of camera
-		distanceDelta = 1.5, -- delta of distance change
+		distanceDelta = 3, -- delta of distance change
 		distanceMin = 2.0,
 		distanceMax = 3000.0,
 		hightFactor = 0.5, -- 0..1 factor for hight of camera
@@ -15,31 +15,31 @@ Config = {
 		maxLinearVelocity = 300.0,
 		maxAngularVelocity = 100.0,
 		spawnPosition = Vec3(0.0, 0.0, 5.0),
-		torqueMulScalar = 1000
+		torqueMulScalar = 2
 	},
 
 	materials = {
 		wood = {
-			mass = 500.0,
+			mass = 360.0,
 			friction = 10.0,
-			angularDamping = 1.0,
-			linearDamping = 1.0,
+			angularDamping = 0.0,
+			linearDamping = 0.0,
 			restitution = 0.0,
 			radius = 0.5
 		},
 		stone = {
-			mass = 3000.0,
-			friction = 100.0,
-			angularDamping = 1.0,
-			linearDamping = 1.0,
+			mass = 1370.0,
+			friction = 10.0,
+			angularDamping = 0.0,
+			linearDamping = 0.0,
 			restitution = 0.0,
 			radius = 0.5
 		},
 		paper = {
-			mass = 100.0,
-			friction = 1.0,
-			angularDamping = 1.0,
-			linearDamping = 1.0,
+			mass = 3.09,
+			friction = 10.0,
+			angularDamping = 0.0,
+			linearDamping = 0.0,
 			restitution = 0.0,
 			radius = 0.5
 		}

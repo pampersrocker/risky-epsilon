@@ -17,7 +17,7 @@ function LevelMeta:initializeGameObject()
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 
 	CreatePhysicsComponent( self , cinfo )
-	--CreateRenderComponent(self, "data/models/plane.thModel")
+	CreateRenderComponent(self, "data/models/LevelElements/track_test.thModel")
 	logMessage("LevelMeta:init() end")
 
 end
