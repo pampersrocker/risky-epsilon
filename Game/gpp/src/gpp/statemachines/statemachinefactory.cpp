@@ -32,6 +32,23 @@ void gpp::sm::StateMachineFactory::destroy()
     m_stateMachines.clear();
 }
 
+gep::Result gpp::sm::StateMachineFactory::destroy(const std::string& name)
+{
+    auto result = gep::FAILURE;
+    m_stateMachines.ifExists(name, [&](StateMachine* pFsm){
+        GEP_DELETE(m_pAllocator, pFsm);
+        result = gep::SUCCESS;
+        m_stateMachines.remove(name);
+    });
+    return result;
+}
+
+gep::Result gpp::sm::StateMachineFactory::destroy(StateMachine* pInstance)
+{
+    GEP_ASSERT(pInstance, "The state machine you passed is invalid!");
+    return destroy(pInstance->getName());
+}
+
 gpp::sm::StateMachine* gpp::sm::StateMachineFactory::create(const std::string& name)
 {
     GEP_ASSERT(m_stateMachines.exists(name) == false, "A top-level state machine of the given name already exists!", name);

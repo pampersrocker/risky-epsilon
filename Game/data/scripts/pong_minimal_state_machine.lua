@@ -180,25 +180,15 @@ cameraComponent:lookAt(Vec3(0,0,0))
 --cameraComponent:setBaseViewDirection(Vec3(0,0,1))
 cameraComponent:setState(ComponentState.Active)
 
+Events.Update:registerListener(function(dt)
+	logMessage("Looking at the ball!")
+	cameraComponent:lookAt(ball:getPosition())
+	return EventResult.Handled
+end)
 
-animgo = GameObjectManager:createGameObject("animgo")
-animcomp = animgo:createAnimationComponent()
-animcomp:setSkeletonFile("data/animations/HavokGirl/hkRig_L4101.hkx")
-animcomp:setSkinFile("data/animations/HavokGirl/hkLowResSkinWithEyesPS2_L4101.hkx")
-animcomp:addAnimationFile("test", "data/animations/HavokGirl/hkRunTurnRLoop_L4101.hkx")
-
-
-local myGameState = State{
+State{
 	name = "A",
-	parent = "/game/gameRunning",
-	states = {
-		{
-			name = "a"
-		}
-	},
-	transitions = {
-		{ from = "__enter",   to = "a" }
-	}
+	parent = "/game/gameRunning"
 }
 StateTransitions{
 	parent = "/game/gameRunning",

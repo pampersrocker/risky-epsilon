@@ -87,7 +87,7 @@ namespace gep
         {
             drawArrow(start, end, color);
         }
-	};
+    };
 
     /// \brief interface for drawing 2d elements
     class IContext2D

@@ -11,12 +11,75 @@
 #include "gep/interfaces/renderer.h"
 #include "gep/interfaces/physics/characterController.h"
 
+hkBool gep::HavokCollisionFilter_Simple::isCollisionEnabled(const hkpCollidable& a,
+                                                            const hkpCollidable& b) const
+{
+    return isCollisionEnabled(a.getCollisionFilterInfo(), b.getCollisionFilterInfo());
+}
+
+hkBool gep::HavokCollisionFilter_Simple::isCollisionEnabled(const hkpCollisionInput& input,
+                                                            const hkpCdBody& a,
+                                                            const hkpCdBody& b,
+                                                            const HK_SHAPE_CONTAINER& bContainer,
+                                                            hkpShapeKey bKey) const
+{
+    hkUint32 infoB = bContainer.getCollisionFilterInfo(bKey);
+    // We need a corresponding filter info for 'a'. Whether we should get this from a parent/grandparent/etc... of 'a' in the case that
+    // 'a' is part of a shape collection depends on how we decide to handle the 'collection vs collection' case.
+    // Here we just assume that we do not have collections colliding against collections, and use the filter info of the root collidable of 'a'
+    return isCollisionEnabled(a.getRootCollidable()->getCollisionFilterInfo(), infoB);
+}
+
+hkBool gep::HavokCollisionFilter_Simple::isCollisionEnabled(const hkpCollisionInput& input,
+                                                            const hkpCdBody& collectionBodyA,
+                                                            const hkpCdBody& collectionBodyB,
+                                                            const HK_SHAPE_CONTAINER& containerShapeA,
+                                                            const HK_SHAPE_CONTAINER& containerShapeB,
+                                                            hkpShapeKey keyA,
+                                                            hkpShapeKey keyB) const
+{
+    hkUint32 infoA = containerShapeA.getCollisionFilterInfo(keyA);
+    hkUint32 infoB = containerShapeB.getCollisionFilterInfo(keyB);
+    return isCollisionEnabled(infoA, infoB);
+}
+
+hkBool gep::HavokCollisionFilter_Simple::isCollisionEnabled(const hkpShapeRayCastInput& aInput,
+                                                            const HK_SHAPE_CONTAINER& bContainer,
+                                                            hkpShapeKey bKey) const
+{
+    hkUint32 infoB = bContainer.getCollisionFilterInfo(bKey);
+    return isCollisionEnabled(aInput.m_filterInfo, infoB);
+}
+
+hkBool gep::HavokCollisionFilter_Simple::isCollisionEnabled(const hkpWorldRayCastInput& a,
+                                                            const hkpCollidable& collidableB) const
+{
+    return isCollisionEnabled(a.m_filterInfo, collidableB.getCollisionFilterInfo());
+}
+
+hkBool gep::HavokCollisionFilter_Simple::isCollisionEnabled(hkUint32 infoA,
+                                                            hkUint32 infoB) const
+{
+    // Examine the collisionfilterinfo of each. This is "user" information which can be interpreted
+    // however the filter sees fit. Another example would be to let every body have a unique
+    // collisionfilterinfo value, and allow/disallow collisions based on a pairwise lookup.
+    // We use a much simpler rule here for ease of illustration.
+    // Let's say that bodies with collisionfilters X and Y are allowed to collide if and only if X == Y,
+    // ie. if they are in the same "group"
+
+    return infoA & infoB;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
 gep::HavokWorld::HavokWorld(const WorldCInfo& cinfo) :
     m_pWorld(nullptr),
     m_entities(),
     m_characters(),
     m_actualContactListener(this),
-    m_event_contactPoint()
+    m_event_contactPoint(),
+    m_event_collisionAdded(),
+    m_event_collisionRemoved()
 {
     m_entities.reserve(64);
 
@@ -27,6 +90,7 @@ gep::HavokWorld::HavokWorld(const WorldCInfo& cinfo) :
     worldInfo.setBroadPhaseWorldSize(cinfo.worldSize);
 //	worldInfo.m_simulationType = hkpWorldCinfo::SIMULATION_TYPE_DISCRETE;
     m_pWorld = new hkpWorld(worldInfo);
+    m_pWorld->removeReference();
 
     // Register all collision agents
     // It's important to register collision agents before adding any entities to the world.
@@ -43,8 +107,8 @@ gep::HavokWorld::~HavokWorld()
 void gep::HavokWorld::addEntity(IPhysicsEntity* entity)
 {
     //TODO: can only add rigid bodies at the moment.
-    auto* actualEntity = dynamic_cast<HavokRigidBody*>(entity);
-    GEP_ASSERT(actualEntity != nullptr, "Attempted to add wrong kind of entity. (only rigid bodies are supported at the moment)");
+    auto* actualEntity = static_cast<HavokRigidBody*>(entity);
+    GEP_ASSERT(dynamic_cast<HavokRigidBody*>(entity) != nullptr, "Attempted to add wrong kind of entity. (only rigid bodies are supported at the moment)");
     addEntity(actualEntity->getHkpRigidBody());
     m_entities.append(entity);
 }
@@ -128,17 +192,23 @@ void gep::HavokWorld::castRay(const RayCastInput& input, RayCastOutput& output) 
     // Process input
     conversion::hk::to(input.from, actualInput.m_from);
     conversion::hk::to(input.to, actualInput.m_to);
+    actualInput.m_filterInfo = input.filterInfo;
 
     // Cast the ray
-    m_pWorld->castRay(actualInput, actualOutput);
+    {
+        m_pWorld->lock();
+        m_pWorld->castRay(actualInput, actualOutput);
+        m_pWorld->unlock();
+    }
 
     // Process output
     output.hitFraction = actualOutput.m_hitFraction;
-    // TODO: havok uses "collidables", which form a hierarchy. We have to wrap this as well if we want to have something like hit zones.
-    // TODO: Check if it is really ok to const_cast here.
+    conversion::hk::from(actualOutput.m_normal, output.normal);
     if (actualOutput.m_rootCollidable)
     {
-        output.hitEntity = new HavokCollidable(const_cast<hkpCollidable*>(actualOutput.m_rootCollidable));
+        // We only support rigid bodies right now.
+        auto actualEntity = static_cast<hkpEntity*>(actualOutput.m_rootCollidable->getOwner());
+        output.pHitBody = static_cast<IRigidBody*>(reinterpret_cast<IPhysicsEntity*>(actualEntity->getUserData()));
     }
 }
 
@@ -149,15 +219,36 @@ void gep::HavokWorld::contactPointCallback(const ContactPointArgs& evt)
 
 void gep::HavokWorld::collisionAddedCallback(const CollisionArgs& evt)
 {
-    GEP_ASSERT(false, "Not implemented.");
+    m_event_collisionAdded.trigger(&const_cast<gep::CollisionArgs&>(evt));
 }
 
 void gep::HavokWorld::collisionRemovedCallback(const CollisionArgs& evt)
 {
-    GEP_ASSERT(false, "Not implemented.");
+    m_event_collisionRemoved.trigger(&const_cast<gep::CollisionArgs&>(evt));
 }
 
 gep::Event<gep::ContactPointArgs*>* gep::HavokWorld::getContactPointEvent()
 {
     return &m_event_contactPoint;
+}
+
+gep::Event<gep::CollisionArgs*>* gep::HavokWorld::getCollisionAddedEvent()
+{
+    return &m_event_collisionAdded;
+}
+
+gep::Event<gep::CollisionArgs*>* gep::HavokWorld::getCollisionRemovedEvent()
+{
+    return &m_event_collisionRemoved;
+}
+
+void gep::HavokWorld::setCollisionFilter(ICollisionFilter* pFilter)
+{
+    auto pHkFilterWrapper = static_cast<HavokCollisionFilterWrapper*>(pFilter);
+    GEP_ASSERT(dynamic_cast<HavokCollisionFilterWrapper*>(pFilter), "Invalid type of collision filter!");
+
+    auto pHkFilter = pHkFilterWrapper->getHkCollisionFilter();
+    GEP_ASSERT(pHkFilter, "Filter wrapper has an invalid hk object!");
+
+    m_pWorld->setCollisionFilter(pHkFilter);
 }

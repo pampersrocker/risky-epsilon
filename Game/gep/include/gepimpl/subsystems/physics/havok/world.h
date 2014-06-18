@@ -11,6 +11,50 @@ namespace gep
 
     class HavokBaseAction;
 
+    class HavokCollisionFilterWrapper : public ICollisionFilter
+    {
+        hkRefPtr<hkpCollisionFilter> m_pHkCollisionFilter;
+    public:
+        HavokCollisionFilterWrapper(hkpCollisionFilter* pFilter) :
+            m_pHkCollisionFilter(pFilter)
+        {
+        }
+
+        hkpCollisionFilter* getHkCollisionFilter() { return m_pHkCollisionFilter; }
+    };
+
+    class HavokCollisionFilter_Simple :
+        public hkpCollisionFilter
+    {
+    public:
+
+        virtual hkBool isCollisionEnabled(const hkpCollidable& a,
+                                          const hkpCollidable& b) const override;
+        virtual hkBool isCollisionEnabled(const hkpCollisionInput& input,
+                                          const hkpCdBody& a,
+                                          const hkpCdBody& b,
+                                          const HK_SHAPE_CONTAINER& bContainer,
+                                          hkpShapeKey bKey) const override;
+        virtual hkBool isCollisionEnabled(const hkpCollisionInput& input,
+                                          const hkpCdBody& collectionBodyA,
+                                          const hkpCdBody& collectionBodyB,
+                                          const HK_SHAPE_CONTAINER& containerShapeA,
+                                          const HK_SHAPE_CONTAINER& containerShapeB,
+                                          hkpShapeKey keyA,
+                                          hkpShapeKey keyB) const override;
+        virtual hkBool isCollisionEnabled(const hkpShapeRayCastInput& aInput,
+                                          const HK_SHAPE_CONTAINER& bContainer,
+                                          hkpShapeKey bKey) const override;
+        virtual hkBool isCollisionEnabled(const hkpWorldRayCastInput& a,
+                                          const hkpCollidable& collidableB) const override;
+
+    protected:
+
+        // The base collision filtering logic - all the other function calls will forward to this one
+        hkBool isCollisionEnabled(hkUint32 infoA, hkUint32 infoB) const;
+    };
+    
+
     class HavokWorld : public IWorld, public IContactListener
     {
         hkRefPtr<hkpWorld> m_pWorld;
@@ -20,6 +64,8 @@ namespace gep
         DynamicArray<HavokContactListener*> m_contactListeners;
         HavokContactListener m_actualContactListener;
         gep::Event<gep::ContactPointArgs*> m_event_contactPoint;
+        gep::Event<gep::CollisionArgs*> m_event_collisionAdded;
+        gep::Event<gep::CollisionArgs*> m_event_collisionRemoved;
     public:
         HavokWorld(const WorldCInfo& cinfo);
 
@@ -39,7 +85,11 @@ namespace gep
 
         hkpWorld* getHkpWorld() const { return m_pWorld; }
 
+        virtual void setCollisionFilter(ICollisionFilter* pFilter) override;
+
         virtual gep::Event<gep::ContactPointArgs*>* getContactPointEvent() override;
+        virtual gep::Event<gep::CollisionArgs*>* getCollisionAddedEvent() override;
+        virtual gep::Event<gep::CollisionArgs*>* getCollisionRemovedEvent() override;
 
         virtual void contactPointCallback(const ContactPointArgs& evt) override;
         virtual void collisionAddedCallback(const CollisionArgs& evt) override;

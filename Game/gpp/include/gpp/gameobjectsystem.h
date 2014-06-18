@@ -205,8 +205,10 @@ namespace gpp
             LUA_BIND_FUNCTION_NAMED(getComponent<ScriptComponent>, "getScriptComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<AnimationComponent>, "getAnimationComponent")
             LUA_BIND_FUNCTION(setPosition)
+            LUA_BIND_FUNCTION(getPosition)
             LUA_BIND_FUNCTION(getWorldPosition)
             LUA_BIND_FUNCTION(setRotation)
+            LUA_BIND_FUNCTION(getRotation)
             LUA_BIND_FUNCTION(getWorldRotation)
             LUA_BIND_FUNCTION(getViewDirection)
             LUA_BIND_FUNCTION(setScale)
@@ -217,6 +219,7 @@ namespace gpp
             LUA_BIND_FUNCTION(setComponentStates)
             LUA_BIND_FUNCTION(setBaseOrientation)
             LUA_BIND_FUNCTION(setBaseViewDirection)
+            LUA_BIND_FUNCTION_NAMED(getNameCopy, "getName")
             LUA_BIND_FUNCTION(setParent)
         LUA_BIND_REFERENCE_TYPE_END;
 
@@ -227,6 +230,8 @@ namespace gpp
         gep::ITransform* m_transform;
         gep::Hashmap<const char*, ComponentWrapper> m_components;
         gep::DynamicArray<ComponentWrapper> m_updateQueue;
+
+        inline std::string getNameCopy() { return getName(); }
 
         template<typename T>
         void addComponent(T* specializedComponent)
