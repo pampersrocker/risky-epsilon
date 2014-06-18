@@ -39,7 +39,8 @@ Config = {
 		backward = Key.S,
 		left = Key.A,
 		right = Key.D,
-		pause = Key.P
+		pause = Key.P,
+		restart = Key.R
 	},
 
 	world = {
