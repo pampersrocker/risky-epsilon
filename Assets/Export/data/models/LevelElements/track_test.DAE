@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
-  <asset><contributor><author></author><authoring_tool>FBX COLLADA exporter</authoring_tool><comments></comments></contributor><created>2014-06-18T10:13:08Z</created><keywords></keywords><modified>2014-06-18T10:13:08Z</modified><revision></revision><subject></subject><title></title><unit meter="0.010000" name="centimeter"></unit><up_axis>Y_UP</up_axis></asset>
+  <asset><contributor><author></author><authoring_tool>FBX COLLADA exporter</authoring_tool><comments></comments></contributor><created>2014-06-18T10:24:49Z</created><keywords></keywords><modified>2014-06-18T10:24:49Z</modified><revision></revision><subject></subject><title></title><unit meter="0.010000" name="centimeter"></unit><up_axis>Y_UP</up_axis></asset>
   <library_materials>
     <material id="_01 - Default" name="_01 - Default">
       <instance_effect url="#_01 - Default-fx"/>
@@ -671,7 +671,7 @@
   </library_geometries>
   <library_visual_scenes>
     <visual_scene id="track_test" name="track_test">
-      <node name="straight_2000_01" id="straight_2000_01" sid="straight_2000_01"><matrix sid="matrix">0.100000 0.000000 0.000000 0.000000 0.000000 0.000000 0.100000 0.000000 0.000000 -0.100000 0.000000 0.000000 0.000000 0.000000 0.000000 1.000000</matrix><instance_geometry url="#straight_2000_01-lib"><bind_material><technique_common><instance_material symbol="_01 - Default" target="#_01 - Default"/></technique_common></bind_material></instance_geometry><extra><technique profile="FCOLLADA"><visibility>1.000000</visibility></technique></extra></node>
+      <node name="straight_2000_01" id="straight_2000_01" sid="straight_2000_01"><matrix sid="matrix">1.000000 0.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000 0.000000 1.000000</matrix><instance_geometry url="#straight_2000_01-lib"><bind_material><technique_common><instance_material symbol="_01 - Default" target="#_01 - Default"/></technique_common></bind_material></instance_geometry><extra><technique profile="FCOLLADA"><visibility>1.000000</visibility></technique></extra></node>
       <extra><technique profile="MAX3D"><frame_rate>30.000000</frame_rate></technique><technique profile="FCOLLADA"><start_time>0.000000</start_time><end_time>3.333333</end_time></technique></extra>
     </visual_scene>
   </library_visual_scenes>
