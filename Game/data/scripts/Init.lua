@@ -8,9 +8,10 @@ function InitializeWorld(  )
 	PhysicsSystem:setWorld(world)
 	PhysicsSystem:setDebugDrawingEnabled(true)
 
+	PlayerMeta.__index = PlayerMeta
+
 	-- create player
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
-	PlayerMeta.__index = PlayerMeta
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
 	GameLogic.playerInstance:initializeGameObjectWood()
@@ -18,15 +19,14 @@ function InitializeWorld(  )
 
 	-- create playerStone
 	GameLogic.playerInstanceStone = CreateEmptyGameObject("playerInstanceStone")
-	PlayerMeta.__index = PlayerMeta
+
 	setmetatable( GameLogic.playerInstanceStone, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstanceStone, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
 	GameLogic.playerInstanceStone:initializeGameObjectStone()
 	GameLogic.playerInstanceStone.go:setComponentStates(ComponentState.Inactive)
 
-	-- create playerStone
+	-- create playerPaper
 	GameLogic.playerInstancePaper = CreateEmptyGameObject("playerInstancePaper")
-	PlayerMeta.__index = PlayerMeta
 	setmetatable( GameLogic.playerInstancePaper, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstancePaper, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
 	GameLogic.playerInstancePaper:initializeGameObjectPaper()
