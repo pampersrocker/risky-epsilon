@@ -1,0 +1,1 @@
+The directory structure here is the same as later in the game, this simplifies the process of exporting meshes and the corresponding textures using the correct relative paths.
