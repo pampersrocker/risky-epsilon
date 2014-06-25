@@ -50,7 +50,7 @@ function LevelMeta:initializeGameObject()
 	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/roundtrack_02_col.hkx")
 	cinfo.motionType = MotionType.Fixed
 	cinfo.restitution = Config.materials.track.wood.restitution
-	cinfo.friction = Config.materials.wood.friction
+	cinfo.friction = Config.materials.track.wood.friction
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 
 	CreatePhysicsComponent( self , cinfo )

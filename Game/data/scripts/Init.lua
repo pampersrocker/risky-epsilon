@@ -94,7 +94,7 @@ function InitializeWorld(  )
 	GameLogic.fan1 = CreateEmptyGameObject(name)
 	setmetatable(GameLogic.fan1, FanMeta)
 	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan1:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(40.0,0.0,5.0), true, Vec3(0.0,0.0,1123.0))
+	GameLogic.fan1:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(-185.0,-150.0,-30.0), true, Vec3(0.0,0.0,1123.0))
 	
 	logMessage("Creating Fan")
 	local name = "Fan2"
@@ -150,7 +150,7 @@ function InitializeWorld(  )
 		
 		return EventResult.Handled
 	end)
-	
+	--[[
 	--create EndTrigger
 	local endtrigger = CreateEmptyGameObject("endtrigger")
 	triggerEnd = FanMeta:createPhantomCallbackTriggerBox("endtrigger", Vec3(1.0,1.0,1.0), Vec3(-10.0,0.0,0.0))
@@ -159,7 +159,7 @@ function InitializeWorld(  )
 		
 		return EventResult.Handled
 	end)
-	
+	]]
 	--create trigger for groundfall
 	local gotrigger = CreateEmptyGameObject("trigger for groundfall")
 	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for groundfall", Vec3(Config.world.worldSize/2.0,Config.world.worldSize/2.0,3.0), Vec3(0.0,0.0,-Config.world.worldSize/2.5))
