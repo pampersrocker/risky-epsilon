@@ -695,6 +695,9 @@
     <ClCompile Include="src\gep\subsystems\physics\havok\havokPhysicsShape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\gepimpl\transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\gep\memory\newdelete.inl">

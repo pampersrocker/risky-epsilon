@@ -77,10 +77,8 @@ namespace gep
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(getPosition)
             LUA_BIND_FUNCTION(getRotation)
-            LUA_BIND_FUNCTION(getScale)
             LUA_BIND_FUNCTION(getWorldPosition)
             LUA_BIND_FUNCTION(getWorldRotation)
-            LUA_BIND_FUNCTION(getWorldScale)
             LUA_BIND_FUNCTION(getViewDirection)
             LUA_BIND_FUNCTION(getRightDirection)
             LUA_BIND_FUNCTION(getUpDirection)

@@ -100,7 +100,7 @@ void gep::AnimationSystem::destroy()
     m_pAnimationFactory->destroy();
 }
 
-void gep::AnimationSystem::update( float elapsedTime )
+void gep::AnimationSystem::update(float elapsedSeconds)
 {
     throw std::exception("The method or operation is not implemented.");
 }
@@ -279,23 +279,20 @@ gep::IAnimationControl* gep::AnimatedSkeleton::addAnimationControl(ResourcePtr<I
 }
 
 
-void gep::AnimatedSkeleton::update(float elapsedMS)
+void gep::AnimatedSkeleton::update(float elapsedSeconds)
 {
-
-
-    m_pHkaAnimatedSkeleton->stepDeltaTime(elapsedMS/1000);
+    m_pHkaAnimatedSkeleton->stepDeltaTime(elapsedSeconds);
     m_pHkaAnimatedSkeleton->sampleAndCombineAnimations(m_pPose->accessSyncedPoseLocalSpace().begin(), m_pPose->getFloatSlotValues().begin());
 
     for (auto& bone : m_bones.values())
     {
-        bone->update(elapsedMS);
+        bone->update(elapsedSeconds);
     }
-    
+
     if(m_drawDebug)
     {
         renderDebug();
     }
-
 }
 
 gep::uint32 gep::AnimatedSkeleton::findBoneForName(const char* name)
@@ -354,11 +351,9 @@ void gep::AnimatedSkeleton::renderDebug()
        p1 = p1 * m_debugDrawingScale;
        p2 = p2 * m_debugDrawingScale;
        
-       p1 = m_pTransform->getWorldScale() * p1;
        p1 = m_pTransform->getWorldRotation().toMat3() * p1;
        p1 = m_pTransform->getWorldPosition() + p1;
        
-       p2 = m_pTransform->getWorldScale() * p2;
        p2 = m_pTransform->getWorldRotation().toMat3() * p2;
        p2 = m_pTransform->getWorldPosition() + p2;
 
@@ -439,11 +434,6 @@ void gep::Bone::setRotation(const gep::Quaternion& rot)
     GEP_ASSERT(false, "Do not set the rotation of a bone!")
 }
 
-void gep::Bone::setScale(const gep::vec3& scale)
-{
-    GEP_ASSERT(false, "Do not set the scale of a bone!")
-}
-
 gep::mat4 gep::Bone::getTransformationMatrix() const
 {
       return gep::mat4::translationMatrix( conversion::hk::from(m_pBone->getTranslation())) * (conversion::hk::from(m_pBone->getRotation())).toMat4();
@@ -457,11 +447,6 @@ gep::vec3 gep::Bone::getPosition() const
 gep::Quaternion gep::Bone::getRotation() const
 {
    return conversion::hk::from(m_pBone->getRotation());
-}
-
-gep::vec3 gep::Bone::getScale() const
-{
-    return conversion::hk::from(m_pBone->getScale());
 }
 
 gep::vec3 gep::Bone::getViewDirection() const
@@ -506,16 +491,7 @@ gep::Quaternion gep::Bone::getWorldRotation() const
    return conversion::hk::from(m_pBone->getRotation());
 }
 
-gep::vec3 gep::Bone::getWorldScale() const 
-{
-    if (m_pParent)
-    {
-        return  m_pParent->getWorldScale() * conversion::hk::from(m_pBone->getScale());
-    }
-    return conversion::hk::from(m_pBone->getScale());
-}
-
-void gep::Bone::update(float elapsedMS)
+void gep::Bone::update(float elapsedSeconds)
 {
     m_pBone = &m_pPose->getBoneModelSpace(m_boneID);
 }

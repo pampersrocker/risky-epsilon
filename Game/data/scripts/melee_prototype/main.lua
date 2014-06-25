@@ -30,40 +30,10 @@ debugCam = createDebugCam("debugCam")
 -- 3rd person cam
 cam = GameObjectManager:createGameObject("cam")
 cam.cc = cam:createCameraComponent()
+cam.cc:setBaseViewDirection(Vec3(0, -1, 0))
 cam.rotation = 0
 -- character
-character = GameObjectManager:createGameObject("character")
-character.rc = character:createRenderComponent()
-character.rc:setPath("data/models/barbarian/barbarianAnimated.thModel")
-character.ac = character:createAnimationComponent()
-character.ac:setSkeletonFile("data/animations/Barbarian/Barbarian.hkt")
-character.ac:setSkinFile("data/animations/Barbarian/Barbarian.hkt")
-character.ac:addAnimationFile("Idle", "data/animations/Barbarian/Barbarian_Idle.hkt")
-character.ac:addAnimationFile("Walk", "data/animations/Barbarian/Barbarian_Walk.hkt")
-character.ac:addAnimationFile("Run", "data/animations/Barbarian/Barbarian_Run.hkt")
-character.ac:addAnimationFile("Attack", "data/animations/Barbarian/Barbarian_Attack.hkt")
-character.pc = character:createPhysicsComponent()
-local cinfo = RigidBodyCInfo()
-cinfo.collisionFilterInfo = 0x1
-local sphere = PhysicsFactory:createSphere(50)
-cinfo.shape = PhysicsFactory:createConvexTranslateShape(sphere, Vec3(0, 0, 50))
-cinfo.motionType = MotionType.Dynamic
-cinfo.position = Vec3(0, 0, 5)
-cinfo.mass = 100
-cinfo.restitution = 0
-cinfo.friction = 0
-cinfo.linearDamping = 2.5
-cinfo.angularDamping = 1
-cinfo.gravityFactor = 25
-character.pc.rb = character.pc:createRigidBody(cinfo)
-character.pc.rb:setUserData(character)
-character:setBaseViewDirection(Vec3(0, -1, 0):normalized())
-character.attacking = false
-character.walkSpeed = 0
-character.maxWalkSpeed = 35000
-character.relativeSpeed = 0
-character.rotationSpeed = 0
-character.maxRotationSpeed = 250
+character = createCharacter("character", Vec3(0, 0, 5))
 -- axe
 axe = GameObjectManager:createGameObject("axe")
 axe.rc = axe:createRenderComponent()
@@ -82,34 +52,33 @@ do
 		local go = args:getRigidBody():getUserData()
 		if args:getEventType() == TriggerEventType.Entered then
 			timedStatusDisplay("Hit " .. go:getName())
-			local hitDir = axe:getViewDirection()
-			go.pc.rb:applyLinearImpulse(hitDir:mulScalar(-100000.0))
+--			local hitDir = axe:getViewDirection()
+			local hitDir = axe:getUpDirection()
+			go.pc.rb:applyLinearImpulse(hitDir:mulScalar(-50000.0))
 		elseif args:getEventType() == TriggerEventType.Left then
 			timedStatusDisplay("Not hitting " .. go:getName() .. " anymore.")
 		end
 		return EventResult.Handled
 	end)
 end
+-- NPC
+npc = createCharacter("npc", Vec3(500, -500, 5))
 
 -- global state flags
 debugCamEnabled = false
+cameraRelativeControls = true
 
 function defaultEnter(enterData)
 
 	character.rc:setState(ComponentState.Inactive)
+--	character.rc:setScale(Vec3(0.5, 0.5, 0.5))
 	character.ac:setBoneDebugDrawingEnabled(true)
+	character:initialize()
 
-	-- set the initial animation states
-	character.ac:setReferencePoseWeightThreshold(0.1)
-	character.ac:easeIn("Idle", 0.0)
-	character.ac:setMasterWeight("Idle", 0.1)
-	character.ac:easeIn("Walk", 0.0)
-	character.ac:setMasterWeight("Walk", 0.0)
-	character.ac:easeIn("Run", 0.0)
-	character.ac:setMasterWeight("Run", 0.0)
-	character.ac:easeOut("Attack", 0.0)
-	character.ac:setMasterWeight("Attack", 1.0)
-	character.ac:setPlaybackSpeed("Attack", 1.5)
+--	npc.rc:setState(ComponentState.Inactive)
+	npc.rc:setScale(Vec3(1.25, 1.25, 1.25))
+	npc.ac:setBoneDebugDrawingEnabled(false)
+	npc:initialize()
 
 	-- parent the axe to the character's hand
 	local bone = character.ac:getBoneByName("right_attachment_jnt")
@@ -117,19 +86,17 @@ function defaultEnter(enterData)
 	axe:setParent(bone)
 	axe:setRotation(rot)
 
---	axeCollider:setParent(axe)
-
 	return EventResult.Handled
 end
 
 function defaultUpdate(updateData)
 
-	local elapsedTime = updateData:getElapsedTime() / 1000.0
+	local elapsedTime = updateData:getElapsedTime()
 
+	-- switch between normal and debug camera
 	if (InputHandler:wasTriggered(Key.C) or bit32.btest(InputHandler:gamepad(0):buttonsTriggered(), Button.Start)) then
 		debugCamEnabled = not debugCamEnabled
 	end
-
 	if (debugCamEnabled) then
 		debugCam:setComponentStates(ComponentState.Active)
 		debugCam:update(elapsedTime)
@@ -137,6 +104,11 @@ function defaultUpdate(updateData)
 		cam:setComponentStates(ComponentState.Active)
 	end
 
+	-- switch between camera-relative and absolute controls
+	if (InputHandler:wasTriggered(Key.Y) or bit32.btest(InputHandler:gamepad(0):buttonsTriggered(), Button.Y)) then
+		cameraRelativeControls = not cameraRelativeControls
+	end
+	
 	-- virtual analog stick (WASD)
 	local virtualStick = Vec2(0, 0)
 	if (InputHandler:isPressed(Key.A)) then virtualStick.x = virtualStick.x - 1 end
@@ -144,121 +116,51 @@ function defaultUpdate(updateData)
 	if (InputHandler:isPressed(Key.W)) then virtualStick.y = virtualStick.y + 1 end
 	if (InputHandler:isPressed(Key.S)) then virtualStick.y = virtualStick.y - 1 end
 	virtualStick = virtualStick:normalized()
+	
 	-- gamepad input
 	local gamepad = InputHandler:gamepad(0)
 	local leftStick = gamepad:leftStick()
 	local rightStick = gamepad:rightStick()
+	
 	-- mose input
 	local mouseDelta = InputHandler:getMouseDelta()
 	
 	-- combined move vector
 	local moveVector = virtualStick + leftStick
 	
---	local moveVector3 = Vec3(moveVector.x, moveVector.y, 0)
---	moveVector3 = cam.cc:getWorldRotation():toMat3():mulVec3(moveVector3)
---	DebugRenderer:drawArrow(character:getPosition(), character:getPosition() + moveVector3:mulScalar(250))
-	
-	-- update axe collider
---	local axeColliderPos = axeCollider:getPosition()
---	local axeHeadPos = axe:getWorldPosition()-- + axe:getViewDirection():mulScalar(50)
---	DebugRenderer:drawArrow(axeColliderPos, axeHeadPos)
---	axeCollider:setPosition(axeHeadPos)
-
-	-- start attack
-	if (not character.attacking) then
-		if (InputHandler:wasTriggered(Key.Space) or bit32.btest(InputHandler:gamepad(0):buttonsTriggered(), Button.X)) then
-			character.attacking = true
-			character.walkSpeed = 0
-			character.rotationSpeed = 0
-			character.ac:easeOut("Walk", 0.2)
-			character.ac:easeOut("Run", 0.2)
-			character.ac:easeIn("Attack", 0.2)
-			character.ac:setLocalTimeNormalized("Attack", 0.0)
-		end
-	end
-
-	character.relativeSpeed = character.walkSpeed / character.maxWalkSpeed
-	if (character.relativeSpeed < 0) then
-		character.relativeSpeed = -character.relativeSpeed
-	end	
-	
-	-- while attacking
-	if (character.attacking) then
-		local localTimeNormalized = character.ac:getLocalTimeNormalized("Attack")
-
-		-- hitting stuff
-		if (localTimeNormalized >= 0.35 and localTimeNormalized <= 0.55) then
-			axe.pc.rb:setCollisionFilterInfo(0x2)
-		--	local charPos = character:getPosition()
-		--	local charDir = character:getViewDirection()
-		--	local axePos = charPos + charDir:mulScalar(150)
-		--	axePos.z = 100
-		--	DebugRenderer:drawArrow(charPos, axePos)
-		--	for i, v in ipairs(spheres) do
-		--		local spherePos = v:getPosition()
-		--		local distVec = spherePos - axePos
-		--		if (distVec:length() <= 110) then
-		--			local impulseDir = character:getViewDirection()
-		--			impulseDir.z = 0.75
-		--			impulseDir = impulseDir:normalized()
-		--			v.pc.rb:applyLinearImpulse(impulseDir:mulScalar(500000))
-		--			v.pc.rb:setAngularVelocity(Vec3(math.random(-10, 10), math.random(-10, 10), math.random(-10, 10)))
-		--		end
-		--	end
-		else
-			axe.pc.rb:setCollisionFilterInfo(0x0)
-		end
-
-		-- attack ends
-		if (localTimeNormalized >= 0.90) then
-			character.attacking = false
-			character.ac:easeIn("Walk", 0.2)
-			character.ac:easeIn("Run", 0.2)
-			character.ac:easeOut("Attack", 0.2)
-		end
-
-	-- idle, walking, and running
+	-- move vector relative to the camera
+	local camViewDir = cam.cc:getViewDirection()
+	local charViewDir = character:getViewDirection()
+	camViewDir.z = 0
+	local angleDeg = 0
+	if (cameraRelativeControls) then
+		angleDeg = calcAngleBetween(Vec2(1, 0), camViewDir)
 	else
-
-		-- walking
-		character.walkSpeed = character.maxWalkSpeed * moveVector.y
-		if (character.walkSpeed < 0) then
-			character.walkSpeed = character.walkSpeed * 0.75
-			character.ac:setPlaybackSpeed("Walk", -0.75)
-			character.ac:setPlaybackSpeed("Run", -0.75)
-		else
-			character.ac:setPlaybackSpeed("Walk", 1.5)
-			character.ac:setPlaybackSpeed("Run", 1.5)
-		end
-		DebugRenderer:printText(Vec2(-0.9, 0.70), "character.walkSpeed " .. string.format("%5.2f", character.walkSpeed))
-
-		-- turning
-		character.rotationSpeed = character.maxRotationSpeed * -moveVector.x * elapsedTime
-		DebugRenderer:printText(Vec2(-0.9, 0.65), "character.rotationSpeed " .. string.format("%5.2f", character.rotationSpeed))
-
-		-- walk and run animation weights
-		local maxWeight = 1.0
-		local threshold = 0.65
-		local walkWeight = 0.0
-		local runWeight = 0.0
-		if (character.relativeSpeed <= threshold) then
-			walkWeight = maxWeight * (character.relativeSpeed / threshold)
-		else
-			walkWeight = maxWeight * (1.0 - ((character.relativeSpeed - threshold) / (1.0 - threshold)))
-			runWeight = maxWeight - walkWeight
-		end
-		character.ac:setMasterWeight("Walk", walkWeight)
-		DebugRenderer:printText(Vec2(-0.9, 0.60), "walkWeight " .. string.format("%6.3f", walkWeight))
-		character.ac:setMasterWeight("Run", runWeight)
-		DebugRenderer:printText(Vec2(-0.9, 0.55), "runWeight " .. string.format("%6.3f", runWeight))
+		angleDeg = calcAngleBetween(Vec2(1, 0), charViewDir)
 	end
-
-	-- set forces
-	local viewDirection = character:getViewDirection()
-	character.pc.rb:applyLinearImpulse(viewDirection:mulScalar(character.walkSpeed))
-	character.pc.rb:setAngularVelocity(Vec3(0, 0, character.rotationSpeed))
-
-	-- third person cam
+	local moveVector3 = Vec3(moveVector.x, moveVector.y, 0)
+	local moveVector3Rot = rotateVector(moveVector3, Vec3(0.0, 0.0, 1.0), angleDeg)
+	DebugRenderer:drawArrow(character:getPosition(), character:getPosition() + moveVector3Rot:mulScalar(250), Color(0, 1, 1, 1))
+	
+	-- update the character
+	local walkSpeed = 0
+	if (cameraRelativeControls) then
+		walkSpeed = character.maxWalkSpeed * moveVector:length()	-- direction depends on the camera
+	else
+		walkSpeed = character.maxWalkSpeed * moveVector.y			-- up means forward
+	end
+	local rotationSpeed = 0
+	if (cameraRelativeControls) then
+		local steer = character:calcSteering(moveVector3Rot)
+--		DebugRenderer:printText(Vec2(0.0, 0.85), "steer " .. string.format("%5.2f", steer))
+		rotationSpeed = character.maxRotationSpeed * -steer * elapsedTime			-- rotation relative to the camera
+	else
+		rotationSpeed = character.maxRotationSpeed * -moveVector.x * elapsedTime	-- left/right means rotate
+	end
+	local attack = (InputHandler:wasTriggered(Key.Space) or bit32.btest(InputHandler:gamepad(0):buttonsTriggered(), Button.X))
+	character:update(walkSpeed, rotationSpeed, attack)
+	
+	-- third person camera
 	cam.rotation = cam.rotation + (mouseDelta.x * 50 * elapsedTime) + (rightStick.x * -200 * elapsedTime)
 	if (cam.rotation > 180) then
 		cam.rotation = cam.rotation - 360
@@ -266,12 +168,9 @@ function defaultUpdate(updateData)
 	if (cam.rotation < -180) then
 		cam.rotation = cam.rotation + 360
 	end
-	cam.rotation = cam.rotation * (1 - 1.5 * character.relativeSpeed * elapsedTime)
-	DebugRenderer:printText(Vec2(-0.9, 0.50), "cam.rotation " .. string.format("%5.2f", cam.rotation))
+	cam.rotation = cam.rotation * (1 - math.clamp(1.5 * character.relativeSpeed * elapsedTime, 0, 0.05))
 	local invDir = character:getViewDirection():mulScalar(-350)
-	local rotQuat = Quaternion(Vec3(0.0, 0.0, 1.0), cam.rotation)
-	local rotMat = rotQuat:toMat3()
-	local rotInvDir = rotMat:mulVec3(invDir)
+	local rotInvDir = rotateVector(invDir, Vec3(0.0, 0.0, 1.0), cam.rotation)
 	local camPos = character:getPosition() + rotInvDir
 	camPos.z = 250
 	local camAim = character:getPosition()
@@ -281,6 +180,65 @@ function defaultUpdate(updateData)
 	cam.cc:setPosition(newCamPos)
 	cam.cc:lookAt(camAim)
 
+	-- debug texts
+	DebugRenderer:printText(Vec2(-0.9, 0.65), "cameraRelativeControls " .. tostring(cameraRelativeControls))
+	DebugRenderer:printText(Vec2(-0.9, 0.60), "character.walkSpeed " .. string.format("%5.2f", character.walkSpeed))
+	DebugRenderer:printText(Vec2(-0.9, 0.55), "character.rotationSpeed " .. string.format("%5.2f", character.rotationSpeed))
+	DebugRenderer:printText(Vec2(-0.9, 0.50), "character.walkAnimWeight " .. string.format("%6.3f", character.walkAnimWeight))
+	DebugRenderer:printText(Vec2(-0.9, 0.45), "character.runAnimWeight " .. string.format("%6.3f", character.runAnimWeight))
+	DebugRenderer:printText(Vec2(-0.9, 0.40), "cam.rotation " .. string.format("%5.2f", cam.rotation))
+	
+	-- update the NPC
+	local spherePos = spheres[3]:getPosition()
+	DebugRenderer:drawArrow(spherePos, spherePos + Vec3(0, 0, 150), Color(1, 1, 0, 1))
+	local npcPos = npc:getPosition()
+	local npcMoveVec = spherePos - npcPos
+	local npcMoveDist = npcMoveVec:length()
+	DebugRenderer:drawArrow(npcPos, npcPos + npcMoveVec, Color(1, 0, 1, 1))
+	local npcWalkSpeed = 0
+	if (npcMoveDist > 350) then
+		npcWalkSpeed = npc.walkSpeed + 5000 * elapsedTime
+	else
+		npcWalkSpeed = npc.walkSpeed - 7500 * elapsedTime
+	end
+	npcWalkSpeed = math.clamp(npcWalkSpeed, 0, npc.maxWalkSpeed)
+	local npcRotationSpeed = 0
+	if (npcMoveDist > 150) then
+		local npcSteer = npc:calcSteering(npcMoveVec:normalized())
+		npcRotationSpeed = npc.maxRotationSpeed * -npcSteer * elapsedTime
+	end
+	local npcAttack = false
+	npc:update(npcWalkSpeed, npcRotationSpeed, npcAttack)
+	
+	--
+	-- some debug drawing to test potential bugs
+	--
+	
+	-- axe dir/up/right vectors
+	-- => works
+	local axePos = axe:getWorldPosition()
+	local axeViewDir = axe:getViewDirection()
+	DebugRenderer:drawArrow(axePos, axePos + axeViewDir:mulScalar(100), Color(0, 1, 0, 1))
+	local axeUpDir = axe:getUpDirection()
+	DebugRenderer:drawArrow(axePos, axePos + axeUpDir:mulScalar(100), Color(0, 0, 1, 1))
+	local axeRightDir = axe:getRightDirection()
+	DebugRenderer:drawArrow(axePos, axePos + axeRightDir:mulScalar(100), Color(1, 0, 0, 1))
+	
+	-- camera rotation
+	-- => seems to be broken, behaves strangely
+--	local camRotVec = Vec3(0, -1, 0)
+--	camRotVec = cam.cc:getRotation():toMat3():mulVec3(camRotVec)
+--	camRotVec = cam.cc:getWorldRotation():toMat3():mulVec3(camRotVec)
+--	DebugRenderer:drawArrow(Vec3(0, 0, 0), camRotVec:mulScalar(250))
+	
+	-- 2D lines
+	-- => works
+--	local lineFrom = Vec2(0.25, 0.25)
+--	local lineTo = Vec2(0.75, 0.75)
+--	DebugRenderer:printText(lineFrom, "line from")
+--	DebugRenderer:printText(lineTo, "line to")
+--	DebugRenderer:drawLine2D(lineFrom, lineTo)
+	
 	return EventResult.Handled
 end
 

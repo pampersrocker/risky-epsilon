@@ -35,11 +35,11 @@ void gpp::CameraComponent::update(float elapsedMS)
 {
     m_pCamera->setPosition(m_transform.getWorldPosition());
     
-    if(m_viewTarget.getParent())
+    if(m_viewTarget.getParent() != gep::getIdentityTransform())
     {
         lookAt(m_viewTarget.getWorldPosition());
     }
-    if(m_upTarget.getParent())
+    if(m_upTarget.getParent() != gep::getIdentityTransform())
     {
         m_pCamera->setUpVector(m_upTarget.getUpDirection());
     }
@@ -69,7 +69,7 @@ gep::vec3 gpp::CameraComponent::getWorldPosition() const
 
 gep::Quaternion gpp::CameraComponent::getWorldRotation() const 
 {
-    return m_transform.getWorldRotation();
+    return  m_pCamera->getViewMatrix().rotationPart();
 }
 
 gep::mat4 gpp::CameraComponent::getTransformationMatrix() const 
@@ -85,11 +85,6 @@ gep::vec3 gpp::CameraComponent::getPosition() const
 gep::Quaternion gpp::CameraComponent::getRotation() const 
 {
     return m_transform.getRotation();
-}
-
-gep::vec3 gpp::CameraComponent::getScale() const 
-{
-   return m_transform.getScale();
 }
 
 void gpp::CameraComponent::lookAt(const gep::vec3& target)
@@ -130,10 +125,6 @@ void gpp::CameraComponent::setState(State::Enum state)
     }
 }
 
-void gpp::CameraComponent::setScale(const gep::vec3& scale)
-{
-}
-
 void gpp::CameraComponent::setBaseOrientation(const gep::Quaternion& orientation)
 {
     m_transform.setBaseOrientation(orientation);
@@ -147,11 +138,6 @@ void gpp::CameraComponent::setBaseViewDirection(const gep::vec3& direction)
 gep::mat4 gpp::CameraComponent::getWorldTransformationMatrix() const 
 {
     return m_transform.getWorldTransformationMatrix();
-}
-
-gep::vec3 gpp::CameraComponent::getWorldScale() const 
-{
-    return gep::vec3(1,1,1); // TODO
 }
 
 gep::vec3 gpp::CameraComponent::getViewDirection() const 
@@ -189,9 +175,6 @@ void gpp::CameraComponent::move(const gep::vec3& delta)
 
     m_pCamera->setPosition(pos);
     m_transform.setPosition(pos);
-
-
-
 }
 
 void gpp::CameraComponent::look(const gep::vec2& delta)
@@ -199,22 +182,26 @@ void gpp::CameraComponent::look(const gep::vec2& delta)
     m_pCamera->look(delta);
 }
 
+gep::ITransform* gpp::CameraComponent::getParent()
+{
+    return m_transform.getParent();
+}
 
-void gpp::CameraComponent::setParent(const gep::ITransform* parent)
+const gep::ITransform* gpp::CameraComponent::getParent() const
+{
+   return m_transform.getParent();
+}
+
+void gpp::CameraComponent::setParent(gep::ITransform* parent)
 {
     m_transform.setParent(parent);
 }
 
-void gpp::CameraComponent::setViewTarget(const gep::ITransform* viewTarget)
+void gpp::CameraComponent::setViewTarget(gep::ITransform* viewTarget)
 {
     m_viewTarget.setParent(viewTarget);
 }
-void gpp::CameraComponent::setUpTarget(const gep::ITransform* upTarget)
+void gpp::CameraComponent::setUpTarget(gep::ITransform* upTarget)
 {
     m_upTarget.setParent(upTarget);
-}
-
-const gep::ITransform* gpp::CameraComponent::getParent()
-{
-   return m_transform.getParent();
 }

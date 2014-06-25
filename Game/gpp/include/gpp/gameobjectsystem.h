@@ -162,14 +162,11 @@ namespace gpp
 
         virtual void setPosition(const gep::vec3& pos) override;
         virtual void setRotation(const gep::Quaternion& rot) override;
-        virtual void setScale(const gep::vec3& scale) override;
 
         virtual gep::vec3 getWorldPosition() const override;
         virtual gep::Quaternion getWorldRotation() const override;
-        virtual gep::vec3 getWorldScale() const override;
         virtual gep::mat4 getWorldTransformationMatrix() const override;
 
-        virtual gep::vec3 getScale() const override;
         virtual gep::Quaternion getRotation() const override;
         virtual gep::vec3 getPosition() const override;
         virtual gep::mat4 getTransformationMatrix() const override;
@@ -188,10 +185,9 @@ namespace gpp
         inline const gep::ITransform& getTransform() const { return *m_transform; }
         inline void setTransform(gep::ITransform& transform) { m_transform = &transform; }
 
-
-
-        virtual const gep::ITransform* getParent() override;
-        virtual void setParent(const gep::ITransform* parent) override;
+        virtual       gep::ITransform* getParent()       override;
+        virtual const gep::ITransform* getParent() const override;
+        virtual void setParent(gep::ITransform* parent) override;
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION_NAMED(createComponent<CameraComponent>, "createCameraComponent")
@@ -199,11 +195,13 @@ namespace gpp
             LUA_BIND_FUNCTION_NAMED(createComponent<PhysicsComponent>, "createPhysicsComponent")
             LUA_BIND_FUNCTION_NAMED(createComponent<ScriptComponent>, "createScriptComponent")
             LUA_BIND_FUNCTION_NAMED(createComponent<AnimationComponent>, "createAnimationComponent")
+            LUA_BIND_FUNCTION_NAMED(createComponent<CharacterComponent>, "createCharacterComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<CameraComponent>, "getCameraComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<RenderComponent>, "getRenderComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<PhysicsComponent>, "getPhysicsComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<ScriptComponent>, "getScriptComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<AnimationComponent>, "getAnimationComponent")
+            LUA_BIND_FUNCTION_NAMED(getComponent<CharacterComponent>, "getCharacterComponent")
             LUA_BIND_FUNCTION(setPosition)
             LUA_BIND_FUNCTION(getPosition)
             LUA_BIND_FUNCTION(getWorldPosition)
@@ -211,9 +209,6 @@ namespace gpp
             LUA_BIND_FUNCTION(getRotation)
             LUA_BIND_FUNCTION(getWorldRotation)
             LUA_BIND_FUNCTION(getViewDirection)
-            LUA_BIND_FUNCTION(setScale)
-            LUA_BIND_FUNCTION(getScale)
-            LUA_BIND_FUNCTION(getWorldScale)
             LUA_BIND_FUNCTION(getUpDirection)
             LUA_BIND_FUNCTION(getRightDirection)
             LUA_BIND_FUNCTION(setComponentStates)
@@ -282,14 +277,14 @@ namespace gpp
             return nullptr;
         }
         
-        /// The smaller this value, the earlier this component type will be updated.
+        /// The smaller this value, the earlier this component type will be initialized.
         static const gep::int32 initializationPriority()
         {
             static_assert(false, "Please specialize this template in the specific component class!");
             return 0;
         }
 
-        /// The closer this value is to 0, the earlier the component is updated within one frame.
+        /// The smaller, the earlier the component is updated within one frame.
         /// If this value is std::numeric_limits<gep::int32>::max(), this component type will never be updated.
         static const gep::int32 updatePriority()
         {

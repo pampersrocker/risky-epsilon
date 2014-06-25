@@ -15,29 +15,110 @@ namespace gep
         inline       hkpShape* getHkpShape()       { return m_pHkpShape.val(); }
         inline const hkpShape* getHkpShape() const { return m_pHkpShape.val(); }
         inline void setHkpShape(hkpShape* pHkpShape) { m_pHkpShape = pHkpShape; }
-
-    protected:
-        void initialize(hkpShape* pShape);
     };
 
     class HavokShape_Box :
         public IBoxShape,
         public HavokShapeBase
     {
-        vec3 m_cachedHalfExtents;
     public:
         HavokShape_Box(const vec3& halfExtents);
         virtual ~HavokShape_Box() {}
 
-        virtual vec3 getHalfExtents() const override;
+        virtual void IShape::initialize() override { HavokShapeBase::initialize(); }
 
-        virtual const ITransform* getTransform() const override
-        {
-            GEP_ASSERT(false, "Not implemented.");
-            return nullptr;
-        }
+        virtual vec3 getHalfExtents() const override;
     };
-    
+
+    class HavokShape_Sphere :
+        public ISphereShape,
+        public HavokShapeBase
+    {
+    public:
+        HavokShape_Sphere(float radius);
+        virtual ~HavokShape_Sphere() {}
+
+        virtual void IShape::initialize() override { HavokShapeBase::initialize(); }
+
+        virtual float getRadius() const override;
+    };
+
+    class HavokShape_Capsule :
+        public ICapsuleShape,
+        public HavokShapeBase
+    {
+    public:
+        HavokShape_Capsule(const vec3& start, const vec3& end, float radius);
+        virtual ~HavokShape_Capsule() {}
+
+        virtual void IShape::initialize() override { HavokShapeBase::initialize(); }
+
+        virtual vec3 getStart() const override;
+        virtual vec3 getEnd() const override;
+        virtual float getRadius() const override;
+    };
+
+    class HavokShape_Cylinder :
+        public ICylinderShape,
+        public HavokShapeBase
+    {
+    public:
+        HavokShape_Cylinder(const vec3& start, const vec3& end, float radius);
+        virtual ~HavokShape_Cylinder() {}
+
+        virtual void IShape::initialize() override { HavokShapeBase::initialize(); }
+
+        virtual vec3 getStart() const override;
+        virtual vec3 getEnd() const override;
+        virtual float getRadius() const override;
+    };
+
+    class HavokShape_Triangle :
+        public ITriangleShape,
+        public HavokShapeBase
+    {
+    public:
+        HavokShape_Triangle(const vec3& vertex0, const vec3& vertex1, const vec3& vertex2);
+        virtual ~HavokShape_Triangle() {}
+
+        virtual void IShape::initialize() override { HavokShapeBase::initialize(); }
+
+        virtual vec3 getVertex(int32 index) const override;
+    };
+
+    class HavokShape_ConvexTranslate :
+        public IConvexTranslateShape,
+        public HavokShapeBase
+    {
+        /// \brief Used only so it lives at least as long as this instance.
+        mutable SmartPtr<IShape> m_pChildShape;
+    public:
+        HavokShape_ConvexTranslate(IShape* pShape, const vec3& translation);
+        virtual ~HavokShape_ConvexTranslate() {}
+        
+        virtual void IShape::initialize() override { HavokShapeBase::initialize(); }
+
+        virtual IShape* getChildShape() override;
+        virtual vec3 getTranslation() const override;
+    };
+
+    class HavokShape_BoundingVolume :
+        public IBoundingVolumeShape,
+        public HavokShapeBase
+    {
+        /// \brief Used only so they live at least as long as this instance.
+        mutable SmartPtr<IShape> m_pBounding;
+        mutable SmartPtr<IShape> m_pChild;
+
+    public:
+        HavokShape_BoundingVolume(IShape* pBounding, IShape* pChild);
+        virtual ~HavokShape_BoundingVolume() {}
+
+        virtual void IShape::initialize() override { HavokShapeBase::initialize(); }
+
+        virtual IShape* getBoundingShape() const override;
+        virtual IShape* getChildShape() const override;
+    };
 
     class HavokMeshShape : public IShape
     {
@@ -56,7 +137,9 @@ namespace gep
             DELETE_AND_NULL(m_pTransform);
         }
 
-        virtual ShapeType::Enum getShapeType() const override { return ShapeType::Triangle; }
+        virtual void initialize() override { }
+
+        virtual ShapeType::Enum getShapeType() const override { return ShapeType::BoundingVolumeCompressedMesh; }
 
         hkpShape* getHkShape() { return m_pHkActualShape; }
         const hkpShape* getHkShape() const { return m_pHkActualShape; }
@@ -108,6 +191,9 @@ namespace gep
 
         HavokPhantomCallbackShapeGep(): m_pTransform(new Transform()) { m_hkShape.m_pGepShape = this; }
         ~HavokPhantomCallbackShapeGep(){DELETE_AND_NULL(m_pTransform);}
+
+        virtual void initialize() override {}
+
         virtual Event<IRigidBody*>* getEnterEvent() override { return &m_enterEvent; }
         virtual Event<IRigidBody*>* getLeaveEvent() override { return &m_leaveEvent; }
 

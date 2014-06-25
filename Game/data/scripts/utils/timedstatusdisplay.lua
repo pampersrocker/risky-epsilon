@@ -26,7 +26,7 @@ local fsm = StateMachine{
 				enter = { function() if status.time <= 0.0 then status.time = 3.0 end return EventResult.Handled end},
 				update = {
 					function(args)
-						local elapsedTime = args:getElapsedTime() / 1000.0
+						local elapsedTime = args:getElapsedTime()
 						DebugRenderer:printText(status.screenPosition, status.message)
 						status.time = status.time - elapsedTime
 						return EventResult.Handled

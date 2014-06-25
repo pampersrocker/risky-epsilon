@@ -32,6 +32,7 @@ void gpp::ScriptComponent::initalize()
 void gpp::ScriptComponent::destroy()
 {
     if(m_state == State::Inactive) { return; }
+
     if (m_funcRef_destroy.isValid())
     {
         g_globalManager.getScriptingManager()->callFunction<void>(
@@ -44,6 +45,7 @@ void gpp::ScriptComponent::destroy()
 void gpp::ScriptComponent::update(float elapsedMS)
 {
     if(m_state == State::Inactive) { return; }
+
     if (m_funcRef_update.isValid())
     {
         g_globalManager.getScriptingManager()->callFunction<void>(

@@ -26,11 +26,7 @@ namespace gpp
 
         virtual gep::Quaternion getWorldRotation() const  override;
         
-        virtual gep::vec3 getWorldScale() const  override;
-        
         virtual gep::mat4 getWorldTransformationMatrix() const override;
-
-        virtual gep::vec3 getScale() const override;
 
         virtual gep::Quaternion getRotation()const override;
 
@@ -79,17 +75,15 @@ namespace gpp
         virtual void setBaseViewDirection(const gep::vec3& direction) override;
         
         virtual void setBaseOrientation(const gep::Quaternion& orientation) override;
-        
-        virtual void setScale(const gep::vec3& scale) override;
 
         virtual void setState(State::Enum state) override;
 
-        virtual const gep::ITransform* getParent() override;
-
-        virtual void setParent(const gep::ITransform* parent) override;
+        virtual       gep::ITransform* getParent()       override;
+        virtual const gep::ITransform* getParent() const override;
+        virtual void setParent(gep::ITransform* parent) override;
         
-        void setViewTarget(const gep::ITransform* view);
-        void setUpTarget(const gep::ITransform* view);
+        void setViewTarget(gep::ITransform* view);
+        void setUpTarget(gep::ITransform* view);
         
         void unsetViewTarget() { m_viewTarget.setParent(nullptr); };
         void unsetUpTarget() { m_upTarget.setParent(nullptr); };
