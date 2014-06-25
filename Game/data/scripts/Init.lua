@@ -128,8 +128,8 @@ function InitializeWorld(  )
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:createBox(Vec3(35.0,5.0,1.0))
 	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.wood.restitution
-	cinfo.friction = Config.materials.wood.friction
+	cinfo.restitution = Config.materials.track.wood.restitution
+	cinfo.friction = Config.materials.track.wood.friction
 	cinfo.position = Vec3(80.0, 0.0, 10.0)
 	CreatePhysicsComponent( GameLogic.woodfanslvlpart1 , cinfo )
 	

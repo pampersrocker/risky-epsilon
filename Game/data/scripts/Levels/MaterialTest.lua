@@ -5,8 +5,8 @@ function LevelMeta:initializeTrack1()
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_material_test_01.hkx")
 	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.wood.restitution
-	cinfo.friction = Config.materials.wood.friction
+	cinfo.restitution = Config.materials.track.stone.restitution
+	cinfo.friction = Config.materials.track.stone.friction
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/LevelElements/track_material_test_01.thModel")
@@ -15,8 +15,8 @@ function LevelMeta:initializeTrack2()
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_material_test_02.hkx")
 	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.wood.restitution
-	cinfo.friction = Config.materials.wood.friction
+	cinfo.restitution = Config.materials.track.wood.restitution
+	cinfo.friction = Config.materials.track.wood.friction
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/LevelElements/track_material_test_02.thModel")
@@ -25,8 +25,8 @@ function LevelMeta:initializeTrack3()
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_material_test_03.hkx")
 	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.wood.restitution
-	cinfo.friction = Config.materials.wood.friction
+	cinfo.restitution = Config.materials.track.stone.restitution
+	cinfo.friction = Config.materials.track.stone.friction
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/LevelElements/track_material_test_03.thModel")
@@ -35,8 +35,8 @@ function LevelMeta:initializeTrack4()
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_material_test_04.hkx")
 	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.wood.restitution
-	cinfo.friction = Config.materials.wood.friction
+	cinfo.restitution = Config.materials.track.wood.restitution
+	cinfo.friction = Config.materials.track.wood.friction
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/LevelElements/track_material_test_04.thModel")
@@ -49,7 +49,7 @@ function LevelMeta:initializeGameObject()
 	cinfo.shape = PhysicsFactory:createBox(Vec3(800,800,1))
 	--cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_start_col.hkx")
 	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.wood.restitution
+	cinfo.restitution = Config.materials.track.wood.restitution
 	cinfo.friction = Config.materials.wood.friction
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 
