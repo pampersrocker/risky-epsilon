@@ -57,7 +57,7 @@ function LevelMeta:initializeGameObject()
 	GameLogic.trigger3.phantomCallback:getEnterEvent():registerListener(function(arg)
 		logMessage("Entering trigger volume 3!")
 		
-		local go = GetGObyGUID("playerInstance")
+		local go = GetGObyGUID("playerInstanceStone")
 		if not(GameLogic.isoCam.trackingObject == go) then
 			ChangePlayer(go)
 		end
