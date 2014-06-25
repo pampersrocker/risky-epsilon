@@ -5,7 +5,7 @@ PlayerMeta = {}
 function PlayerMeta:initializeGameObjectWood( )
 	logMessage("PlayerMeta:init() start ")
 	local cinfo = RigidBodyCInfo()
-	local materialTable = Config.materials.wood
+	local materialTable = Config.materials.sphere.wood
 	cinfo.shape = PhysicsFactory:createSphere(materialTable.radius)
 	cinfo.motionType = MotionType.Dynamic
 	cinfo.mass = materialTable.mass
@@ -31,7 +31,7 @@ end
 function PlayerMeta:initializeGameObjectStone( )
 	logMessage("PlayerMeta:initStone() start ")
 	local cinfo = RigidBodyCInfo()
-	local materialTable = Config.materials.stone
+	local materialTable = Config.materials.sphere.stone
 	cinfo.shape = PhysicsFactory:createSphere(materialTable.radius)
 	cinfo.motionType = MotionType.Dynamic
 	cinfo.mass = materialTable.mass 
@@ -50,7 +50,7 @@ end
 function PlayerMeta:initializeGameObjectPaper( )
 	logMessage("PlayerMeta:initPaper() start ")
 	local cinfo = RigidBodyCInfo()
-	local materialTable = Config.materials.paper
+	local materialTable = Config.materials.sphere.paper
 	cinfo.shape = PhysicsFactory:createSphere(materialTable.radius)
 	cinfo.motionType = MotionType.Dynamic
 	cinfo.mass = materialTable.mass 
