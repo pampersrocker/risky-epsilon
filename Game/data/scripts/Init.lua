@@ -41,20 +41,54 @@ function InitializeWorld(  )
 	GameLogic.isoCam.isEnabled = true
 	logMessage("GameLogic:init()")
 
-	--create Level
-	logMessage("Creating Level")
-	GameLogic.level = CreateEmptyGameObject("TestLevel")
+
+	-- --create Level
+	-- logMessage("Creating Level")
+	-- GameLogic.level = CreateEmptyGameObject("TestLevel")
+	-- LevelMeta.__index = LevelMeta
+	-- setmetatable(GameLogic.level, LevelMeta)
+	-- CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	-- --GameLogic.level.cb = CreateCollisionBox("cb_ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
+	-- GameLogic.level:initializeGameObject()
+
 	LevelMeta.__index = LevelMeta
-	setmetatable(GameLogic.level, LevelMeta)
-	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	--GameLogic.level.cb = CreateCollisionBox("cb_ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
-	GameLogic.level:initializeGameObject()
+
+	logMessage("Creating Track1")
+	local name = "track1"
+	GameLogic.track1 = CreateEmptyGameObject(name)
+	setmetatable(GameLogic.track1, LevelMeta)
+	CreateScriptComponent(GameLogic.track1, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	GameLogic.track1:initializeTrack1()
+
+	logMessage("Creating Track2")
+	local name = "track2"
+	GameLogic.track2 = CreateEmptyGameObject(name)
+	setmetatable(GameLogic.track2, LevelMeta)
+	CreateScriptComponent(GameLogic.track2, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	GameLogic.track2:initializeTrack2()
+
+	logMessage("Creating Track3")
+	local name = "track3"
+	GameLogic.track3 = CreateEmptyGameObject(name)
+	setmetatable(GameLogic.track3, LevelMeta)
+	CreateScriptComponent(GameLogic.track3, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	GameLogic.track3:initializeTrack3()
+
+	logMessage("Creating Track4")
+	local name = "track4"
+	GameLogic.track4 = CreateEmptyGameObject(name)
+	setmetatable(GameLogic.track4, LevelMeta)
+	CreateScriptComponent(GameLogic.track4, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	GameLogic.track4:initializeTrack4()
 	
+
+
 	--create Fans
+	FanMeta.__index = FanMeta
+	
 	logMessage("Creating Fan")
 	local name = "Fan1"
 	GameLogic.fan1 = CreateEmptyGameObject(name)
-	FanMeta.__index = FanMeta
 	setmetatable(GameLogic.fan1, FanMeta)
 	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan1:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(40.0,0.0,5.0), true, Vec3(0.0,0.0,1123.0))
@@ -62,7 +96,6 @@ function InitializeWorld(  )
 	logMessage("Creating Fan")
 	local name = "Fan2"
 	GameLogic.fan2 = CreateEmptyGameObject(name)
-	FanMeta.__index = FanMeta
 	setmetatable(GameLogic.fan2, FanMeta)
 	CreateScriptComponent(GameLogic.fan2, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan2:initializeGameObjectFan1(name, Vec3(10.0,5.0,4.0), Vec3(-50.0,0.0,2.0), false, Vec3(4123.0,0.0,0.0))
@@ -71,7 +104,6 @@ function InitializeWorld(  )
 	logMessage("Creating Fan")
 	local name = "Fan3"
 	GameLogic.fan3 = CreateEmptyGameObject(name)
-	FanMeta.__index = FanMeta
 	setmetatable(GameLogic.fan3, FanMeta)
 	CreateScriptComponent(GameLogic.fan3, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan3:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(120.0,0.0,5.0), true, Vec3(200.0,0.0,2123.0))
@@ -79,7 +111,6 @@ function InitializeWorld(  )
 	logMessage("Creating Fan")
 	local name = "Fan4"
 	GameLogic.fan4 = CreateEmptyGameObject(name)
-	FanMeta.__index = FanMeta
 	setmetatable(GameLogic.fan4, FanMeta)
 	CreateScriptComponent(GameLogic.fan4, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan4:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(130.0,0.0,5.0), true, Vec3(200.0,0.0,2123.0))
