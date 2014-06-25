@@ -57,7 +57,7 @@ function InitializeWorld(  )
 	FanMeta.__index = FanMeta
 	setmetatable(GameLogic.fan1, FanMeta)
 	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan1:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(40.0,0.0,0.0), true, Vec3(0.0,0.0,1123.0))
+	GameLogic.fan1:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(40.0,0.0,5.0), true, Vec3(0.0,0.0,1123.0))
 	
 	logMessage("Creating Fan")
 	local name = "Fan2"
@@ -65,7 +65,42 @@ function InitializeWorld(  )
 	FanMeta.__index = FanMeta
 	setmetatable(GameLogic.fan2, FanMeta)
 	CreateScriptComponent(GameLogic.fan2, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan2:initializeGameObjectFan1(name, Vec3(10.0,5.0,4.0), Vec3(-50.0,0.0,0.0), false, Vec3(4123.0,0.0,0.0))
+	GameLogic.fan2:initializeGameObjectFan1(name, Vec3(10.0,5.0,4.0), Vec3(-50.0,0.0,2.0), false, Vec3(4123.0,0.0,0.0))
+	
+	--wood fans
+	logMessage("Creating Fan")
+	local name = "Fan3"
+	GameLogic.fan3 = CreateEmptyGameObject(name)
+	FanMeta.__index = FanMeta
+	setmetatable(GameLogic.fan3, FanMeta)
+	CreateScriptComponent(GameLogic.fan3, FanMeta.init, FanMeta.update, FanMeta.destroy)
+	GameLogic.fan3:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(120.0,0.0,5.0), true, Vec3(200.0,0.0,2123.0))
+	
+	logMessage("Creating Fan")
+	local name = "Fan4"
+	GameLogic.fan4 = CreateEmptyGameObject(name)
+	FanMeta.__index = FanMeta
+	setmetatable(GameLogic.fan4, FanMeta)
+	CreateScriptComponent(GameLogic.fan4, FanMeta.init, FanMeta.update, FanMeta.destroy)
+	GameLogic.fan4:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(130.0,0.0,5.0), true, Vec3(200.0,0.0,2123.0))
+	
+	logMessage("Creating Fan")
+	local name = "Fan5"
+	GameLogic.fan5 = CreateEmptyGameObject(name)
+	FanMeta.__index = FanMeta
+	setmetatable(GameLogic.fan5, FanMeta)
+	CreateScriptComponent(GameLogic.fan5, FanMeta.init, FanMeta.update, FanMeta.destroy)
+	GameLogic.fan5:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(140.0,0.0,5.0), true, Vec3(200.0,0.0,2123.0))
+	
+	--wood fans level parts
+	GameLogic.woodfanslvlpart1 = CreateEmptyGameObject("woodfanslvlpart1")
+	local cinfo = RigidBodyCInfo()
+	cinfo.shape = PhysicsFactory:createBox(Vec3(35.0,5.0,1.0))
+	cinfo.motionType = MotionType.Fixed
+	cinfo.restitution = Config.materials.wood.restitution
+	cinfo.friction = Config.materials.wood.friction
+	cinfo.position = Vec3(80.0, 0.0, 10.0)
+	CreatePhysicsComponent( GameLogic.woodfanslvlpart1 , cinfo )
 	
 	--create Triggers
 	local gotrigger = CreateEmptyGameObject("trigger for fan2")
