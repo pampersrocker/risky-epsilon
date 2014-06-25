@@ -47,28 +47,12 @@ Config = {
 		},
 		track = {
 			wood = {
-				mass = 200.0,
 				friction = 20.0,
-				angularDamping = 4.0,
-				linearDamping = 0.0,
-				restitution = 0.0,
-				radius = 0.5
+				restitution = 0.75,
 			},
-			stone = {
-				mass = 1370.0,
-				friction = 30.0,
-				angularDamping = 0.3,
-				linearDamping = 0.0,
-				restitution = 0.0,
-				radius = 0.5
-			},
-			paper = {
-				mass = 30.09,
-				friction = 30.0,
-				angularDamping = 10.0,
-				linearDamping = 3.0,
-				restitution = 0.0,
-				radius = 0.5
+			ice = {
+				friction = 0.01, 
+				restitution = 0.0
 			}
 		}
 
