@@ -18,6 +18,9 @@ end
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
 	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
+	
+	IsoCamera.update( updateData:getElapsedTime() )
+	
 	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
 	if (InputHandler:isPressed(Key._1) or bit32.btest(buttonsTriggered, Button.X)) then
 		local go = GetGObyGUID("playerInstance")
@@ -28,18 +31,7 @@ function GameLogic.updateRunning( updateData )
 	elseif (InputHandler:isPressed(Key._3) or bit32.btest(buttonsTriggered, Button.A)) then
 		local go = GetGObyGUID("playerInstancePaper")
 		ChangePlayer(go)
-	end
-	
-	--testing of disable physics component
-	if (InputHandler:isPressed(Key.L) or bit32.btest(buttonsTriggered, Button.RightShoulder)) then
-		local go = GetGObyGUID("playerInstance")
-		if(go.go.pc:getState() == ComponentState.Inactive) then
-			go.go.pc:setState(ComponentState.Active)
-		elseif(go.go.pc:getState() == ComponentState.Active) then
-			go.go.pc:setState(ComponentState.Inactive)
-		end
-	end
-	
+	end	
 	return EventResult.Handled;
 end
 
@@ -63,6 +55,24 @@ end
 function GameLogic.updatePause( updateData )
 	-- body
 	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: pause")
+	local red = 1
+	local green = 0
+	local blue =0
+	
+	for i=-1,1,0.05 do
+		if (i < -0.5) then
+			green = green + 0.1
+		elseif (i > -0.5 and i <0) then
+			red = red - 0.1
+		elseif (i > 0 and i <0.5) then
+			blue = blue + 0.1
+		elseif (i > 0.5 and i <1) then
+			green = green - 0.1
+		end
+		for j=-1,1,0.1 do			
+			DebugRenderer:printTextColor(Vec2(j, i), "PAUSE!!! ",Color(red, green, blue, 1.0))
+		end
+	end
 	logMessage("Updating Pause state");
 	return EventResult.Handled;
 end
@@ -70,12 +80,17 @@ end
 function GameLogic.enterPause( updateData )
 	-- body
 	logMessage("Entering Pause state");
+	local go = GameLogic.isoCam.trackingObject
+	go.go.pc:setState(ComponentState.Inactive)
 	return EventResult.Handled;
 end
 
 function GameLogic.leavePause( updateData )
 	-- body
 	logMessage("Leaving Pause state");
+
+	local go = GameLogic.isoCam.trackingObject
+	go.go.pc:setState(ComponentState.Active)
 	return EventResult.Handled;
 end
 
