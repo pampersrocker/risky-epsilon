@@ -286,6 +286,12 @@ gep::IConvexTranslateShape* gep::HavokPhysicsFactory::createConvexTranslateShape
     return postProcessNewShape(pResult);
 }
 
+gep::ITransformShape* gep::HavokPhysicsFactory::createTransformShape(IShape* pShape, const vec3& translation, const Quaternion& rotation)
+{
+    auto pResult = GEP_NEW(m_pAllocator, HavokShape_Transform)(pShape, translation, rotation);
+    return postProcessNewShape(pResult);
+}
+
 gep::IBoundingVolumeShape* gep::HavokPhysicsFactory::createBoundingVolumeShape(IShape* pBounding, IShape* pChild)
 {
     auto pResult = GEP_NEW(m_pAllocator, HavokShape_BoundingVolume)(pBounding, pChild);
