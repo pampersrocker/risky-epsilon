@@ -15,8 +15,9 @@ namespace gep
     class CollisionMesh : public ICollisionMesh
     {
         friend class CollisionMeshFileLoader;
-
+        
         IShape* m_pShape;
+        Transform* m_pTransform;
         CollisionMeshFileLoader* m_pCollisionMeshFileLoader;
     public:
         CollisionMesh();
@@ -44,8 +45,9 @@ namespace gep
         virtual const IShape* getShape() const override;
 
     private:
-
+        
         void setShape(IShape* shape);
+        void setTransform(Transform* transform);
 
     };
 
@@ -94,5 +96,11 @@ namespace gep
 
         virtual ResourcePtr<ICollisionMesh> loadCollisionMesh(const char* path);
         virtual IShape* loadCollisionMeshFromLua(const char* path);
+
+        virtual IBoxShape* createBox(const vec3& halfExtends) override;
+        virtual IPhantomCallbackShape* createPhantomCallbackShape() override;
+
+        virtual ICollisionFilter* createCollisionFilter_Simple() override;
+
     };
 }

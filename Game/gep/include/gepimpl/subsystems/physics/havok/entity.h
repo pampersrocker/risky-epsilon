@@ -11,22 +11,24 @@
 
 namespace gep
 {
-    
-    class HavokEntity : public IPhysicsEntity
+    class HavokTriggerVolume;
+
+    class HavokEntityInternals
     {
+        ScriptTableWrapper m_userData;
         DynamicArray<HavokContactListener*> m_contactListeners;
     protected:
         hkRefPtr<hkpEntity> m_pEntity; ///< Must be set in a subclass, e.g. via the base ctor!
     public:
-        HavokEntity(hkpEntity* entity) :
+        HavokEntityInternals(hkpEntity* entity) :
             m_pEntity(nullptr)
         {
             setHkpEntity(entity);
         }
 
-        virtual ~HavokEntity()
+        virtual ~HavokEntityInternals()
         {
-            for (auto contactListener : m_contactListeners)
+            for(auto contactListener : m_contactListeners)
             {
                 m_pEntity->removeContactListener(contactListener);
                 deleteAndNull(contactListener);
@@ -47,10 +49,10 @@ namespace gep
         {
             GEP_ASSERT(listener);
             GEP_ASSERT(m_pEntity);
-            for (size_t i = 0; i < m_contactListeners.length(); i++)
+            for(size_t i = 0; i < m_contactListeners.length(); i++)
             {
                 auto internalListener = m_contactListeners[i];
-                if (internalListener->getActualListener() == listener)
+                if(internalListener->getActualListener() == listener)
                 {
                     m_contactListeners.removeAtIndex(i);
                     m_pEntity->removeContactListener(internalListener);
@@ -60,24 +62,28 @@ namespace gep
             }
         }
 
-        inline       hkpEntity* getHkpEntity()       { return m_pEntity; }
+        inline       hkpEntity* getHkpEntity() { return m_pEntity; }
         inline const hkpEntity* getHkpEntity() const { return m_pEntity; }
         inline void setHkpEntity(hkpEntity* entity) { m_pEntity = entity; }
 
-        virtual void initialize() override {}
+        virtual void initialize() {}
 
-        virtual void activate() override { m_pEntity->activate(); }
-        virtual void requestDeactivation() override { m_pEntity->requestDeactivation(); }
-        virtual bool isActive() const override { return m_pEntity->isActive(); }
+        virtual void activate() { m_pEntity->activate(); }
+        virtual void requestDeactivation() { m_pEntity->requestDeactivation(); }
+        virtual bool isActive() const { return m_pEntity->isActive(); }
 
+        virtual void setUserData(ScriptTableWrapper table);
+        virtual ScriptTableWrapper getUserData();
     };
 
     class HavokRigidBody : public IRigidBody
     {
-        hkpTriggerVolume* m_pTriggerVolume;
+        HavokTriggerVolume* m_pTriggerVolume;
         DynamicArray<IRigidBody::PositionChangedCallback> m_positionChangedCallbacks;
-        SmartPtr<IShape> m_shape; ///< If != nullptr, we own this shape and must delete it.
-        HavokEntity m_entity;
+        SmartPtr<IShape> m_shape;
+        HavokEntityInternals m_entity;
+        Transform m_initialTransformDefault;
+        const ITransform* m_pInitialTransform;
     public:
 
         HavokRigidBody(hkpRigidBody* rigidBody = nullptr);
@@ -95,7 +101,7 @@ namespace gep
         void triggerSimulationCallbacks() const;
 
         virtual uint32 getCollisionFilterInfo() const override { return getHkpRigidBody()->getCollisionFilterInfo(); }
-        virtual void setCollisionFilterInfo(uint32 value) override { getHkpRigidBody()->setCollisionFilterInfo(value); }
+        virtual void setCollisionFilterInfo(uint32 value) override;
 
         virtual float getMass() const override { return getHkpRigidBody()->getMass(); }
         virtual void setMass(float value) override { getHkpRigidBody()->setMass(value); }
@@ -112,6 +118,8 @@ namespace gep
         virtual Quaternion getRotation() const override { return conversion::hk::from(getHkpRigidBody()->getRotation()); }
         virtual void setRotation(const Quaternion& value) override { getHkpRigidBody()->setRotation(conversion::hk::to(value)); }
         
+        virtual void setInitialTransform(const ITransform* transform) { m_pInitialTransform = transform; };
+
         virtual float getFriction() const override { return getHkpRigidBody()->getFriction(); }
         virtual void setFriction(float value) override { return getHkpRigidBody()->setFriction(value); }
         
@@ -145,8 +153,9 @@ namespace gep
         virtual uint16 getContactPointCallbackDelay() const override { return getHkpRigidBody()->getContactPointCallbackDelay(); }
         virtual void setContactPointCallbackDelay(uint16 value) override { getHkpRigidBody()->setContactPointCallbackDelay(value); }
 
-        virtual void convertToTriggerVolume() override { if(!isTriggerVolume()) m_pTriggerVolume = new hkpTriggerVolume(getHkpRigidBody()); }
+        virtual void convertToTriggerVolume() override;
         virtual bool isTriggerVolume() const override { return m_pTriggerVolume != nullptr; }
+        virtual Event<ITriggerEventArgs*>* getTriggerEvent() override;
 
         virtual void applyForce(float deltaSeconds, const vec3& force) override { getHkpRigidBody()->applyForce(deltaSeconds, conversion::hk::to(force)); }
         virtual void applyForceAt(float deltaSeconds, const vec3& force, const vec3& point) override { getHkpRigidBody()->applyForce(deltaSeconds, conversion::hk::to(force), conversion::hk::to(point)); }
@@ -170,6 +179,45 @@ namespace gep
         virtual bool isActive() const override { return m_entity.isActive(); }
 
         virtual void reset() override;
+
+        virtual void setUserData(ScriptTableWrapper table) override { m_entity.setUserData(table); }
+        virtual ScriptTableWrapper getUserData() override { return m_entity.getUserData(); }
+    };
+
+    class TriggerEventArgs : public ITriggerEventArgs
+    {
+    public:
+        TriggerEventArgs(IRigidBody* pRigidBody, Type::Enum eventType) :
+            m_pRigidBody(pRigidBody),
+            m_type(eventType)
+        {
+        }
+
+        virtual IRigidBody* getRigidBody() override { return m_pRigidBody.get(); }
+        virtual Type::Enum getEventType() override { return m_type; }
+
+        LUA_BIND_REFERENCE_TYPE_BEGIN
+            LUA_BIND_FUNCTION(getRigidBody)
+            LUA_BIND_FUNCTION(getEventType)
+            LUA_BIND_REFERENCE_TYPE_END
+
+    private:
+        SmartPtr<IRigidBody> m_pRigidBody;
+
+        Type::Enum m_type;
+    };
+
+    class HavokTriggerVolume : public hkpTriggerVolume
+    {
+    public:
+        HavokTriggerVolume(HavokRigidBody* pRigidBody);
+
+        virtual void triggerEventCallback(hkpRigidBody* body, EventType type) override;
+
+        inline Event<ITriggerEventArgs*>* getTriggerEvent() { return &m_triggerEvent; }
+
+    private:
+        Event<ITriggerEventArgs*> m_triggerEvent;
     };
 
     //TODO: Needs more wrapping!

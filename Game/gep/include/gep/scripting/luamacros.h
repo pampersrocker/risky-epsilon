@@ -5,14 +5,14 @@
     template <typename __T>                                                                 \
     static void Lua_Bind(lua_State* L, const char* className)                               \
     {                                                                                       \
-        static bool alreadyBound(false);                                                    \
-        if (alreadyBound) { return; }                                                       \
-        alreadyBound = true;                                                                \
+        auto& scriptInfo = gep::getScriptTypeInfo<__T>();                            \
+        if(scriptInfo.getNumBindings() > 0) { return; }                                     \
+        scriptInfo.addNumBindings();                                                        \
         lua::utils::StackChecker checker(L, 0);                                             \
         /* remember the className */                                                        \
-        gep::ScriptTypeInfo<__T>::instance().setClassName(className);                       \
+        scriptInfo.setClassName(className);                                                 \
         /* create new metatable and store it in the registry */                             \
-        luaL_newmetatable(L, gep::ScriptTypeInfo<__T>::instance().getMetaTableName());      \
+        luaL_newmetatable(L, scriptInfo.getMetaTableName());                                \
                                                                                             \
         /* TODO inheritance */                                                              \
         /* Class_Sub -> setmetatable(Class_Sub_Meta, Class_Meta) */                         \
@@ -43,7 +43,7 @@
         /* add "create" function to metatable */                                      \
         lua_pushcfunction(L, Lua_Create<__T>);                                        \
         /* local t = T(params) OR local t = T({params}) */                            \
-        lua_setglobal(L, gep::ScriptTypeInfo<__T>::instance().getClassName());        \
+        lua_setglobal(L, gep::getScriptTypeInfo<__T>().getClassName());        \
         lua_pop(L, 1);                                                                \
     }                                                                                 \
     template <typename __T>                                                           \
@@ -79,5 +79,5 @@
 #define LUA_BIND_MEMBER(memberVariable) LUA_BIND_MEMBER_NAMED(memberVariable, #memberVariable)
 
 #define LUA_BIND_VALUE_TYPE_END                                                                  \
-        if (push) luaL_setmetatable(L, gep::ScriptTypeInfo<__T>::instance().getMetaTableName()); \
+        if (push) luaL_setmetatable(L, gep::getScriptTypeInfo<__T>().getMetaTableName()); \
     }

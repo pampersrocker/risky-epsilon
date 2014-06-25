@@ -247,6 +247,15 @@ namespace gep
                 /*&& x != float.infinity && y != float.infinity && z != float.infinity && angle != float.infinity*/);
         }
 
+        bool isIdentity() const
+        {
+            using gep::epsilonCompare;
+            return epsilonCompare(x, 0.0f)
+                && epsilonCompare(y, 0.0f)
+                && epsilonCompare(z, 0.0f)
+                && epsilonCompare(angle, 1.0f);
+        }
+
 		const vec4_t<T> toVec4()
 		{
 			return vec4_t<T>(this->x,this->y,this->z,this->angle);
@@ -333,7 +342,7 @@ namespace gep
             LUA_BIND_MEMBER(y)
             LUA_BIND_MEMBER(z)
             LUA_BIND_MEMBER(angle)
-        LUA_BIND_VALUE_TYPE_END
+        LUA_BIND_VALUE_TYPE_END;
 
 	private:
 		const Quaternion_t<T> mulFromScript(const Quaternion_t<T>& rh) const { return *this * rh; }

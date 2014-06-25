@@ -10,15 +10,27 @@ gep::Camera::Camera() :
     m_aspectRatio(9.0f / 16.0f),
     m_viewAngleInDegrees(60),
     m_near(0.1f),
-    m_far(10000.0f)
+    m_far(10000.0f),
+    m_orthographic(false)
 {
 
 }
 
 const gep::mat4 gep::Camera::getProjectionMatrix() const
 {
-    return mat4::projectionMatrix(m_viewAngleInDegrees, m_aspectRatio, m_near, m_far);
-    //return mat4::ortho(-30.0f, 30.0f, -15.0f, 15.0f, m_near, m_far);
+    if(m_orthographic)
+    {
+        float distance = (m_far - m_near) / 2; // use half view distance as adjacent length to calculate frustum
+        float viewAngleHalfInRad = gep::toRadians(m_viewAngleInDegrees/2);
+        float tangens = gep::sin(viewAngleHalfInRad) / gep::cos(viewAngleHalfInRad);
+        float topDist = tangens * distance; // tan * adjacent = opposite
+        float rightDist = m_aspectRatio * topDist;
+        return mat4::ortho(-topDist, topDist, -rightDist, rightDist, m_near, m_far);
+    }
+    else
+    {
+        return mat4::projectionMatrix(m_viewAngleInDegrees, m_aspectRatio, m_near, m_far);
+    }
 }
 
 
@@ -186,22 +198,23 @@ void gep::CameraLookAtHorizon::tilt(float amount)
     m_tilt += amount;
 }
 
-const  gep::mat4  gep::CameraLookAtHorizon::getViewMatrix() const
+const gep::mat4  gep::CameraLookAtHorizon::getViewMatrix() const
 {
     vec3 up = Quaternion(m_viewDir, -m_tilt).toMat3() * m_upVector;
 
     return mat4::lookAtMatrix(m_position, m_position + m_viewDir, up);
 }
 
-void  gep::CameraLookAtHorizon::setUpVector(const vec3& vector)
+void gep::CameraLookAtHorizon::setUpVector(const vec3& vector)
 {
     m_upVector = vector.normalized();
 }
 
-void  gep::CameraLookAtHorizon::setViewVector(const vec3& vector)
+void gep::CameraLookAtHorizon::setViewVector(const vec3& vector)
 {
     m_viewDir = vector.normalized();
 }
+
 
 void gep::CameraLookAtHorizon::lookAt(const gep::vec3& target)
 {
@@ -210,22 +223,22 @@ void gep::CameraLookAtHorizon::lookAt(const gep::vec3& target)
 }
 
 
-void  gep::CameraLookAtHorizon::setPosition(const gep::vec3& pos)
+void gep::CameraLookAtHorizon::setPosition(const gep::vec3& pos)
 {
     m_position = pos;
 }
 
-void  gep::CameraLookAtHorizon::setRotation(const gep::Quaternion& rot)
+void gep::CameraLookAtHorizon::setRotation(const gep::Quaternion& rot)
 {
    m_rotation = rot;
 }
 
-gep::vec3  gep::CameraLookAtHorizon::getPosition()
+gep::vec3 gep::CameraLookAtHorizon::getPosition()
 {
     return m_position;
 }
 
-gep::Quaternion  gep::CameraLookAtHorizon::getRotation()
+gep::Quaternion gep::CameraLookAtHorizon::getRotation()
 {
     return m_rotation;
 }

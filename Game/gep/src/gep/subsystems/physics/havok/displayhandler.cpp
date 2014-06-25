@@ -57,11 +57,13 @@ namespace gep {
 
     void HavokDisplayManager::destroy()
     {
-        for(auto& models : m_geometries.values())
+        for(auto& geometryInfos : m_geometries.values())
         {
-            for(auto& model : models)
-                g_globalManager.getResourceManager()->deleteResource(model);
-            models.resize(0);
+            for(auto& info : geometryInfos)
+            {
+                g_globalManager.getResourceManager()->deleteResource(info.pModel);
+            }
+            geometryInfos.clear();
         }
     }
 
@@ -72,7 +74,7 @@ namespace gep {
         vec3 newTranslation(DO_NOT_INITIALIZE);
         Quaternion newRotation(DO_NOT_INITIALIZE);
         gep::conversion::hk::from(transform, newTranslation, newRotation);
-        mat4 newTransform =  mat4::translationMatrix(newTranslation) * newRotation.toMat4() ;
+        mat4 newTransform =  mat4::translationMatrix(newTranslation) * newRotation.toMat4();
         m_transformations[id] = newTransform;
         
         for (auto geom : geometries)
@@ -84,8 +86,12 @@ namespace gep {
             auto vertices = ArrayPtr<vec4>((vec4*)&pGeom->m_vertices[0], pGeom->m_vertices.getSize());
             auto indices = pDataHolder->getIndices();
 
-            auto pModel = g_globalManager.getRenderer()->loadModel(pDataHolder, vertices, indices);
-            a.append(pModel);
+            DisplayGeometryInfo info;
+            info.pModel = g_globalManager.getRenderer()->loadModel(pDataHolder, vertices, indices);
+
+            gep::conversion::hk::from(geom->getTransform(), newTranslation, newRotation);
+            info.transform = mat4::translationMatrix(newTranslation) * newRotation.toMat4();
+            a.append(info);
         }
 
         return HK_SUCCESS;
@@ -223,9 +229,10 @@ namespace gep {
         for(auto& it : m_geometries)
         {
             auto& transform = m_transformations[it.key];
-            for(auto& model : it.value)
+            for(auto& info : it.value)
             {
-                model->extract(extractor, transform);
+                auto actualTransform = transform * info.transform;
+                info.pModel->extract(extractor, actualTransform);
             }
         }
     }

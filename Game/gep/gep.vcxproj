@@ -48,7 +48,7 @@
     <ClInclude Include="include\gepimpl\subsystems\physics\havok\factory.h" />
     <ClInclude Include="include\gepimpl\subsystems\physics\havok\manager.h" />
     <ClInclude Include="include\gepimpl\subsystems\physics\havok\entity.h" />
-    <ClInclude Include="include\gepimpl\subsystems\physics\havok\shape.h" />
+    <ClInclude Include="include\gepimpl\subsystems\physics\havok\havokPhysicsShape.h" />
     <ClInclude Include="include\gepimpl\havok\util.h" />
     <ClInclude Include="include\gepimpl\subsystems\physics\havok\world.h" />
     <ClInclude Include="include\gepimpl\subsystems\renderer\ddsLoader.h" />
@@ -159,6 +159,7 @@
     <ClCompile Include="src\gep\settings.cpp" />
     <ClCompile Include="src\gep\subsystems\animation\havok\animation.cpp" />
     <ClCompile Include="src\gep\subsystems\animation\havok\animationFactory.cpp" />
+    <ClCompile Include="src\gep\subsystems\physics\havok\havokPhysicsShape.cpp" />
     <ClCompile Include="src\gep\subsystems\scripting\basicBindings.cpp" />
     <ClCompile Include="src\gep\subsystems\scripting\luaHelper.cpp" />
     <ClCompile Include="src\gep\subsystems\cameraManager.cpp" />

@@ -8,30 +8,37 @@ function InitializeWorld(  )
 	PhysicsSystem:setWorld(world)
 	PhysicsSystem:setDebugDrawingEnabled(true)
 
+	PlayerMeta.__index = PlayerMeta
+
 	-- create player
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
-	PlayerMeta.__index = PlayerMeta
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
-	GameLogic.playerInstance:initializeGameObject()
+	GameLogic.playerInstance:initializeGameObjectWood()
 	--GameLogic.playerInstance.go:setComponentStates(ComponentState.Inactive)
-	
+
 	-- create playerStone
 	GameLogic.playerInstanceStone = CreateEmptyGameObject("playerInstanceStone")
-	PlayerMeta.__index = PlayerMeta
+
 	setmetatable( GameLogic.playerInstanceStone, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstanceStone, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
 	GameLogic.playerInstanceStone:initializeGameObjectStone()
 	GameLogic.playerInstanceStone.go:setComponentStates(ComponentState.Inactive)
-	
+
+	-- create playerPaper
+	GameLogic.playerInstancePaper = CreateEmptyGameObject("playerInstancePaper")
+	setmetatable( GameLogic.playerInstancePaper, PlayerMeta)
+	CreateScriptComponent(GameLogic.playerInstancePaper, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
+	GameLogic.playerInstancePaper:initializeGameObjectPaper()
+	GameLogic.playerInstancePaper.go:setComponentStates(ComponentState.Inactive)
+
 	--create camera
-	isoCam = createDefaultCam("IsoCam")
-	isoCam.go.cc:look(Config.camera.initLook)
-	isoCam.trackingObject = GetGObyGUID("playerInstance")
-	
-	setmetatable( isoCam, IsoCamera)
-	CreateScriptComponent(isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
-	GameLogic.isoCam = isoCam
+	GameLogic.isoCam = createDefaultCam("IsoCam")
+	GameLogic.isoCam.go.cc:look(Config.camera.initLook)
+	GameLogic.isoCam.trackingObject = GetGObyGUID("playerInstance")
+	setmetatable( GameLogic.isoCam, IsoCamera)
+	--CreateScriptComponent(GameLogic.isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
+	GameLogic.isoCam.isEnabled = true
 	logMessage("GameLogic:init()")
 
 	--create Level

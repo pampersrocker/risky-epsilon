@@ -353,10 +353,12 @@ void gep::AnimatedSkeleton::renderDebug()
        conversion::hk::from(hp2,p2);
        p1 = p1 * m_debugDrawingScale;
        p2 = p2 * m_debugDrawingScale;
-
+       
+       p1 = m_pTransform->getWorldScale() * p1;
        p1 = m_pTransform->getWorldRotation().toMat3() * p1;
        p1 = m_pTransform->getWorldPosition() + p1;
-
+       
+       p2 = m_pTransform->getWorldScale() * p2;
        p2 = m_pTransform->getWorldRotation().toMat3() * p2;
        p2 = m_pTransform->getWorldPosition() + p2;
 

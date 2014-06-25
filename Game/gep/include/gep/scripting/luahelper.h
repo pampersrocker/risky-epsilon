@@ -83,14 +83,18 @@ namespace lua
                 return reinterpret_cast<U>(__ptr);
             }
 
-            template <typename U>
-            static int push(lua_State* L, U pObject)
+            template <typename T_Ptr>
+            static int push(lua_State* L, T_Ptr pObject)
             {
+                typedef __RM_P(T_Ptr) T;
+
                 lua_newtable(L);
                 pushTableEntry<const char*, void*>(L, "__ptr", pObject);
 
-                luaL_setmetatable(L, gep::ScriptTypeInfo<__RM_P(U)>::instance().getMetaTableName());
-                IncreaseReferenceCount<std::is_convertible<U, gep::ReferenceCounted*>::value>::addRef(pObject);
+                auto& scriptTypeInfo = gep::getScriptTypeInfo<T>();
+
+                luaL_setmetatable(L, scriptTypeInfo.getMetaTableName());
+                IncreaseReferenceCount<std::is_convertible<T_Ptr, gep::ReferenceCounted*>::value>::addRef(pObject);
                 return 1;
             }
         };

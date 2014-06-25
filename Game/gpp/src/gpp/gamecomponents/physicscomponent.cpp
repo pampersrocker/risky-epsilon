@@ -31,7 +31,7 @@ void gpp::PhysicsComponent::update(float elapsedMS)
 {
     if(m_pRigidBody)
     {
-        if(m_pRigidBody->isTriggerVolume())   
+        if(m_pRigidBody->isTriggerVolume() || m_pRigidBody->getMotionType() == gep::MotionType::Fixed)
         {
             m_pRigidBody->setPosition(m_transform.getWorldPosition());
             m_pRigidBody->setRotation(m_transform.getWorldRotation());
@@ -41,7 +41,7 @@ void gpp::PhysicsComponent::update(float elapsedMS)
             if(m_transform.getParent())
             {
                 m_transform.setPosition( m_pRigidBody->getPosition()  - m_transform.getParent()->getWorldPosition());
-                m_transform.setRotation(m_transform.getParent()->getWorldRotation().inverse() * m_pRigidBody->getRotation() );
+                m_transform.setRotation( m_transform.getParent()->getWorldRotation().inverse() * m_pRigidBody->getRotation() );
             }
             else
             {
@@ -111,7 +111,6 @@ gep::Quaternion gpp::PhysicsComponent::getWorldRotation() const
 
 gep::vec3 gpp::PhysicsComponent::getWorldScale() const
 {
-   GEP_ASSERT(false, "The engine currently doesn't (and probably never will) support scaling of rigid bodies!");
    return gep::vec3(1.0f, 1.0f, 1.0f);
 }
 
@@ -164,11 +163,34 @@ gep::IRigidBody* gpp::PhysicsComponent::createRigidBody(gep::RigidBodyCInfo& cin
 
     m_pParentGameObject->setTransform(*this); //TODO: Set parent gameObject in Component Constructor!
 
-    auto* physicsSystem = g_globalManager.getPhysicsSystem();
-    auto* physicsFactory = physicsSystem->getPhysicsFactory();
+
+
+
+    // cinfo.position > 0
+    if(!gep::epsilonCompare(cinfo.position.squaredLength(), 0.0f))
+    {
+        m_transform.setPosition(m_transform.getWorldPosition() + cinfo.position);
+    }
+
+    if(!cinfo.rotation.isIdentity())
+    {
+        m_transform.setRotation(m_transform.getWorldRotation() * cinfo.rotation);
+    }
+
+
+
+    auto physicsSystem = g_globalManager.getPhysicsSystem();
+    auto physicsFactory = physicsSystem->getPhysicsFactory();
 
     m_pRigidBody = physicsFactory->createRigidBody(cinfo);
     m_pRigidBody->initialize();
+
+    if(cinfo.shape->getShapeType() == gep::ShapeType::Triangle)
+    {
+        auto shapeTransform = cinfo.shape->getTransform();
+        m_pRigidBody->setInitialTransform(shapeTransform);
+    }
+     
     return m_pRigidBody.get();
 }
 
