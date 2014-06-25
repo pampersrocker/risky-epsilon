@@ -9,7 +9,7 @@ function InitializeWorld(  )
 	PhysicsSystem:setDebugDrawingEnabled(true)
 
 	PlayerMeta.__index = PlayerMeta
-
+	GameLogic.totalElapsedTime = 0
 	-- create player
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
@@ -116,7 +116,7 @@ function InitializeWorld(  )
 	
 	--create trigger for groundfall
 	local gotrigger = CreateEmptyGameObject("trigger for groundfall")
-	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for groundfall", Vec3(Config.world.worldSize/2.0,Config.world.worldSize/2.0,2.0), Vec3(0.0,0.0,-Config.world.worldSize/2.0))
+	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for groundfall", Vec3(Config.world.worldSize/2.0,Config.world.worldSize/2.0,3.0), Vec3(0.0,0.0,-Config.world.worldSize/2.5))
 	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
 		GameLogic.restart()		
 		return EventResult.Handled

@@ -20,6 +20,9 @@ function GameLogic.updateRunning( updateData )
 	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
 	
 	IsoCamera.update( updateData:getElapsedTime() )
+	GameLogic.totalElapsedTime = GameLogic.totalElapsedTime + updateData:getElapsedTime()
+	
+	DebugRenderer:printText(Vec2(-0.9, 0.1), "totalElapsedTime: "..GameLogic.totalElapsedTime)
 	
 	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
 	if (InputHandler:isPressed(Key._1) or bit32.btest(buttonsTriggered, Button.X)) then
@@ -51,6 +54,7 @@ function GameLogic.restart()
 	GameLogic.isoCam.trackingObject.go:setPosition(Config.player.spawnPosition)
 	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
 	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
+	GameLogic.totalElapsedTime = 0
 end
 
 -------------------------------------------------------
