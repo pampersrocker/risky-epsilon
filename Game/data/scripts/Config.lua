@@ -6,8 +6,8 @@ Config = {
 		distanceMax = 3000.0,
 		hightFactor = 0.5, -- 0..1 factor for hight of camera
 		initLook = Vec2(0.0, 20.0),
-		rotationSpeedFactor = 50000,
-		rotationSpeedFactorGamePad = 200000,
+		rotationSpeedFactor = 50,
+		rotationSpeedFactorGamePad = 200,
 		zoomfactorgamepad = 1.65
 	},
 
