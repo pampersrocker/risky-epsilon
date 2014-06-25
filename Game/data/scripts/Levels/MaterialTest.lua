@@ -60,6 +60,7 @@ function LevelMeta:initializeGameObject()
 		local go = GetGObyGUID("playerInstanceStone")
 		if not(GameLogic.isoCam.trackingObject == go) then
 			ChangePlayer(go)
+			--GetFanbyID().isActive = true
 		end
 		return EventResult.Handled
 	end)
@@ -69,7 +70,11 @@ function LevelMeta:initializeGameObject()
 	end)
 	
 	logMessage("LevelMeta:init() end")
+	
 
+	logMessage("LevelMeta:init() end")
+	
+	
 end
 
 function createPhantomCallbackTriggerBox(guid, halfExtends, position)

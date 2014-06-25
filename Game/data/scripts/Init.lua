@@ -49,6 +49,15 @@ function InitializeWorld(  )
 	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
 	--GameLogic.level.cb = CreateCollisionBox("cb_ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
 	GameLogic.level:initializeGameObject()
+	
+	--create Fan
+	logMessage("Creating Fan")
+	local name = "Fan1"
+	GameLogic.fan1 = CreateEmptyGameObject(name)
+	FanMeta.__index = FanMeta
+	setmetatable(GameLogic.fan1, FanMeta)
+	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
+	GameLogic.fan1:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(40.0,0.0,0.0), true, Vec3(0.0,0.0,1123.0))
 end
 
 InitializeWorld()

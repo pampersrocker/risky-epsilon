@@ -9,6 +9,7 @@ Scripting:registerScript("Utils.lua")
 Scripting:registerScript("Player/Player.lua")
 Scripting:registerScript("Camera/IsometricCamera.lua")
 Scripting:registerScript("Levels/MaterialTest.lua")
+Scripting:registerScript("Fans/FanMeta.lua")
 Scripting:registerScript("GameLogic.lua")
 Scripting:registerScript("Init.lua")
 
