@@ -50,7 +50,7 @@ function InitializeWorld(  )
 	--GameLogic.level.cb = CreateCollisionBox("cb_ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
 	GameLogic.level:initializeGameObject()
 	
-	--create Fan
+	--create Fans
 	logMessage("Creating Fan")
 	local name = "Fan1"
 	GameLogic.fan1 = CreateEmptyGameObject(name)
@@ -58,6 +58,27 @@ function InitializeWorld(  )
 	setmetatable(GameLogic.fan1, FanMeta)
 	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan1:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(40.0,0.0,0.0), true, Vec3(0.0,0.0,1123.0))
+	
+	logMessage("Creating Fan")
+	local name = "Fan2"
+	GameLogic.fan2 = CreateEmptyGameObject(name)
+	FanMeta.__index = FanMeta
+	setmetatable(GameLogic.fan2, FanMeta)
+	CreateScriptComponent(GameLogic.fan2, FanMeta.init, FanMeta.update, FanMeta.destroy)
+	GameLogic.fan2:initializeGameObjectFan1(name, Vec3(10.0,5.0,4.0), Vec3(-50.0,0.0,0.0), false, Vec3(4123.0,0.0,0.0))
+	
+	--create Triggers
+	local gotrigger = CreateEmptyGameObject("trigger for fan2")
+	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for fan2", Vec3(2.0,2.0,2.0), Vec3(-20.0,10.0,0.0))
+	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
+		local go = GetGObyGUID("playerInstanceStone")
+		if (GameLogic.isoCam.trackingObject == go) then
+			GameLogic.fan2.isActive = true			
+		end
+		
+		return EventResult.Handled
+	end)
+	
 end
 
 InitializeWorld()
