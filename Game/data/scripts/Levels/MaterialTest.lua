@@ -5,8 +5,8 @@ LevelMeta = {}
 function LevelMeta:initializeGameObject()
 	logMessage("LevelMeta:init() start ")
 	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:createBox(Vec3(800,800,1))
-	--cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_parts_Default.hkx")
+	--cinfo.shape = PhysicsFactory:createBox(Vec3(800,800,1))
+	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_start_col.hkx")
 	cinfo.motionType = MotionType.Fixed
 	--cinfo.mass = 100.0
 	cinfo.restitution = Config.materials.wood.restitution
@@ -18,11 +18,12 @@ function LevelMeta:initializeGameObject()
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 
 	CreatePhysicsComponent( self , cinfo )
-	CreateRenderComponent(self, "data/models/LevelElements/track_test.thModel")
+	CreateRenderComponent(self, "data/models/LevelElements/track_start.thModel")
 	
 	
 	
 	
+	--[[
 	GameLogic.trigger2 = createPhantomCallbackTriggerBox("trigger2", Vec3(2, 2, 2), Vec3(50.0, 0.0, 1.0))
 	GameLogic.trigger2.phantomCallback:getEnterEvent():registerListener(function(arg)
 		logMessage("Entering trigger volume 2!")
@@ -70,7 +71,7 @@ function LevelMeta:initializeGameObject()
 	end)
 	
 	logMessage("LevelMeta:init() end")
-	
+	]]
 
 	logMessage("LevelMeta:init() end")
 	
