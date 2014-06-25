@@ -50,6 +50,7 @@ namespace gep
         virtual ICylinderShape* createCylinder(const vec3& start, const vec3& end, float radius) = 0;
         virtual ITriangleShape* createTriangle(const vec3& vertex0, const vec3& vertex1, const vec3& vertex2) = 0;
         virtual IConvexTranslateShape* createConvexTranslateShape(IShape* pShape, const vec3& translation) = 0;
+        virtual ITransformShape* createTransformShape(IShape* pShape, const vec3& translation, const Quaternion& rotation) = 0;
         virtual IBoundingVolumeShape* createBoundingVolumeShape(IShape* pBounding, IShape* pChild) = 0;
         virtual IPhantomCallbackShape* createPhantomCallbackShape() = 0;
 
