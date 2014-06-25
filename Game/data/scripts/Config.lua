@@ -65,7 +65,8 @@ Config = {
 	},
 
 	world = {
-		gravity = Vec3(0,0,-9.81)
+		gravity = Vec3(0,0,-9.81),
+		worldSize = 4000
 	}
 
 }

@@ -110,6 +110,7 @@ namespace gep
         mutable SmartPtr<IShape> m_pChildShape;
     public:
         HavokShape_Transform(IShape* pShape, const vec3& translation, const Quaternion& rotation);
+        HavokShape_Transform(hkpTransformShape* pHkpShape);
         virtual ~HavokShape_Transform() {}
 
         virtual void IShape::initialize() override { HavokShapeBase::initialize(); }

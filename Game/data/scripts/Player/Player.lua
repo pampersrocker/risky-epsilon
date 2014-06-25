@@ -78,12 +78,12 @@ function PlayerMeta.update( guid, elapsedTime )
 	local mouseDelta = InputHandler:getMouseDelta()
 
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
-		PlayerMeta.restart()
+		GameLogic.restart()
 	end
 	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
 	if InputHandler:gamepad(0):isConnected() then
 		if (bit32.btest(buttonsTriggered, Config.keys.gamepad.restart) ) then
-			PlayerMeta.restart()
+			GameLogic.restart()
 		end
 		local leftTorque = viewDir:mulScalar(Config.player.torqueMulScalar):mulScalar(InputHandler:gamepad(0):leftStick().x)
 		local rightTorque = rightDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().y)
@@ -114,11 +114,7 @@ function PlayerMeta.update( guid, elapsedTime )
 	end
 end
 
-function PlayerMeta.restart()
-	GameLogic.isoCam.trackingObject.go:setPosition(Config.player.spawnPosition)
-	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
-	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
-end
+
 
 function PlayerMeta.init( guid )
 	-- body

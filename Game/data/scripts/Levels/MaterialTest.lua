@@ -5,16 +5,11 @@ LevelMeta = {}
 function LevelMeta:initializeGameObject()
 	logMessage("LevelMeta:init() start ")
 	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:createBox(Vec3(800,800,1))
-	--cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_start_col.hkx")
+	--cinfo.shape = PhysicsFactory:createBox(Vec3(800,800,1))
+	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_start_col.hkx")
 	cinfo.motionType = MotionType.Fixed
-	--cinfo.mass = 100.0
 	cinfo.restitution = Config.materials.wood.restitution
 	cinfo.friction = Config.materials.wood.friction
-	--cinfo.maxLinearVelocity = 300.0
-	--cinfo.maxAngularVelocity = 2.0
-	----cinfo.linearDamping = 1.0
-	--cinfo.angularDamping = 10.0
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 
 	CreatePhysicsComponent( self , cinfo )

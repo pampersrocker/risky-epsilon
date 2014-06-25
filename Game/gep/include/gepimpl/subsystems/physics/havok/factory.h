@@ -53,9 +53,10 @@ namespace gep
 
     class CollisionMeshFileLoader : public IResourceLoader
     {
+        IAllocator* m_pAllocator;
         std::string m_path;
     public:
-        CollisionMeshFileLoader(const char* path);
+        CollisionMeshFileLoader(IAllocator* pAllocator, const char* path);
         virtual ~CollisionMeshFileLoader();
 
         virtual IResource* loadResource(IResource* pInPlace);

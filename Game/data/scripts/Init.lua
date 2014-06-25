@@ -3,7 +3,7 @@ function InitializeWorld(  )
 	-- body
 	local cinfo = WorldCInfo()
 	cinfo.gravity = Config.world.gravity
-	cinfo.worldSize = 4000.0
+	cinfo.worldSize = Config.world.worldSize
 	local world = PhysicsFactory:createWorld(cinfo)
 	PhysicsSystem:setWorld(world)
 	PhysicsSystem:setDebugDrawingEnabled(true)
@@ -111,6 +111,14 @@ function InitializeWorld(  )
 			GameLogic.fan2.isActive = true			
 		end
 		
+		return EventResult.Handled
+	end)
+	
+	--create trigger for groundfall
+	local gotrigger = CreateEmptyGameObject("trigger for groundfall")
+	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for groundfall", Vec3(Config.world.worldSize/2.0,Config.world.worldSize/2.0,2.0), Vec3(0.0,0.0,-Config.world.worldSize/2.0))
+	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
+		GameLogic.restart()		
 		return EventResult.Handled
 	end)
 	
