@@ -38,7 +38,7 @@ namespace gep
         virtual const ITransform* getTransform() const { return nullptr; }
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
-        LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 
     class IBoxShape : public IShape
@@ -50,7 +50,7 @@ namespace gep
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(getHalfExtents)
-        LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 
     class ISphereShape : public IShape
@@ -62,7 +62,7 @@ namespace gep
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(getRadius)
-        LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 
     class ICapsuleShape : public IShape
@@ -78,7 +78,7 @@ namespace gep
             LUA_BIND_FUNCTION(getRadius)
             LUA_BIND_FUNCTION(getStart)
             LUA_BIND_FUNCTION(getEnd)
-        LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 
     class ICylinderShape : public IShape
@@ -94,7 +94,7 @@ namespace gep
             LUA_BIND_FUNCTION(getRadius)
             LUA_BIND_FUNCTION(getStart)
             LUA_BIND_FUNCTION(getEnd)
-        LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 
     class ITriangleShape : public IShape
@@ -116,7 +116,7 @@ namespace gep
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(getBoundingShape)
             LUA_BIND_FUNCTION(getChildShape)
-        LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_END;
     };
     
     class IPhantomCallbackShape : public IShape
@@ -131,7 +131,7 @@ namespace gep
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(getEnterEvent)
             LUA_BIND_FUNCTION(getLeaveEvent)
-        LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 
     class IConvexTranslateShape : public IShape
@@ -146,9 +146,25 @@ namespace gep
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(getChildShape)
-            LUA_BIND_FUNCTION(setShape)
             LUA_BIND_FUNCTION(getTranslation)
-            LUA_BIND_FUNCTION(setTranslation)
-        LUA_BIND_REFERENCE_TYPE_END
+        LUA_BIND_REFERENCE_TYPE_END;
+    };
+
+    class ITransformShape : public IShape
+    {
+    public:
+        inline virtual ShapeType::Enum getShapeType() const override { return ShapeType::Transform; }
+
+        virtual IShape* getChildShape() = 0;
+        virtual vec3 getTranslation() const = 0;
+        virtual Quaternion getRotation() const = 0;
+
+        virtual const ITransform* getTransform() const override { return nullptr; }
+
+        LUA_BIND_REFERENCE_TYPE_BEGIN
+            LUA_BIND_FUNCTION(getChildShape)
+            LUA_BIND_FUNCTION(getTranslation)
+            LUA_BIND_FUNCTION(getRotation)
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 }

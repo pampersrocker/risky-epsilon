@@ -102,6 +102,23 @@ namespace gep
         virtual vec3 getTranslation() const override;
     };
 
+    class HavokShape_Transform :
+        public ITransformShape,
+        public HavokShapeBase
+    {
+        /// \brief Used only so it lives at least as long as this instance.
+        mutable SmartPtr<IShape> m_pChildShape;
+    public:
+        HavokShape_Transform(IShape* pShape, const vec3& translation, const Quaternion& rotation);
+        virtual ~HavokShape_Transform() {}
+
+        virtual void IShape::initialize() override { HavokShapeBase::initialize(); }
+
+        virtual IShape* getChildShape() override;
+        virtual vec3 getTranslation() const override;
+        virtual Quaternion getRotation() const override;
+    };
+
     class HavokShape_BoundingVolume :
         public IBoundingVolumeShape,
         public HavokShapeBase

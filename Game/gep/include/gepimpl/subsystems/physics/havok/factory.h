@@ -103,6 +103,7 @@ namespace gep
         virtual ICylinderShape* createCylinder(const vec3& start, const vec3& end, float radius) override;
         virtual ITriangleShape* createTriangle(const vec3& vertex0, const vec3& vertex1, const vec3& vertex2) override;
         virtual IConvexTranslateShape* createConvexTranslateShape(IShape* pShape, const vec3& translation) override;
+        virtual ITransformShape* createTransformShape(IShape* pShape, const vec3& translation, const Quaternion& rotation) override;
         virtual IBoundingVolumeShape* createBoundingVolumeShape(IShape* pBounding, IShape* pChild) override;
         virtual IPhantomCallbackShape* createPhantomCallbackShape() override;
 
