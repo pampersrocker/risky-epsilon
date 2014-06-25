@@ -47,6 +47,11 @@ function GameLogic.leaveRunning( updateData )
 	return EventResult.Handled;
 end
 
+function GameLogic.restart()
+	GameLogic.isoCam.trackingObject.go:setPosition(Config.player.spawnPosition)
+	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
+	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
+end
 
 -------------------------------------------------------
 -- Pause State
