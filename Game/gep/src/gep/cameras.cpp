@@ -218,8 +218,14 @@ void gep::CameraLookAtHorizon::setViewVector(const vec3& vector)
 
 void gep::CameraLookAtHorizon::lookAt(const gep::vec3& target)
 {
-     m_viewDir = (target - m_position).normalized();
-
+    if (target.epsilonCompare(m_position))
+    {
+        m_viewDir = vec3(0, 0, 0);
+    }
+    else
+    {
+        m_viewDir = (target - m_position).normalized();
+    }
 }
 
 

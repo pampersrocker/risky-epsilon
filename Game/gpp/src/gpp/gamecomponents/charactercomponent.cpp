@@ -14,14 +14,9 @@
 
 
 gpp::CharacterComponent::CharacterComponent():
-    Component(),
-    m_scale(1.0f, 1.0f, 1.0f),
-    m_position(0.0f, 0.0f, 0.0f),
-    m_rotation(),
-    m_pCharacterRigidBody(nullptr),
-    m_transform()
+    PhysicsComponent(),
+    m_pCharacterRigidBody(nullptr)
 {
-    m_transform.setParent(m_pParentGameObject);
 }
 
 gpp::CharacterComponent::~CharacterComponent()
@@ -30,205 +25,114 @@ gpp::CharacterComponent::~CharacterComponent()
 
 void gpp::CharacterComponent::initalize()
 {
-
-}
-
-void gpp::CharacterComponent::update( float elapsedMS )
-{
-    auto* pInputHandler = g_globalManager.getInputHandler();
-    auto* pLogging = g_globalManager.getLogging();
-    auto& debugRenderer = g_globalManager.getRenderer()->getDebugRenderer();
-
-    if (m_pCharacterRigidBody)
-    {
-        gep::CharacterInput input;
-        gep::CharacterOutput output;
-
-        input.deltaTime = elapsedMS;
-        input.velocity = m_pCharacterRigidBody->getRigidBody()->getLinearVelocity();
-        input.position = m_pCharacterRigidBody->getRigidBody()->getPosition();
-
-        if (pInputHandler->isPressed(gep::Key::Up))
-        {
-            pLogging->logMessage("up");
-            input.inputUD = -1.0f;
-        }
-        if (pInputHandler->isPressed(gep::Key::Down))
-        {
-            pLogging->logMessage("down");
-            input.inputUD = 1.0f;
-        }
-        if (pInputHandler->isPressed(gep::Key::Left))
-        {
-            pLogging->logMessage("left");
-            input.inputLR = 1.0f;
-        }
-        if (pInputHandler->isPressed(gep::Key::Right))
-        {
-            pLogging->logMessage("right");
-            input.inputLR = -1.0f;
-        }
-
-        input.forward.x = 1.0f;
-        input.characterGravity.z = -9.81f;
-
-        m_pCharacterRigidBody->checkSupport(elapsedMS, input.surfaceInfo);
-
-        switch (input.surfaceInfo.supportedState)
-        {
-        case gep::SurfaceInfo::SupportedState::Supported:
-            debugRenderer.printText(m_position + gep::vec3(0.0f, 0.0f, -10.0f), "Supported", gep::Color::yellow());
-            break;
-        case gep::SurfaceInfo::SupportedState::Unsupported:
-            debugRenderer.printText(m_position + gep::vec3(0.0f, 0.0f, -10.0f), "Unsupported", gep::Color::yellow());
-            break;
-        case gep::SurfaceInfo::SupportedState::Sliding:
-            debugRenderer.printText(m_position + gep::vec3(0.0f, 0.0f, -10.0f), "Sliding", gep::Color::yellow());
-            break;
-        default:
-            break;
-        }
-
-        debugRenderer.printText(m_position + gep::vec3(0.0f, 0.0f, -5.0f),
-            gep::CharacterState::toString(m_pCharacterRigidBody->getState()),
-            gep::Color::yellow());
-
-        m_pCharacterRigidBody->update(input, output);
-
-        m_pCharacterRigidBody->setLinearVelocity(output.velocity, elapsedMS);
-    }
+    PhysicsComponent::initalize();
 }
 
 void gpp::CharacterComponent::destroy()
 {
-
+    PhysicsComponent::destroy();
 }
 
-void gpp::CharacterComponent::setPosition(const gep::vec3& pos )
+void gpp::CharacterComponent::update( float elapsedMS )
 {
-    m_position = pos;
+    PhysicsComponent::update(elapsedMS);
+    auto deltaSeconds = g_globalManager.getUpdateFramework()->calcElapsedTimeAverage(60);
+
+    gep::IWorld::ScopedLock raii(m_pWorld.get());
+
+    auto* pInputHandler = g_globalManager.getInputHandler();
+    auto* pLogging = g_globalManager.getLogging();
+    auto& debugRenderer = g_globalManager.getRenderer()->getDebugRenderer();
+
+    gep::CharacterInput input;
+    gep::CharacterOutput output;
+
+    input.deltaTime = deltaSeconds;
+    input.velocity = m_pCharacterRigidBody->getRigidBody()->getLinearVelocity();
+    input.position = m_pCharacterRigidBody->getRigidBody()->getPosition();
+
+    if (pInputHandler->isPressed(gep::Key::Up))
+    {
+        pLogging->logMessage("up");
+        input.inputUD = -1.0f;
+    }
+    if (pInputHandler->isPressed(gep::Key::Down))
+    {
+        pLogging->logMessage("down");
+        input.inputUD = 1.0f;
+    }
+    if (pInputHandler->isPressed(gep::Key::Left))
+    {
+        pLogging->logMessage("left");
+        input.inputLR = 1.0f;
+    }
+    if (pInputHandler->isPressed(gep::Key::Right))
+    {
+        pLogging->logMessage("right");
+        input.inputLR = -1.0f;
+    }
+
+    input.up = m_pParentGameObject->getUpDirection();
+    input.forward = m_pParentGameObject->getViewDirection();
+    input.characterGravity.z = -9.81f;
+
+    auto result = m_event_updateCharacterInput.trigger(&input);
+
+    // If no one handled the result, there is nothing to do here.
+    //if (result == gep::EventResult::Ignored) { return; }
+
+    m_pCharacterRigidBody->checkSupport(deltaSeconds, input.surfaceInfo);
+
+    switch (input.surfaceInfo.supportedState)
+    {
+    case gep::SurfaceInfo::SupportedState::Supported:
+        debugRenderer.printText(getWorldPosition() + gep::vec3(0.0f, 0.0f, -10.0f), "Supported", gep::Color::yellow());
+        break;
+    case gep::SurfaceInfo::SupportedState::Unsupported:
+        debugRenderer.printText(getWorldPosition() + gep::vec3(0.0f, 0.0f, -10.0f), "Unsupported", gep::Color::yellow());
+        break;
+    case gep::SurfaceInfo::SupportedState::Sliding:
+        debugRenderer.printText(getWorldPosition() + gep::vec3(0.0f, 0.0f, -10.0f), "Sliding", gep::Color::yellow());
+        break;
+    default:
+        break;
+    }
+
+    debugRenderer.printText(getWorldPosition() + gep::vec3(0.0f, 0.0f, -5.0f),
+        gep::CharacterState::toString(m_pCharacterRigidBody->getState()),
+        gep::Color::yellow());
+
+    m_pCharacterRigidBody->update(input, output);
+
+    m_pCharacterRigidBody->setLinearVelocity(output.velocity, deltaSeconds);
 }
 
-void gpp::CharacterComponent::setRotation(const gep::Quaternion& rot )
+gep::ICharacterRigidBody* gpp::CharacterComponent::createCharacterRigidBody(const gep::CharacterRigidBodyCInfo& cinfo)
 {
-    m_rotation = rot;
-}
 
-void gpp::CharacterComponent::setScale(const gep::vec3& scale )
-{
-    GEP_ASSERT(false, "The engine currently doesn't support scaling of rigid bodies!");
-}
+    // cinfo.position > 0
+    if(!gep::epsilonCompare(cinfo.position.squaredLength(), 0.0f))
+    {
+        m_transform.setPosition(m_transform.getWorldPosition() + cinfo.position);
+    }
 
+    if(!cinfo.rotation.isIdentity())
+    {
+        m_transform.setRotation(m_transform.getWorldRotation() * cinfo.rotation);
+    }
 
-
-gep::vec3 gpp::CharacterComponent::getWorldScale() const
-{
-    GEP_ASSERT(false, "The engine currently doesn't support scaling of rigid bodies!");
-    return gep::vec3(1,1,1);
-}
-
-
-void gpp::CharacterComponent::createCharacterRigidBody(gep::CharacterRigidBodyCInfo cinfo)
-{
-    GEP_ASSERT(m_pWorld != nullptr, "The Physics World for of the CharacterComponent on %s has not been set.", m_pParentGameObject->getName().c_str());
-
-    GEP_ASSERT(m_pParentGameObject->getComponent<PhysicsComponent>() == nullptr, "The GameObject already has physical behavior. Currently no character can be added. TODO: FIX ME!");
-
-    auto physicsComponent = m_pParentGameObject->createComponent<PhysicsComponent>();
-
-
-    auto* physicsSystem = g_globalManager.getPhysicsSystem();
-    auto* physicsFactory = physicsSystem->getPhysicsFactory();
+    auto physicsSystem = g_globalManager.getPhysicsSystem();
+    auto physicsFactory = physicsSystem->getPhysicsFactory();
 
     m_pCharacterRigidBody = physicsFactory->createCharacterRigidBody(cinfo);
+    m_pRigidBody = m_pCharacterRigidBody->getRigidBody();
     m_pCharacterRigidBody->initialize();
-    //Note: The world is taking ownership of the rigid body here.
-    m_pWorld->addCharacter(m_pCharacterRigidBody.get());
-    
-    physicsComponent->setRigidBody(m_pCharacterRigidBody->getRigidBody());
+
+    if(cinfo.shape->getShapeType() == gep::ShapeType::Triangle)
+    {
+        auto shapeTransform = cinfo.shape->getTransform();
+        m_pRigidBody->setInitialTransform(shapeTransform);
+    }
+
+    return m_pCharacterRigidBody.get();
 }
-
-void gpp::CharacterComponent::move(const gep::vec3& in_delta)
-{
-    gep::vec3 delta(in_delta.x, in_delta.z, -in_delta.y);
-    m_position += m_rotation.toMat3() * delta;
-}
-
-
-
-gep::vec3 gpp::CharacterComponent::getViewDirection() const
-{
-    return (m_rotation * m_baseOrientation).toMat3() * gep::vec3(0,1,0);
-}
-
-gep::vec3 gpp::CharacterComponent::getUpDirection() const
-{
-    return  (m_rotation * m_baseOrientation).toMat3()  * gep::vec3(0,0,1);
-}
-
-
-
-gep::vec3 gpp::CharacterComponent::getRightDirection() const
-{
-    return  (m_rotation * m_baseOrientation).toMat3()  * gep::vec3(1,0,0);
-}
-
-
-
-void gpp::CharacterComponent::setBaseOrientation(const gep::Quaternion& viewDir)
-{
-   m_baseOrientation = viewDir;
-}
-
-
-void gpp::CharacterComponent::setBaseViewDirection(const gep::vec3& direction)
-{
-   m_baseOrientation = gep::Quaternion(direction, gep::vec3(0,1,0));
-}
-
-gep::mat4 gpp::CharacterComponent::getWorldTransformationMatrix() const 
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-gep::vec3 gpp::CharacterComponent::getWorldPosition() const 
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-gep::Quaternion gpp::CharacterComponent::getWorldRotation() const 
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-gep::mat4 gpp::CharacterComponent::getTransformationMatrix() const 
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-gep::vec3 gpp::CharacterComponent::getPosition() const 
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-gep::Quaternion gpp::CharacterComponent::getRotation() const 
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-gep::vec3 gpp::CharacterComponent::getScale() const 
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-void gpp::CharacterComponent::setParent(const gep::ITransform* parent)
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-const gep::ITransform* gpp::CharacterComponent::getParent()
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-

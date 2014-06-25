@@ -99,11 +99,6 @@ void gpp::GameObject::setBaseOrientation(const gep::Quaternion& orientation)
     m_transform->setBaseOrientation(orientation);
 }
 
-void gpp::GameObject::setScale(const gep::vec3& scale)
-{
-    m_transform->setScale(scale);
-}
-
 gep::vec3 gpp::GameObject::getWorldPosition() const
 {
     return m_transform->getWorldPosition();
@@ -112,11 +107,6 @@ gep::vec3 gpp::GameObject::getWorldPosition() const
 gep::Quaternion gpp::GameObject::getWorldRotation() const
 {
     return m_transform->getWorldRotation();
-}
-
-gep::vec3 gpp::GameObject::getWorldScale() const
-{
-    return m_transform->getWorldScale();
 }
 
 gep::mat4 gpp::GameObject::getTransformationMatrix() const
@@ -132,11 +122,6 @@ gep::vec3 gpp::GameObject::getPosition() const
 gep::Quaternion gpp::GameObject::getRotation() const
 {
     return m_transform->getRotation();
-}
-
-gep::vec3 gpp::GameObject::getScale() const
-{
-    return m_transform->getScale();
 }
 
 void gpp::GameObject::update(float elapsedMs)
@@ -239,13 +224,17 @@ void gpp::GameObject::setBaseViewDirection(const gep::vec3& direction)
     m_transform->setBaseViewDirection(direction);
 }
 
-
-void gpp::GameObject::setParent(const gep::ITransform* parent)
-{
-   m_transform->setParent(parent);
-}
-
-const gep::ITransform* gpp::GameObject::getParent()
+gep::ITransform* gpp::GameObject::getParent()
 {
    return m_transform->getParent();
+}
+
+const gep::ITransform* gpp::GameObject::getParent() const
+{
+    return m_transform->getParent();
+}
+
+void gpp::GameObject::setParent(gep::ITransform* parent)
+{
+   m_transform->setParent(parent);
 }

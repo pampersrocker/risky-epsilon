@@ -15,7 +15,7 @@ namespace gep
     {
         void destroyScriptTypeInfoMap()
         {
-            getScriptTypeInfoMap().~Hashmap();
+            getScriptTypeInfoMap().clear();
         }
 
         ScriptTypeInfoMap_t& getScriptTypeInfoMap()

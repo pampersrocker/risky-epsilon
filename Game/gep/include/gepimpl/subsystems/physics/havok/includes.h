@@ -19,6 +19,9 @@
 #include <Physics2012/Collide/Shape/Convex/ConvexTransform/hkpConvexTransformShape.h>
 #include <Physics2012/Collide/Shape/Convex/Box/hkpBoxShape.h>
 #include <Physics2012/Collide/Shape/Convex/Sphere/hkpSphereShape.h>
+#include <Physics2012/Collide/Shape/Convex/Cylinder/hkpCylinderShape.h>
+#include <Physics2012/Collide/Shape/Convex/Capsule/hkpCapsuleShape.h>
+#include <Physics2012/Collide/Shape/Convex/Triangle/hkpTriangleShape.h>
 #include <Physics2012/Internal/Collide/BvCompressedMesh/hkpBvCompressedMeshShape.h>
 #include <Physics2012/Internal/Collide/BvCompressedMesh/hkpBvCompressedMeshShapeCinfo.h>
 #include <Physics2012/Collide/Shape/Misc/Bv/hkpBvShape.h>

@@ -14,9 +14,9 @@ namespace gep
     public:
         Timer();
 
-        /// \brief returns the time elapsed since the start of the timer as a float (in milliseconds)
+        /// \brief returns the time elapsed since the start of the timer as a float (in seconds)
         float getTimeAsFloat() const;
-        /// \brief returns the time elapsed since the start of the timer as a double (in milliseconds)
+        /// \brief returns the time elapsed since the start of the timer as a double (in seconds)
         double getTimeAsDouble() const;
         /// \brief returns the time elapsed since the start of the timer as a 64 bit int (in the smallest measurable unit)
         uint64 getTime() const;

@@ -83,3 +83,22 @@ function createDebugCam(guid)
 	end
 	return cam
 end
+
+function calcAngleBetween(vector1, vector2)
+	local angleRad = math.atan2(vector2.y, vector2.x) - math.atan2(vector1.x, vector1.y)
+	local angleDeg = (angleRad / math.pi) * 180
+	if (angleDeg > 180) then
+		angleDeg = angleDeg - 360
+	end
+	if (angleDeg < -180) then
+		angleDeg = angleDeg + 360
+	end
+	return angleDeg
+end
+
+function rotateVector(vector, axis, angle)
+	local rotQuat = Quaternion(axis, angle)
+	local rotMat = rotQuat:toMat3()
+	local rotVector = rotMat:mulVec3(vector)
+	return rotVector
+end

@@ -10,10 +10,10 @@ namespace gep
 
     class HavokCharacterRigidBody : public ICharacterRigidBody
     {
-        HavokRigidBody* m_pRigidBody;
+        SmartPtr<HavokRigidBody> m_pRigidBody;
 
-        hkpCharacterRigidBody* m_pHkCharacterRigidBody;
-        hkpCharacterContext* m_pHkCharacterContext;
+        hkRefPtr<hkpCharacterRigidBody> m_pHkCharacterRigidBody;
+        hkRefPtr<hkpCharacterContext> m_pHkCharacterContext;
 
     public:
         HavokCharacterRigidBody(const CharacterRigidBodyCInfo& cinfo);
@@ -29,7 +29,7 @@ namespace gep
 
         virtual void setLinearVelocity(const vec3& newVelocity, float deltaTime) override;
 
-        virtual IRigidBody* getRigidBody() const override;
+        virtual IRigidBody* getRigidBody() override;
 
         virtual CharacterState::Enum getState() const;
 

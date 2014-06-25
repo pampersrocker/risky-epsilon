@@ -76,9 +76,9 @@ void gpp::Game::bindOther()
     scripting->bind<gep::IWorld>("World");
     scripting->bind<gep::IShape>("Shape");
     scripting->bind<gep::IBoxShape>("BoxShape");
-    scripting->bind<gep::SphereShape>("SphereShape");
-    scripting->bind<gep::Event<gep::IRigidBody*>>("PhantomCallbackShape");
-    scripting->bind<gep::BoundingVolumeShape>("BoundingVolumeShape");
+    scripting->bind<gep::ISphereShape>("SphereShape");
+    scripting->bind<gep::ICapsuleShape>("SphereShape");
+    scripting->bind<gep::IBoundingVolumeShape>("BoundingVolumeShape");
     scripting->bind<gep::IPhantomCallbackShape>("PhantomCallbackShape");
     scripting->bind<gep::RigidBodyCInfo>("RigidBodyCInfo");
     scripting->bind<gep::ITriggerEventArgs>("TriggerEventArgs");
@@ -97,6 +97,7 @@ void gpp::Game::bindOther()
 
     scripting->bind<gep::ICharacterRigidBody>("CharacterRigidBody");
     scripting->bind<gep::CharacterRigidBodyCInfo>("CharacterRigidBodyCInfo");
+    scripting->bind<gep::CharacterInput>("CharacterInput");
 
     scripting->bind<gpp::GameObject>("GameObject");
     scripting->bind<gpp::GameObjectManager>("GameObjectManager", &g_gameObjectManager);
@@ -120,6 +121,8 @@ void gpp::Game::bindOther()
     scripting->bind< gep::Event<gep::ContactPointArgs*> >("_ContactPointEvent");
     scripting->bind< gep::Event<gep::ScriptTableWrapper> >("_GenericEvent");
     scripting->bind< gep::Event<gep::ITriggerEventArgs*> >("_TriggerEvent");
+    scripting->bind< gep::Event<gep::CharacterInput*> >("_CharacterInputEvent");
+    scripting->bind<gep::Event<gep::IRigidBody*>>("PhantomCallbackShape");
     scripting->bind< gep::IEventManager >("_EventManager", g_globalManager.getEventManager());
 
     //Animation

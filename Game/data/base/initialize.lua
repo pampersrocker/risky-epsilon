@@ -17,6 +17,7 @@ include{
 
 	-- main scripts
 	"melee_prototype/helper.lua",
+	"melee_prototype/character.lua",
 	"melee_prototype/main.lua",
 }
 

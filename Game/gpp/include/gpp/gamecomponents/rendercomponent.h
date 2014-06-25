@@ -36,18 +36,24 @@ namespace gpp
         gep::DynamicArray<const char*> getBoneNames();
         void setBoneMapping(const gep::DynamicArray<gep::uint32>& boneIds);
         void applyBoneTransformations(const gep::ArrayPtr<gep::mat4>& transformations);
-
+        
         virtual void setState(State::Enum state) override;
+        
+        gep::vec3 getScale() { return m_scale; };
+        void setScale(const gep::vec3& scale) { m_scale = scale; };
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(setPath)
             LUA_BIND_FUNCTION_NAMED(getPathCopy, "getPath")
             LUA_BIND_FUNCTION(setState)
+            LUA_BIND_FUNCTION(setScale)
+            LUA_BIND_FUNCTION(getScale)
         LUA_BIND_REFERENCE_TYPE_END
 
     private:
         // TODO: No raw pointers to ressources
         gep::IModel* m_pModel;
+        gep::vec3 m_scale;
         gep::DynamicArray<gep::uint32> m_boneMapping;
 
         std::string m_path;

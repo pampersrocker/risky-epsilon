@@ -155,6 +155,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\gepimpl\transform.cpp" />
     <ClCompile Include="src\gep\events.cpp" />
     <ClCompile Include="src\gep\settings.cpp" />
     <ClCompile Include="src\gep\subsystems\animation\havok\animation.cpp" />

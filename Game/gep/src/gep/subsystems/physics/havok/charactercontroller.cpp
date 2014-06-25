@@ -12,7 +12,8 @@
 
 gep::HavokCharacterRigidBody::HavokCharacterRigidBody(const CharacterRigidBodyCInfo& cinfo) :
     m_pRigidBody(nullptr),
-    m_pHkCharacterRigidBody(nullptr)
+    m_pHkCharacterRigidBody(nullptr),
+    m_pHkCharacterContext(nullptr)
 {
     {
         hkpCharacterRigidBodyCinfo hkcinfo;
@@ -78,9 +79,6 @@ gep::HavokCharacterRigidBody::HavokCharacterRigidBody(const CharacterRigidBodyCI
 
 gep::HavokCharacterRigidBody::~HavokCharacterRigidBody()
 {
-    DELETE_AND_NULL(m_pRigidBody);
-    GEP_HK_REMOVE_REF_AND_NULL(m_pHkCharacterRigidBody);
-    GEP_HK_REMOVE_REF_AND_NULL(m_pHkCharacterContext);
 }
 
 void gep::HavokCharacterRigidBody::initialize()
@@ -105,7 +103,7 @@ void gep::HavokCharacterRigidBody::update(const CharacterInput& input, Character
 void gep::HavokCharacterRigidBody::checkSupport(float deltaTime, SurfaceInfo& surfaceinfo)
 {
     hkStepInfo step;
-    step.m_deltaTime = deltaTime / 1000.0f;
+    step.m_deltaTime = deltaTime;
     step.m_invDeltaTime = 1.0f/step.m_deltaTime;
 
     hkpSurfaceInfo surface;
@@ -115,13 +113,14 @@ void gep::HavokCharacterRigidBody::checkSupport(float deltaTime, SurfaceInfo& su
     conversion::hk::from(surface, surfaceinfo);
 }
 
-gep::IRigidBody* gep::HavokCharacterRigidBody::getRigidBody() const
+gep::IRigidBody* gep::HavokCharacterRigidBody::getRigidBody()
 {
-    return m_pRigidBody;
+    return m_pRigidBody.get();
 }
 
 void gep::HavokCharacterRigidBody::setLinearVelocity(const vec3& newVelocity, float deltaTime)
 {
+    GEP_ASSERT(deltaTime > 0.0f || !epsilonCompare(deltaTime, 0.0f), "The delta time must be greater than zero!");
     hkVector4 linearVelocity;
     conversion::hk::to(newVelocity, linearVelocity);
     m_pHkCharacterRigidBody->setLinearVelocity(linearVelocity, deltaTime);

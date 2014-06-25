@@ -146,7 +146,7 @@ namespace gep
         // helper methods
 
         RenderTextInfo prepareText(const char* text, FontHorizontalOrientation hOrientation);
-        void renderText(const ivec2& screenPosition, Color color, const RenderTextInfo& info);
+        void renderText(const uvec2& screenPosition, Color color, const RenderTextInfo& info);
         void renderTextBillboard(const vec3& screenPosition, Color color, const RenderTextInfo& info);
 
         // IRenderer interface
@@ -163,8 +163,8 @@ namespace gep
         virtual void setVSyncEnabled(bool value) override { m_settings.vsyncEnabled = value; }
 
 
-        virtual ivec2 toAbsoluteScreenPosition(const vec2& screenPosNormalized) const override;
-        virtual gep::vec2 toNormalizedScreenPosition(const ivec2& screenPos) const override;
+        virtual uvec2 toAbsoluteScreenPosition(const vec2& screenPosNormalized) const override;
+        virtual gep::vec2 toNormalizedScreenPosition(const uvec2& screenPos) const override;
 
     };
 

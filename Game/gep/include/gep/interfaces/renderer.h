@@ -54,39 +54,13 @@ namespace gep
             Color colorZ = Color::blue()) = 0;
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
-            LUA_BIND_FUNCTION_NAMED(scripting_printText, "printText")
-            LUA_BIND_FUNCTION_NAMED(scripting_drawLine3D, "drawLine3D")
-            LUA_BIND_FUNCTION_NAMED(scripting_drawLine3DColor, "drawLine3DColor")
-            LUA_BIND_FUNCTION_NAMED(scripting_drawLine2D, "drawLine2D")
-            LUA_BIND_FUNCTION_NAMED(scripting_drawArrow, "drawArrow")
-            LUA_BIND_FUNCTION_NAMED(scripting_drawArrowColor, "drawArrowColor")
+            LUA_BIND_FUNCTION_PTR(static_cast<void(IDebugRenderer::*)(const vec2&, const char*, Color)>(&printText), "_printText2D")
+            LUA_BIND_FUNCTION_PTR(static_cast<void(IDebugRenderer::*)(const vec3&, const char*, Color)>(&printText), "_printText3D")
+            LUA_BIND_FUNCTION_PTR(static_cast<void(IDebugRenderer::*)(const vec3&, const vec3&, Color)>(&drawLine), "_drawLine3D")
+            LUA_BIND_FUNCTION_PTR(static_cast<void(IDebugRenderer::*)(const vec2&, const vec2&, Color)>(&drawLine), "_drawLine2D")
+            LUA_BIND_FUNCTION_NAMED(drawArrow, "_drawArrow")
+            LUA_BIND_FUNCTION_NAMED(drawBox, "_drawBox")
         LUA_BIND_REFERENCE_TYPE_END
-
-    private:
-        void scripting_printText(const vec2& screenPositionNormalized, const char* text)
-        {
-            printText(screenPositionNormalized, text);
-        }
-        void scripting_drawLine3D(const vec3& start, const vec3& end)
-        {
-            drawLine(start, end, Color::green());
-        }
-        void scripting_drawLine3DColor(const vec3& start, const vec3& end, const Color& color)
-        {
-            drawLine(start, end, color);
-        }
-        void scripting_drawLine2D(const vec2& start, const vec2& end)
-        {
-            drawLine(start, end, Color::white());
-        }
-        void scripting_drawArrow(const vec3& start, const vec3& end)
-        {
-            drawArrow(start, end, Color::red());
-        }
-        void scripting_drawArrowColor(const vec3& start, const vec3& end, const Color& color)
-        {
-            drawArrow(start, end, color);
-        }
     };
 
     /// \brief interface for drawing 2d elements
@@ -117,8 +91,8 @@ namespace gep
         virtual bool getVSyncEnabled() const = 0;
         virtual void setVSyncEnabled(bool value) = 0;
 
-        virtual ivec2 toAbsoluteScreenPosition(const vec2& screenPosNormalized) const = 0;
-        virtual vec2 toNormalizedScreenPosition(const ivec2& screenPos) const = 0;
+        virtual uvec2 toAbsoluteScreenPosition(const vec2& screenPosNormalized) const = 0;
+        virtual vec2 toNormalizedScreenPosition(const uvec2& screenPos) const = 0;
         LUA_BIND_REFERENCE_TYPE_BEGIN
             LUA_BIND_FUNCTION(getScreenWidth)
             LUA_BIND_FUNCTION(getScreenHeight)

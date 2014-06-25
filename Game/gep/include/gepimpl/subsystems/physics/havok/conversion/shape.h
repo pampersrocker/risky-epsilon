@@ -8,65 +8,61 @@ namespace gep {
 namespace conversion {
 namespace hk {
 
-    const hkpShape* to(const IShape* in_gepShape);
+    //////////////////////////////////////////////////////////////////////////
+
+    namespace detail
+    {
+        template<typename T_WrapperShape>
+        hkpShape* to_shape(const IShape* in_pGepShape)
+        {
+            GEP_ASSERT(dynamic_cast<const T_WrapperShape*>(in_pGepShape) != nullptr, "Shape type does not match the actual class type!");
+            auto pWrapper = static_cast<const T_WrapperShape*>(in_pGepShape);
+            return const_cast<T_WrapperShape*>(pWrapper)->getHkpShape();
+        }
+
+        template<typename T_HavokShape, typename T_WrapperShape>
+        IShape* from_shape(const hkpShape* in_pHkShape)
+        {
+            auto pActual = static_cast<const T_HavokShape*>(in_pHkShape);
+            return static_cast<T_WrapperShape*>(reinterpret_cast<HavokShapeBase*>(pActual->getUserData()));
+        }
+    }
 
     inline hkpShape* to(IShape* in_gepShape)
     {
-        hkpShape* result = nullptr;
-
         GEP_ASSERT(in_gepShape, "Shape is a nullptr!");
 
         switch (in_gepShape->getShapeType())
         {
         case ShapeType::Box:
-            {
-                auto pWrapper = static_cast<HavokShape_Box*>(in_gepShape);
-                GEP_ASSERT(dynamic_cast<HavokShape_Box*>(in_gepShape) != nullptr, "Shape type does not match the actual class type!");
-                result = pWrapper->getHkpShape();
-            }
-            break;
+            return detail::to_shape<HavokShape_Box>(in_gepShape);
+        case ShapeType::ConvexTranslate:
+            return detail::to_shape<HavokShape_ConvexTranslate>(in_gepShape);
         case ShapeType::Sphere:
-            {
-                auto sphere = static_cast<SphereShape*>(in_gepShape);
-                GEP_ASSERT(dynamic_cast<SphereShape*>(in_gepShape) != nullptr, "Shape type does not match the actual class type!");
-                result = new hkpSphereShape(sphere->getRadius());
-            }
-            break;
+            return detail::to_shape<HavokShape_Sphere>(in_gepShape);
+        case ShapeType::Capsule:
+            return detail::to_shape<HavokShape_Capsule>(in_gepShape);
+        case ShapeType::Cylinder:
+            return detail::to_shape<HavokShape_Cylinder>(in_gepShape);
         case ShapeType::Triangle:
+            return detail::to_shape<HavokShape_Triangle>(in_gepShape);
+        case ShapeType::BoundingVolumeCompressedMesh:
             {
                 auto mesh = static_cast<HavokMeshShape*>(in_gepShape);
                 GEP_ASSERT(dynamic_cast<HavokMeshShape*>(in_gepShape) != nullptr, "Shape type does not match the actual class type!");
-                result = mesh->getHkShape();
-            }
-            break;
-        case ShapeType::ConvexTranslate:
-            {
-                auto pTransShape = static_cast<ConvexTranslateShape*>(in_gepShape);
-                GEP_ASSERT(dynamic_cast<ConvexTranslateShape*>(in_gepShape) != nullptr, "Shape type does not match the actual class type!");
-                auto pChildShape = to(pTransShape->getShape());
-                auto translation = to(pTransShape->getTranslation());
-                result = new hkpConvexTranslateShape(static_cast<hkpConvexShape*>(pChildShape), translation);
+                return mesh->getHkShape();
             }
             break;
         case ShapeType::BoundingVolume:
-            {
-                auto bvShape = static_cast<BoundingVolumeShape*>(in_gepShape);
-                GEP_ASSERT(dynamic_cast<BoundingVolumeShape*>(in_gepShape) != nullptr, "Shape type does not match the actual class type!");
-                result = new hkpBvShape(to(bvShape->getBoundingShape()),
-                                        to(bvShape->getChildShape()));
-            }
-            break;
+            return detail::to_shape<HavokShape_BoundingVolume>(in_gepShape);
         case ShapeType::PhantomCallback:
-            {
-                result = static_cast<HavokPhantomCallbackShapeGep*>(in_gepShape)->getHkShape();
-            }
-            break;
+            return static_cast<HavokPhantomCallbackShapeGep*>(in_gepShape)->getHkShape();
         default:
             GEP_ASSERT(false, "Unsupported shape type!");
             break;
         }
 
-        return result;
+        return nullptr;
     }
 
     inline const hkpShape* to(const IShape* in_gepShape)
@@ -74,63 +70,40 @@ namespace hk {
         return to( const_cast<IShape*>(in_gepShape) );
     }
 
-    //////////////////////////////////////////////////////////////////////////
-    
-    const IShape* from(const hkpShape* in_hkShape);
-
     inline IShape* from(hkpShape* in_hkShape)
     {
-        IShape* result = nullptr;
+        GEP_ASSERT(in_hkShape, "The shape is a nullptr!");
+
         switch (in_hkShape->getType())
         {
         case hkcdShapeType::BOX:
-            {
-                auto pActual = static_cast<const hkpBoxShape*>(in_hkShape);
-                result = static_cast<HavokShape_Box*>(reinterpret_cast<HavokShapeBase*>(pActual->getUserData()));
-            }
-            break;
+            return detail::from_shape<hkpBoxShape, HavokShape_Box>(in_hkShape);
+        case hkcdShapeType::CONVEX_TRANSLATE:
+            return detail::from_shape<hkpConvexTranslateShape, HavokShape_ConvexTranslate>(in_hkShape);
         case hkcdShapeType::SPHERE:
-            {
-                const auto* sphereShape = static_cast<const hkpSphereShape*>(in_hkShape);
-                result = GEP_NEW(g_stdAllocator, SphereShape)(sphereShape->getRadius());
-            }
-            break;
-        //TODO: Check if it is actually ok to put all of these into a HavokMeshShape!
+            return detail::from_shape<hkpSphereShape, HavokShape_Sphere>(in_hkShape);
+        case hkcdShapeType::CAPSULE:
+            return detail::from_shape<hkpCapsuleShape, HavokShape_Capsule>(in_hkShape);
+        case hkcdShapeType::CYLINDER:
+            return detail::from_shape<hkpCylinderShape, HavokShape_Cylinder>(in_hkShape);
         case hkcdShapeType::TRIANGLE:
+            return detail::from_shape<hkpTriangleShape, HavokShape_Triangle>(in_hkShape);
+
+        //TODO: Check if it is actually ok to put all of these into a HavokMeshShape!
         case hkcdShapeType::BV_COMPRESSED_MESH:
         case hkcdShapeType::CONVEX_VERTICES:
-            {
-                result = GEP_NEW(g_stdAllocator, HavokMeshShape)(in_hkShape);
-            }
-            break;
-        case hkcdShapeType::CONVEX_TRANSLATE:
-            {
-                auto pTransShape = static_cast<const hkpConvexTranslateShape*>(in_hkShape);
-                GEP_ASSERT(dynamic_cast<hkpConvexTranslateShape*>(in_hkShape) != nullptr, "Shape type does not match the actual class type!");
-                auto pChildShape = from(pTransShape->getChildShape());
-                auto translation = from(pTransShape->getTranslation());
-                result = GEP_NEW(g_stdAllocator, ConvexTranslateShape)(const_cast<IShape*>(pChildShape), translation);
-            }
-            break;
+            return GEP_NEW(g_stdAllocator, HavokMeshShape)(in_hkShape);
+
         case hkcdShapeType::BV:
-            {
-                auto pActualShape = static_cast<const hkpBvShape*>(in_hkShape);
-                auto pBounding = from(pActualShape->m_boundingVolumeShape);
-                auto pChild = from(pActualShape->m_childShape.getChild());
-                result = GEP_NEW(g_stdAllocator, BoundingVolumeShape)(pBounding, pChild);
-            }
-            break;
+            return detail::from_shape<hkpBvShape, HavokShape_BoundingVolume>(in_hkShape);
         case ShapeType::PhantomCallback:
-            {
-                result = static_cast<HavokPhantomCallbackShapeHk*>(in_hkShape)->getOwner();
-            }
-            break;
+            return static_cast<HavokPhantomCallbackShapeHk*>(in_hkShape)->getOwner();
         default:
             GEP_ASSERT(false, "Unsupported shape type!");
             break;
         }
 
-        return result;
+        return nullptr;
     }
 
     inline const IShape* from(const hkpShape* in_hkShape)

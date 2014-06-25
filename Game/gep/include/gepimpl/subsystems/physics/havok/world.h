@@ -94,5 +94,14 @@ namespace gep
         virtual void contactPointCallback(const ContactPointArgs& evt) override;
         virtual void collisionAddedCallback(const CollisionArgs& evt) override;
         virtual void collisionRemovedCallback(const CollisionArgs& evt) override;
+
+        virtual void markForRead() const override;
+        virtual void unmarkForRead() const override;
+
+        virtual void markForWrite() override;
+        virtual void unmarkForWrite() override;
+
+        virtual void lock() override;
+        virtual void unlock() override;
     };
 }

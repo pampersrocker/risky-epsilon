@@ -181,7 +181,13 @@ void gep::HavokWorld::update(float elapsedTime)
 {
     GEP_UNUSED(elapsedTime);
     //TODO tweak this value if havok is complaining too hard about the simulation becoming unstable.
-    m_pWorld->stepDeltaTime(g_globalManager.getUpdateFramework()->calcElapsedTimeAverage(60) / 1000.0f);
+    auto averageDelta = g_globalManager.getUpdateFramework()->calcElapsedTimeAverage(60);
+    // Do update
+    {
+        m_pWorld->lock();
+        m_pWorld->stepDeltaTime(averageDelta);
+        m_pWorld->unlock();
+    }
 }
 
 void gep::HavokWorld::castRay(const RayCastInput& input, RayCastOutput& output) const
@@ -251,4 +257,34 @@ void gep::HavokWorld::setCollisionFilter(ICollisionFilter* pFilter)
     GEP_ASSERT(pHkFilter, "Filter wrapper has an invalid hk object!");
 
     m_pWorld->setCollisionFilter(pHkFilter);
+}
+
+void gep::HavokWorld::markForRead() const
+{
+    m_pWorld->markForRead();
+}
+
+void gep::HavokWorld::unmarkForRead() const
+{
+    m_pWorld->unmarkForRead();
+}
+
+void gep::HavokWorld::markForWrite()
+{
+    m_pWorld->markForWrite();
+}
+
+void gep::HavokWorld::unmarkForWrite()
+{
+    m_pWorld->unmarkForWrite();
+}
+
+void gep::HavokWorld::lock()
+{
+    m_pWorld->lock();
+}
+
+void gep::HavokWorld::unlock()
+{
+    m_pWorld->unlock();
 }

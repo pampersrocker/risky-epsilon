@@ -10,10 +10,6 @@
 namespace gep
 {
     // TODO inheritance
-    // TODO update calls
-    // TODO events
-    // TODO error recovery with reasonable messages
-    // TODO loading scripts from lua
     // TODO resource type and hot reloading of scripts
 
     typedef lua::FunctionWrapper ScriptFunctionWrapper;
@@ -220,7 +216,7 @@ namespace gep
 
     namespace detail
     {
-        typedef Hashmap<std::string, ScriptTypeInfo, StringHashPolicy> ScriptTypeInfoMap_t;
+        typedef Hashmap<std::string, ScriptTypeInfo, StringHashPolicy, MallocAllocatorPolicy> ScriptTypeInfoMap_t;
 
         // Have to use an exported hashmap because static instances are different across dlls...
         GEP_API ScriptTypeInfoMap_t& getScriptTypeInfoMap();

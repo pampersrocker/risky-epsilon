@@ -298,11 +298,7 @@ namespace gep
         {
             if (m_callbackId_update.id == -1)
             {
-                //auto callback = std::bind(&OwnType::updateDelayedEvents, this, std::placeholders::_1);
-                auto callback = [&](float dt){
-                    // TODO Once the engine uses seconds everywhere, remove the division by 1000.0f
-                    updateDelayedEvents(dt / 1000.0f);
-                };
+                auto callback = std::bind(&OwnType::updateDelayedEvents, this, std::placeholders::_1);
                 m_callbackId_update = m_pUpdateFramework->registerUpdateCallback(callback);
             }
         }

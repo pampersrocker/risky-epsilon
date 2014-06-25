@@ -232,27 +232,70 @@ gep::IRigidBody* gep::HavokPhysicsFactory::createRigidBody(const RigidBodyCInfo&
 gep::ICharacterRigidBody* gep::HavokPhysicsFactory::createCharacterRigidBody(const CharacterRigidBodyCInfo& cinfo) const
 {
     GEP_ASSERT(m_pAllocator, "Allocator cannot be nullptr!");
-    return GEP_NEW(m_pAllocator, HavokCharacterRigidBody)(cinfo);
+    auto pCharacterRigidBody = GEP_NEW(m_pAllocator, HavokCharacterRigidBody)(cinfo);
+    pCharacterRigidBody->initialize();
+    return pCharacterRigidBody;
 }
 
 gep::ResourcePtr<gep::ICollisionMesh> gep::HavokPhysicsFactory::loadCollisionMesh(const char* path)
 {
-    return g_globalManager.getResourceManager()->loadResource<CollisionMesh>(CollisionMeshFileLoader(path), LoadAsync::No);
+    auto pResult = g_globalManager.getResourceManager()->loadResource<CollisionMesh>(CollisionMeshFileLoader(path), LoadAsync::No);
+    postProcessNewShape(pResult->getShape());
+    return pResult;
 }
 
 gep::IShape* gep::HavokPhysicsFactory::loadCollisionMeshFromLua(const char* path)
 {
-    return loadCollisionMesh(path).get()->getShape();
+    auto pResult = loadCollisionMesh(path).get()->getShape();
+    return postProcessNewShape(pResult);
 }
 
 gep::IBoxShape* gep::HavokPhysicsFactory::createBox(const vec3& halfExtends)
 {
-    return GEP_NEW(m_pAllocator, HavokShape_Box)(halfExtends);
+    auto pResult = GEP_NEW(m_pAllocator, HavokShape_Box)(halfExtends);
+    return postProcessNewShape(pResult);
+}
+
+gep::ISphereShape* gep::HavokPhysicsFactory::createSphere(float radius)
+{
+    auto pResult = GEP_NEW(m_pAllocator, HavokShape_Sphere)(radius);
+    return postProcessNewShape(pResult);
+}
+
+gep::ICapsuleShape* gep::HavokPhysicsFactory::createCapsule(const vec3& start, const vec3& end, float radius)
+{
+    auto pResult = GEP_NEW(m_pAllocator, HavokShape_Capsule)(start, end, radius);
+    return postProcessNewShape(pResult);
+}
+
+gep::ICylinderShape* gep::HavokPhysicsFactory::createCylinder(const vec3& start, const vec3& end, float radius)
+{
+    auto pResult = GEP_NEW(m_pAllocator, HavokShape_Cylinder)(start, end, radius);
+    return postProcessNewShape(pResult);
+}
+
+gep::ITriangleShape* gep::HavokPhysicsFactory::createTriangle(const vec3& vertexA, const vec3& vertexB, const vec3& vertexC)
+{
+    auto pResult = GEP_NEW(m_pAllocator, HavokShape_Triangle)(vertexA, vertexB, vertexC);
+    return postProcessNewShape(pResult);
+}
+
+gep::IConvexTranslateShape* gep::HavokPhysicsFactory::createConvexTranslateShape(IShape* pShape, const vec3& translation)
+{
+    auto pResult = GEP_NEW(m_pAllocator, HavokShape_ConvexTranslate)(pShape, translation);
+    return postProcessNewShape(pResult);
+}
+
+gep::IBoundingVolumeShape* gep::HavokPhysicsFactory::createBoundingVolumeShape(IShape* pBounding, IShape* pChild)
+{
+    auto pResult = GEP_NEW(m_pAllocator, HavokShape_BoundingVolume)(pBounding, pChild);
+    return postProcessNewShape(pResult);
 }
 
 gep::IPhantomCallbackShape* gep::HavokPhysicsFactory::createPhantomCallbackShape()
 {
-    return GEP_NEW(m_pAllocator, HavokPhantomCallbackShapeGep)();
+    auto pResult = GEP_NEW(m_pAllocator, HavokPhantomCallbackShapeGep)();
+    return postProcessNewShape(pResult);
 }
 
 gep::ICollisionFilter* gep::HavokPhysicsFactory::createCollisionFilter_Simple()
