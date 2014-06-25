@@ -69,8 +69,11 @@ end
 function PlayerMeta.update( guid, elapsedTime )
 
 	local player = GetGObyGUID(guid)
-	
+	local pos = GameLogic.isoCam.trackingObject.go:getWorldPosition()
 	DebugRenderer:printText(Vec2(-0.9, 0.65), "Velocity:" .. player.go.rb:getLinearVelocity():length())
+	DebugRenderer:printText(Vec2(-0.9, 0.55), "X:" .. pos.x)
+	DebugRenderer:printText(Vec2(-0.9, 0.50), "Y:" .. pos.y)
+	DebugRenderer:printText(Vec2(-0.9, 0.45), "Z:" .. pos.z)
 	local viewDir = GameLogic.isoCam.go.cc:getViewDirection()
 	viewDir.z = 0
 	viewDir = viewDir:normalized()

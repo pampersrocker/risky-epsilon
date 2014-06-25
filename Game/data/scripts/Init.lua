@@ -10,6 +10,7 @@ function InitializeWorld(  )
 
 	PlayerMeta.__index = PlayerMeta
 	GameLogic.totalElapsedTime = 0
+	GameLogic.finished = false
 	-- create player
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
@@ -145,6 +146,15 @@ function InitializeWorld(  )
 		return EventResult.Handled
 	end)
 	
+	--create EndTrigger
+	local endtrigger = CreateEmptyGameObject("endtrigger")
+	triggerEnd = FanMeta:createPhantomCallbackTriggerBox("endtrigger", Vec3(1.0,1.0,1.0), Vec3(-10.0,0.0,0.0))
+	triggerEnd.go.phantomCallback:getEnterEvent():registerListener(function(arg)
+		GameLogic.finished = true
+		
+		return EventResult.Handled
+	end)
+	
 	--create trigger for groundfall
 	local gotrigger = CreateEmptyGameObject("trigger for groundfall")
 	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for groundfall", Vec3(Config.world.worldSize/2.0,Config.world.worldSize/2.0,3.0), Vec3(0.0,0.0,-Config.world.worldSize/2.5))
@@ -152,6 +162,8 @@ function InitializeWorld(  )
 		GameLogic.restart()		
 		return EventResult.Handled
 	end)
+	
+		
 	
 end
 
