@@ -91,6 +91,7 @@ function PlayerMeta.update( guid, elapsedTime )
 	end
 	if (InputHandler:isPressed(Config.keys.keyboard.left)) then
 		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
+		logMessage("PlayerUpdate")
 		player.go.angularVelocitySwapped = false
 		player.go.rb:applyTorque(elapsedTime, -viewDir:mulScalar(Config.player.torqueMulScalar))
 	elseif (InputHandler:isPressed(Config.keys.keyboard.right)) then

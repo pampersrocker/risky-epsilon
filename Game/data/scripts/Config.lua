@@ -6,8 +6,8 @@ Config = {
 		distanceMax = 3000.0,
 		hightFactor = 0.5, -- 0..1 factor for hight of camera
 		initLook = Vec2(0.0, 20.0),
-		rotationSpeedFactor = 50,
-		rotationSpeedFactorGamePad = 200,
+		rotationSpeedFactor = 50000,
+		rotationSpeedFactorGamePad = 200000,
 		zoomfactorgamepad = 1.65
 	},
 
@@ -15,7 +15,7 @@ Config = {
 		maxLinearVelocity = 300.0,
 		maxAngularVelocity = 100.0,
 		spawnPosition = Vec3(0.0, 0.0, 5.0),
-		torqueMulScalar = 2
+		torqueMulScalar = 2000
 	},
 
 	materials = {
