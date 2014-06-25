@@ -82,9 +82,12 @@ gep::IResourceLoader* gep::CollisionMesh::getLoader()
 
 //////////////////////////////////////////////////////////////////////////
 
-gep::CollisionMeshFileLoader::CollisionMeshFileLoader(const char* path) : m_path(path)
+gep::CollisionMeshFileLoader::CollisionMeshFileLoader(IAllocator* pAllocator,
+                                                      const char* path) :
+    m_pAllocator(pAllocator),
+    m_path(path)
 {
-
+    GEP_ASSERT(m_pAllocator, "CollisionMeshFileLoader needs an allocator!");
 }
 
 gep::CollisionMeshFileLoader::~CollisionMeshFileLoader()
@@ -146,26 +149,30 @@ gep::CollisionMesh* gep::CollisionMeshFileLoader::loadResource(CollisionMesh* pI
         {
             const auto& physicsSystems = physicsData->getPhysicsSystems();
             GEP_ASSERT(physicsSystems.getSize() == 1, "Wrong number of physics systems!");
-            auto* body = physicsSystems[0]->getRigidBodies()[0];
-            const auto* hkShape = body->getCollidable()->getShape();
+            auto body = physicsSystems[0]->getRigidBodies()[0];
+            auto hkShape = body->getCollidable()->getShape();
 
             auto shape = conversion::hk::from(const_cast<hkpShape*>(hkShape));
 
             auto type = shape->getShapeType();
-            if ( type == hkcdShapeType::TRIANGLE || 
-                 type == hkcdShapeType::BV_COMPRESSED_MESH ||
+            if ( type == hkcdShapeType::BV_COMPRESSED_MESH ||
                  type == hkcdShapeType::CONVEX_VERTICES )
             {
-                auto transform = body->getTransform();
-                auto meshShape = static_cast<HavokMeshShape*>(shape);
-                Transform* tempTrans = new Transform();
-                conversion::hk::from(transform, *tempTrans);
-                
-                // Since havok content tools are buggy (?) and no custom transformation can be applied,
-                // we have to convert into our engine's space by hand.
-                // TODO: Ensure, that this transformation is correct in every case
-                tempTrans->setRotation(tempTrans->getRotation() * Quaternion(vec3(1,0,0),180));
-                meshShape->setTransform(tempTrans);
+                hkTransform transform = body->getTransform();
+                transform.getRotation().setAxisAngle(hkVector4(0.0f, 0.0f, 1.0f), GetPi<float>::value());
+
+                auto hkTransformShape = new hkpTransformShape(hkShape, transform);
+                hkTransformShape->addReference();
+                shape = GEP_NEW(m_pAllocator, HavokShape_Transform)(hkTransformShape);
+                //auto meshShape = static_cast<HavokMeshShape*>(shape);
+                //Transform* tempTrans = new Transform();
+                //conversion::hk::from(transform, *tempTrans);
+                //
+                //// Since havok content tools are buggy (?) and no custom transformation can be applied,
+                //// we have to convert into our engine's space by hand.
+                //// TODO: Ensure, that this transformation is correct in every case
+                //tempTrans->setRotation(tempTrans->getRotation() * Quaternion(vec3(1,0,0),180));
+                //meshShape->setTransform(tempTrans);
             }
 
 
@@ -239,7 +246,7 @@ gep::ICharacterRigidBody* gep::HavokPhysicsFactory::createCharacterRigidBody(con
 
 gep::ResourcePtr<gep::ICollisionMesh> gep::HavokPhysicsFactory::loadCollisionMesh(const char* path)
 {
-    auto pResult = g_globalManager.getResourceManager()->loadResource<CollisionMesh>(CollisionMeshFileLoader(path), LoadAsync::No);
+    auto pResult = g_globalManager.getResourceManager()->loadResource<CollisionMesh>(CollisionMeshFileLoader(m_pAllocator, path), LoadAsync::No);
     postProcessNewShape(pResult->getShape());
     return pResult;
 }

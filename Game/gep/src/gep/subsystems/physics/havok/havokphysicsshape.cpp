@@ -145,6 +145,11 @@ gep::HavokShape_Transform::HavokShape_Transform(IShape* pShape, const vec3& tran
     setHkpShape(pShapeToWrap);
 }
 
+gep::HavokShape_Transform::HavokShape_Transform(hkpTransformShape* pHkpShape)
+{
+    setHkpShape(pHkpShape);
+}
+
 gep::IShape* gep::HavokShape_Transform::getChildShape()
 {
     return m_pChildShape.get();
