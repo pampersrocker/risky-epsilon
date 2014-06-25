@@ -1,6 +1,6 @@
 Config = {
 	camera = {
-		initialDistance = 5.0, -- initial distance of camera
+		distance = 5.0, -- initial distance of camera
 		distanceDelta = 3, -- delta of distance change
 		distanceMin = 2.0,
 		distanceMax = 3000.0,
