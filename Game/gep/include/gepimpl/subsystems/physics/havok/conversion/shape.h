@@ -38,6 +38,8 @@ namespace hk {
             return detail::to_shape<HavokShape_Box>(in_gepShape);
         case ShapeType::ConvexTranslate:
             return detail::to_shape<HavokShape_ConvexTranslate>(in_gepShape);
+        case ShapeType::Transform:
+            return detail::to_shape<HavokShape_Transform>(in_gepShape);
         case ShapeType::Sphere:
             return detail::to_shape<HavokShape_Sphere>(in_gepShape);
         case ShapeType::Capsule:
@@ -80,6 +82,8 @@ namespace hk {
             return detail::from_shape<hkpBoxShape, HavokShape_Box>(in_hkShape);
         case hkcdShapeType::CONVEX_TRANSLATE:
             return detail::from_shape<hkpConvexTranslateShape, HavokShape_ConvexTranslate>(in_hkShape);
+        case hkcdShapeType::TRANSFORM:
+            return detail::from_shape<hkpTransformShape, HavokShape_Transform>(in_hkShape);
         case hkcdShapeType::SPHERE:
             return detail::from_shape<hkpSphereShape, HavokShape_Sphere>(in_hkShape);
         case hkcdShapeType::CAPSULE:

@@ -2,6 +2,8 @@
 #include "gepimpl/subsystems/physics/havok/havokPhysicsShape.h"
 #include "gepimpl/subsystems/physics/havok/entity.h"
 #include "gepimpl/subsystems/physics/havok/conversion/shape.h"
+#include "gepimpl/subsystems/physics/havok/conversion/quaternion.h"
+#include "gepimpl/subsystems/physics/havok/conversion/vector.h"
 
 void gep::HavokShapeBase::initialize()
 {
@@ -128,6 +130,36 @@ gep::vec3 gep::HavokShape_ConvexTranslate::getTranslation() const
 gep::IShape* gep::HavokShape_ConvexTranslate::getChildShape()
 {
     return m_pChildShape.get();
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+gep::HavokShape_Transform::HavokShape_Transform(IShape* pShape, const vec3& translation, const Quaternion& rotation)
+{
+    auto pHkpShape = conversion::hk::to(pShape);
+    auto hkTranslation = conversion::hk::to(translation);
+    auto hkRotation = conversion::hk::to(rotation);
+    auto theTransform = hkTransform(hkRotation, hkTranslation);
+    
+    auto pShapeToWrap = new hkpTransformShape(pHkpShape, theTransform);
+    setHkpShape(pShapeToWrap);
+}
+
+gep::IShape* gep::HavokShape_Transform::getChildShape()
+{
+    return m_pChildShape.get();
+}
+
+gep::vec3 gep::HavokShape_Transform::getTranslation() const
+{
+    auto& transform = static_cast<const hkpTransformShape*>(getHkpShape())->getTransform();
+    return conversion::hk::from(transform.getTranslation());
+}
+
+gep::Quaternion gep::HavokShape_Transform::getRotation() const
+{
+    auto& transform = static_cast<const hkpTransformShape*>(getHkpShape())->getTransform();
+    return conversion::hk::from(hkQuaternion(transform.getRotation()));
 }
 
 //////////////////////////////////////////////////////////////////////////

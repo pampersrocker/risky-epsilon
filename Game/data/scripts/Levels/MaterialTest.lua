@@ -22,7 +22,6 @@ function LevelMeta:initializeGameObject()
 	
 	
 	
-	
 	--[[
 	GameLogic.trigger2 = createPhantomCallbackTriggerBox("trigger2", Vec3(2, 2, 2), Vec3(50.0, 0.0, 1.0))
 	GameLogic.trigger2.phantomCallback:getEnterEvent():registerListener(function(arg)
