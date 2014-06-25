@@ -43,16 +43,17 @@ function InitializeWorld(  )
 	logMessage("GameLogic:init()")
 
 
-	-- --create Level
+
+
+	-- --create Level Tracks
+
+		LevelMeta.__index = LevelMeta
 	-- logMessage("Creating Level")
 	-- GameLogic.level = CreateEmptyGameObject("TestLevel")
-	-- LevelMeta.__index = LevelMeta
 	-- setmetatable(GameLogic.level, LevelMeta)
 	-- CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
 	-- --GameLogic.level.cb = CreateCollisionBox("cb_ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
 	-- GameLogic.level:initializeGameObject()
-
-	LevelMeta.__index = LevelMeta
 
 	logMessage("Creating Track1")
 	local name = "track1"
@@ -82,6 +83,8 @@ function InitializeWorld(  )
 	CreateScriptComponent(GameLogic.track4, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
 	GameLogic.track4:initializeTrack4()
 	
+
+
 
 
 	--create Fans
@@ -133,6 +136,9 @@ function InitializeWorld(  )
 	cinfo.friction = Config.materials.track.wood.friction
 	cinfo.position = Vec3(80.0, 0.0, 10.0)
 	CreatePhysicsComponent( GameLogic.woodfanslvlpart1 , cinfo )
+	
+
+
 	
 	--create Triggers
 	local gotrigger = CreateEmptyGameObject("trigger for fan2")
