@@ -45,16 +45,15 @@ function InitializeWorld(  )
 
 
 
-	-- --create Level Tracks
-
-		LevelMeta.__index = LevelMeta
-	-- logMessage("Creating Level")
-	-- GameLogic.level = CreateEmptyGameObject("TestLevel")
-	-- setmetatable(GameLogic.level, LevelMeta)
-	-- CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	-- --GameLogic.level.cb = CreateCollisionBox("cb_ground", Vec3(166.0, 192.0, 3.0), Vec3(0.0, 0.0, 0.0))
-	-- GameLogic.level:initializeGameObject()
-
+	--create Level Tracks
+     
+	LevelMeta.__index = LevelMeta
+	logMessage("Creating Level")
+	GameLogic.level = CreateEmptyGameObject("TestLevel")
+	setmetatable(GameLogic.level, LevelMeta)
+	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	GameLogic.level:initializeGameObject()
+--[[
 	logMessage("Creating Track1")
 	local name = "track1"
 	GameLogic.track1 = CreateEmptyGameObject(name)
@@ -82,7 +81,7 @@ function InitializeWorld(  )
 	setmetatable(GameLogic.track4, LevelMeta)
 	CreateScriptComponent(GameLogic.track4, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
 	GameLogic.track4:initializeTrack4()
-	
+	]]
 
 
 
