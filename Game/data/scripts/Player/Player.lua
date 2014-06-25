@@ -82,32 +82,35 @@ function PlayerMeta.update( guid, elapsedTime )
 	end
 	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
 	if InputHandler:gamepad(0):isConnected() then
-		if(bit32.btest(buttonsTriggered, Config.keys.gamepad.restart) ) then
+		if (bit32.btest(buttonsTriggered, Config.keys.gamepad.restart) ) then
 			PlayerMeta.restart()
 		end
 		local leftTorque = viewDir:mulScalar(Config.player.torqueMulScalar):mulScalar(InputHandler:gamepad(0):leftStick().x)
 		local rightTorque = rightDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().y)
 		player.go.rb:applyTorque(elapsedTime, leftTorque + rightTorque)
 	end
+
 	if (InputHandler:isPressed(Config.keys.keyboard.left)) then
 		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
 		logMessage("PlayerUpdate")
 		player.go.angularVelocitySwapped = false
 		player.go.rb:applyTorque(elapsedTime, -viewDir:mulScalar(Config.player.torqueMulScalar))
-	elseif (InputHandler:isPressed(Config.keys.keyboard.right)) then
+	end
+	if (InputHandler:isPressed(Config.keys.keyboard.right)) then
 		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 		player.go.angularVelocitySwapped = false
 		player.go.rb:applyTorque(elapsedTime,viewDir:mulScalar(Config.player.torqueMulScalar))
-	elseif (InputHandler:isPressed(Config.keys.keyboard.forward)) then
+	end
+
+	if (InputHandler:isPressed(Config.keys.keyboard.forward)) then
 		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 		player.go.angularVelocitySwapped = false
 		player.go.rb:applyTorque(elapsedTime,-rightDir:mulScalar(Config.player.torqueMulScalar))
-	elseif (InputHandler:isPressed(Config.keys.keyboard.backward)) then
+	end
+	if (InputHandler:isPressed(Config.keys.keyboard.backward)) then
 		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
 		player.go.angularVelocitySwapped = false
 		player.go.rb:applyTorque(elapsedTime,rightDir:mulScalar(Config.player.torqueMulScalar))
-	else
-		player.go.angularVelocitySwapped = false
 	end
 end
 
