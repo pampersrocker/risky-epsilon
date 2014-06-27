@@ -144,6 +144,10 @@ Config = {
 			position = Vec3(0,0,0),
 			name = "trigger1"
 		},
+		trigger2 = {
+			position = Vec3(0,0,0),
+			name = "trigger2"
+		},
 		endtrigger = {
 			position = Vec3(100,0,-20),
 			name = "endtrigger"
