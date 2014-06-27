@@ -112,6 +112,7 @@ function ChangePlayer( newGo )
 	newGo.go.rb:setLinearVelocity(GameLogic.isoCam.trackingObject.go.rb:getLinearVelocity())
 	newGo.go:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
 	newGo.go:setComponentStates(ComponentState.Active)
+	newGo.lastTransformator = GameLogic.isoCam.trackingObject.lastTransformator
 	-- change cam-lockAT
 	GameLogic.isoCam.trackingObject = newGo
 

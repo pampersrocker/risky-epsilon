@@ -18,6 +18,8 @@ function PlayerMeta:initializeGameObjectWood( )
 	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/SphereWood.thmodel")
+	
+	self.lastTransformator = Config.player.lastTransformator
 	logMessage("PlayerMeta:init() end")
 
 	--self.ac = self.go:createAnimationComponent()
@@ -44,6 +46,7 @@ function PlayerMeta:initializeGameObjectStone( )
 	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/SphereMarble.thmodel")
+	self.lastTransformator = Config.player.lastTransformator
 	logMessage("PlayerMeta:initStone() end")
 end
 
@@ -63,6 +66,7 @@ function PlayerMeta:initializeGameObjectPaper( )
 	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/SpherePaper.thmodel")
+	self.lastTransformator = Config.player.lastTransformator
 	logMessage("PlayerMeta:initPaper() end")
 end
 
@@ -80,6 +84,7 @@ function PlayerMeta.update( guid, elapsedTime )
 	local rightDir = viewDir:cross(Vec3(0.0, 0.0, 1.0))
 	local mouseDelta = InputHandler:getMouseDelta()
 
+	-- restart game
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
 		GameLogic.restart()
 	end
@@ -92,6 +97,22 @@ function PlayerMeta.update( guid, elapsedTime )
 		local rightTorque = rightDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().y)
 		player.go.rb:applyTorque(elapsedTime, leftTorque + rightTorque)
 	end
+	
+	-- set position to last transformator
+	if(InputHandler:isPressed(Config.keys.keyboard.lastTransformator)) then
+		GameLogic.lastTransformator()
+	end
+	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
+	if InputHandler:gamepad(0):isConnected() then
+		if (bit32.btest(buttonsTriggered, Config.keys.gamepad.lastTransformator) ) then
+			GameLogic.lastTransformator()
+		end
+		local leftTorque = viewDir:mulScalar(Config.player.torqueMulScalar):mulScalar(InputHandler:gamepad(0):leftStick().x)
+		local rightTorque = rightDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().y)
+		player.go.rb:applyTorque(elapsedTime, leftTorque + rightTorque)
+	end
+	
+	-- movement
 
 	if (InputHandler:isPressed(Config.keys.keyboard.left)) then
 		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
@@ -115,6 +136,21 @@ function PlayerMeta.update( guid, elapsedTime )
 		player.go.angularVelocitySwapped = false
 		player.go.rb:applyTorque(elapsedTime,rightDir:mulScalar(Config.player.torqueMulScalar))
 	end
+	
+	-- development-jump-to-transformator-section
+	if (InputHandler:isPressed(Key.Numpad1)) then
+		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator1.position)
+	end
+	if (InputHandler:isPressed(Key.Numpad2)) then
+		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator2.position)
+	end
+	if (InputHandler:isPressed(Key.Numpad3)) then
+		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator3.position)
+	end
+	if (InputHandler:isPressed(Key.Numpad4)) then
+		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator4.position)
+	end
+	
 end
 
 

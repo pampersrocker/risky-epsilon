@@ -55,8 +55,16 @@ function GameLogic.restart()
 	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
 	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
 	GameLogic.totalElapsedTime = 0
+	GameLogic.isoCam.trackingObject.lastTransformator = Config.player.lastTransformator
 	GameLogic.finished = false
 end
+
+function GameLogic.lastTransformator()
+	GameLogic.isoCam.trackingObject.go:setPosition(GameLogic.isoCam.trackingObject.lastTransformator)
+	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
+	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
+end
+
 
 -------------------------------------------------------
 -- Pause State
@@ -69,7 +77,7 @@ function GameLogic.updatePause( updateData )
 	local green = 0
 	local blue =0
 	
-	for i=-1,1,0.05 do
+	for i=-0.5,0.5,0.05 do
 		if (i < -0.5) then
 			green = green + 0.1
 		elseif (i > -0.5 and i <0) then
@@ -83,7 +91,6 @@ function GameLogic.updatePause( updateData )
 			DebugRenderer:_printText2D(Vec2(j, i), "PAUSE!!! ",Color(red, green, blue, 1.0))
 		end
 	end
-	logMessage("Updating Pause state");
 	return EventResult.Handled;
 end
 
@@ -116,26 +123,18 @@ function GameLogic.updateEnd( updateData )
 	local green = 0
 	local blue =0
 	
-	for i=-1,1,0.05 do
-		if (i < -0.5) then
-			green = green + 0.1
-		elseif (i > -0.5 and i <0) then
-			red = red - 0.1
-		elseif (i > 0 and i <0.5) then
-			blue = blue + 0.1
-		elseif (i > 0.5 and i <1) then
-			green = green - 0.1
+	for i=-0.5,0.5,0.05 do
+		if (i < -0.25) then
+			green = green + 0.05
+		elseif (i > -0.25 and i <0) then
+			red = red - 0.05
+		elseif (i > 0 and i <0.25) then
+			blue = blue + 0.05
+		elseif (i > 0.25 and i <0.5) then
+			green = green - 0.05
 		end
-		for j=-1,1,0.1 do	
-		
-			if (j>-0.41 and j<-0.39 and i>0.09 and i<0.11) then
-				logMessage("goose");
-				DebugRenderer:_printText2D(Vec2(j, i), "Goose! ",Color(red, green, blue, 1.0))
-			else 
-				logMessage("end");
-				DebugRenderer:_printText2D(Vec2(j, i), "End!!! ",Color(red, green, blue, 1.0))
-			end
-			
+		for j=-0.5,0.5,0.05 do	
+			DebugRenderer:_printText2D(Vec2(j, i), "End!!! ",Color(red, green, blue, 1.0))
 		end
 	end
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then

@@ -42,6 +42,7 @@ function InitializeWorld(  )
 	GameLogic.isoCam.isEnabled = true
 	logMessage("GameLogic:init()")
 
+	
 
 
 
@@ -90,54 +91,83 @@ function InitializeWorld(  )
 	FanMeta.__index = FanMeta
 	
 	logMessage("Creating Fan")
-	local name = "Fan1"
-	GameLogic.fan1 = CreateEmptyGameObject(name)
+	local fan = Config.fans.fan1
+	GameLogic.fan1 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan1, FanMeta)
 	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan1:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(-185.0,-150.0,-30.0), true, Vec3(0.0,0.0,1123.0))
+	GameLogic.fan1:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.stoneonly)
 	
 	logMessage("Creating Fan")
-	local name = "Fan2"
-	GameLogic.fan2 = CreateEmptyGameObject(name)
+	local fan = Config.fans.fan2
+	GameLogic.fan2 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan2, FanMeta)
 	CreateScriptComponent(GameLogic.fan2, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan2:initializeGameObjectFan1(name, Vec3(10.0,5.0,4.0), Vec3(-50.0,0.0,2.0), false, Vec3(4123.0,0.0,0.0))
+	GameLogic.fan2:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.paperonly)
 	
-	--wood fans
 	logMessage("Creating Fan")
-	local name = "Fan3"
-	GameLogic.fan3 = CreateEmptyGameObject(name)
+	local fan = Config.fans.fan3
+	GameLogic.fan3 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan3, FanMeta)
 	CreateScriptComponent(GameLogic.fan3, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan3:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(120.0,0.0,5.0), true, Vec3(200.0,0.0,2123.0))
-	
-	logMessage("Creating Fan")
-	local name = "Fan4"
-	GameLogic.fan4 = CreateEmptyGameObject(name)
-	setmetatable(GameLogic.fan4, FanMeta)
-	CreateScriptComponent(GameLogic.fan4, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan4:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(130.0,0.0,5.0), true, Vec3(200.0,0.0,2123.0))
-	
-	logMessage("Creating Fan")
-	local name = "Fan5"
-	GameLogic.fan5 = CreateEmptyGameObject(name)
-	FanMeta.__index = FanMeta
-	setmetatable(GameLogic.fan5, FanMeta)
-	CreateScriptComponent(GameLogic.fan5, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan5:initializeGameObjectFan1(name, Vec3(4.0,4.0,10.0), Vec3(140.0,0.0,5.0), true, Vec3(200.0,0.0,2123.0))
-	
-	--wood fans level parts
-	GameLogic.woodfanslvlpart1 = CreateEmptyGameObject("woodfanslvlpart1")
-	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:createBox(Vec3(35.0,5.0,1.0))
-	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.track.wood.restitution
-	cinfo.friction = Config.materials.track.wood.friction
-	cinfo.position = Vec3(80.0, 0.0, 10.0)
-	CreatePhysicsComponent( GameLogic.woodfanslvlpart1 , cinfo )
-	
+	GameLogic.fan3:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.woodonly)
 
-
+	
+	-- create transformators
+	local transformator = Config.transformators.transformator1
+	GameLogic.transformator1 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
+	GameLogic.transformator1.phantomCallback:getEnterEvent():registerListener(function(arg)		
+		local go = GetGObyGUID(transformator.transformTo)
+		if not(GameLogic.isoCam.trackingObject == go) then
+			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
+			ChangePlayer(go)
+		end
+		return EventResult.Handled
+	end)
+	GameLogic.transformator1.phantomCallback:getLeaveEvent():registerListener(function(arg)
+		return EventResult.Handled
+	end)
+	
+	local transformator = Config.transformators.transformator2
+	GameLogic.transformator2 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
+	GameLogic.transformator2.phantomCallback:getEnterEvent():registerListener(function(arg)		
+		local go = GetGObyGUID(transformator.transformTo)
+		if not(GameLogic.isoCam.trackingObject == go) then
+			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
+			ChangePlayer(go)
+		end
+		return EventResult.Handled
+	end)
+	GameLogic.transformator2.phantomCallback:getLeaveEvent():registerListener(function(arg)
+		return EventResult.Handled
+	end)
+	
+	local transformator = Config.transformators.transformator3
+	GameLogic.transformator3 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
+	GameLogic.transformator3.phantomCallback:getEnterEvent():registerListener(function(arg)		
+		local go = GetGObyGUID(transformator.transformTo)
+		if not(GameLogic.isoCam.trackingObject == go) then
+			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
+			ChangePlayer(go)
+		end
+		return EventResult.Handled
+	end)
+	GameLogic.transformator3.phantomCallback:getLeaveEvent():registerListener(function(arg)
+		return EventResult.Handled
+	end)
+	
+	local transformator = Config.transformators.transformator4
+	GameLogic.transformator4 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
+	GameLogic.transformator4.phantomCallback:getEnterEvent():registerListener(function(arg)		
+		local go = GetGObyGUID(transformator.transformTo)
+		if not(GameLogic.isoCam.trackingObject == go) then
+			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
+			ChangePlayer(go)
+		end
+		return EventResult.Handled
+	end)
+	GameLogic.transformator4.phantomCallback:getLeaveEvent():registerListener(function(arg)
+		return EventResult.Handled
+	end)
 	
 	--create Triggers
 	local gotrigger = CreateEmptyGameObject("trigger for fan2")
@@ -150,16 +180,17 @@ function InitializeWorld(  )
 		
 		return EventResult.Handled
 	end)
-	--[[
+	
 	--create EndTrigger
-	local endtrigger = CreateEmptyGameObject("endtrigger")
-	triggerEnd = FanMeta:createPhantomCallbackTriggerBox("endtrigger", Vec3(1.0,1.0,1.0), Vec3(-10.0,0.0,0.0))
+	local trigger = Config.triggers.endtrigger
+	local endtrigger = CreateEmptyGameObject(trigger.name)
+	triggerEnd = FanMeta:createPhantomCallbackTriggerBox(trigger.name, Config.triggers.triggersize, trigger.position)
 	triggerEnd.go.phantomCallback:getEnterEvent():registerListener(function(arg)
 		GameLogic.finished = true
 		
 		return EventResult.Handled
 	end)
-	]]
+	
 	--create trigger for groundfall
 	local gotrigger = CreateEmptyGameObject("trigger for groundfall")
 	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for groundfall", Vec3(Config.world.worldSize/2.0,Config.world.worldSize/2.0,3.0), Vec3(0.0,0.0,-Config.world.worldSize/2.5))
