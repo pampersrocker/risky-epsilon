@@ -6,11 +6,14 @@ function InitializeWorld(  )
 	cinfo.worldSize = Config.world.worldSize
 	local world = PhysicsFactory:createWorld(cinfo)
 	PhysicsSystem:setWorld(world)
-	PhysicsSystem:setDebugDrawingEnabled(true)
+	PhysicsSystem:setDebugDrawingEnabled(false)
 
 	PlayerMeta.__index = PlayerMeta
 	GameLogic.totalElapsedTime = 0
 	GameLogic.finished = false
+	GameLogic.debugDrawings = false
+	GameLogic.showHelp = false
+	
 	-- create player
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
@@ -40,7 +43,6 @@ function InitializeWorld(  )
 	setmetatable( GameLogic.isoCam, IsoCamera)
 	--CreateScriptComponent(GameLogic.isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
 	GameLogic.isoCam.isEnabled = true
-	logMessage("GameLogic:init()")
 
 	
 
@@ -186,7 +188,12 @@ function InitializeWorld(  )
 	local endtrigger = CreateEmptyGameObject(trigger.name)
 	triggerEnd = FanMeta:createPhantomCallbackTriggerBox(trigger.name, Config.triggers.triggersize, trigger.position)
 	triggerEnd.go.phantomCallback:getEnterEvent():registerListener(function(arg)
-		GameLogic.finished = true
+		logMessage(GameLogic.isoCam.trackingObject.lastTransformator)
+		logMessage(GameLogic.transformator3.position)
+		local go = GetGObyGUID("playerInstance")
+		if (GameLogic.isoCam.trackingObject == go) then
+			GameLogic.finished = true
+		end
 		
 		return EventResult.Handled
 	end)

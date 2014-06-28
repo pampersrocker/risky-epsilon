@@ -17,12 +17,15 @@ end
 -- Running State
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
-	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
-	
+	DebugRenderer:printText(Vec2(0.8, 0.9), "F1 - help")
+	if (GameLogic.debugDrawings == true)then
+		DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
+	end
 	IsoCamera.update( updateData:getElapsedTime() )
 	GameLogic.totalElapsedTime = GameLogic.totalElapsedTime + updateData:getElapsedTime()
-	
-	DebugRenderer:printText(Vec2(-0.9, 0.1), "totalElapsedTime: "..GameLogic.totalElapsedTime)
+	if (GameLogic.debugDrawings == true)then
+		DebugRenderer:printText(Vec2(-0.9, 0.1), "totalElapsedTime: "..GameLogic.totalElapsedTime)
+	end
 	
 	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
 	if (InputHandler:isPressed(Key._1) or bit32.btest(buttonsTriggered, Button.X)) then
@@ -35,6 +38,30 @@ function GameLogic.updateRunning( updateData )
 		local go = GetGObyGUID("playerInstancePaper")
 		ChangePlayer(go)
 	end	
+	if (InputHandler:wasTriggered(Key.F2) ) then
+		if not GameLogic.debugDrawings then
+			GameLogic.debugDrawings = true
+		else
+			GameLogic.debugDrawings = false
+		end
+	end	
+	if (InputHandler:wasTriggered(Key.F1) ) then
+		if not GameLogic.showHelp then
+			GameLogic.showHelp = true
+		else
+			GameLogic.showHelp = false
+		end
+	end	
+	
+	-- show help screen
+	if (GameLogic.showHelp == true) then
+		DebugRenderer:printText(Vec2(0.0, 0.5), "Switches could only be triggered with a stone sphere.")
+		DebugRenderer:printText(Vec2(0.0, 0.45), "Some fans need to be turned on.")
+		DebugRenderer:printText(Vec2(0.0, 0.4), "Backspace - Start at last transformator.")
+		DebugRenderer:printText(Vec2(0.0, 0.35), "R - Restart level.")
+		DebugRenderer:printText(Vec2(0.0, 0.3), "F2 - Debug drawings.")
+	end
+	
 	return EventResult.Handled;
 end
 
@@ -57,12 +84,18 @@ function GameLogic.restart()
 	GameLogic.totalElapsedTime = 0
 	GameLogic.isoCam.trackingObject.lastTransformator = Config.player.lastTransformator
 	GameLogic.finished = false
+	local go = GetGObyGUID("playerInstance")
+	if not(GameLogic.isoCam.trackingObject == go) then
+		ChangePlayer(go)
+	end
+	ResetCamera()
 end
 
 function GameLogic.lastTransformator()
 	GameLogic.isoCam.trackingObject.go:setPosition(GameLogic.isoCam.trackingObject.lastTransformator)
 	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
 	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
+	
 end
 
 
@@ -72,20 +105,22 @@ end
 
 function GameLogic.updatePause( updateData )
 	-- body
-	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: pause")
+	if (GameLogic.debugDrawings == true)then
+		DebugRenderer:printText(Vec2(-0.9, 0.9), "State: pause")
+	end
 	local red = 1
 	local green = 0
 	local blue =0
 	
 	for i=-0.5,0.5,0.05 do
-		if (i < -0.5) then
-			green = green + 0.1
-		elseif (i > -0.5 and i <0) then
-			red = red - 0.1
-		elseif (i > 0 and i <0.5) then
-			blue = blue + 0.1
-		elseif (i > 0.5 and i <1) then
-			green = green - 0.1
+		if (i < -0.25) then
+			green = green + 0.2
+		elseif (i > -0.25 and i <0) then
+			red = red - 0.2
+		elseif (i > 0 and i <0.25) then
+			blue = blue + 0.2
+		elseif (i > 0.25 and i <0.5) then
+			green = green - 0.2
 		end
 		for j=-1,1,0.1 do			
 			DebugRenderer:_printText2D(Vec2(j, i), "PAUSE!!! ",Color(red, green, blue, 1.0))
@@ -118,25 +153,29 @@ end
 
 function GameLogic.updateEnd( updateData )
 	-- body
-	DebugRenderer:printText(Vec2(-0.9, 0.9), "State: End")
+	if (GameLogic.debugDrawings == true)then
+		DebugRenderer:printText(Vec2(-0.9, 0.9), "State: End")
+	end
 	local red = 1
 	local green = 0
 	local blue =0
 	
 	for i=-0.5,0.5,0.05 do
 		if (i < -0.25) then
-			green = green + 0.05
+			green = green + 0.2
 		elseif (i > -0.25 and i <0) then
-			red = red - 0.05
+			red = red - 0.2
 		elseif (i > 0 and i <0.25) then
-			blue = blue + 0.05
+			blue = blue + 0.2
 		elseif (i > 0.25 and i <0.5) then
-			green = green - 0.05
+			green = green - 0.2
 		end
 		for j=-0.5,0.5,0.05 do	
 			DebugRenderer:_printText2D(Vec2(j, i), "End!!! ",Color(red, green, blue, 1.0))
 		end
 	end
+	DebugRenderer:_printText2D(Vec2(0.0, 0.6), "Your time: "..GameLogic.totalElapsedTime,Color(1, 1, 1, 1.0))
+	
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
 		GameLogic.restart()
 	end

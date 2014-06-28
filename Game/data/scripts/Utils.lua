@@ -64,9 +64,10 @@ function createDefaultCam(guid)
 	local cam = CreateEmptyGameObject(guid)
 	cam.go.cc = cam.go:createCameraComponent()
 	cam.go.cc:setPosition(Vec3(0.0, 0.0, 0.0))
-	cam.go.cc:setViewDirection(Vec3(1.0, 0.0, 0.0))
+	cam.go.cc:setViewDirection(Vec3(-1.0, 0.0, 0.0))
 	cam.go.baseViewDir = Vec3(1.0, 0.0, 0.0)
 	cam.go.cc:setBaseViewDirection(cam.go.baseViewDir)
+	cam.distance = Config.camera.distance
 	return cam
 end
 
@@ -101,6 +102,12 @@ end
 
 function SetGObyGUID( guid , instance )
 	GameObjects[guid] = instance
+end
+
+function ResetCamera()
+	GameLogic.isoCam.go.cc:setViewDirection(Vec3(-1.0, 0.0, 0.0))
+	GameLogic.isoCam.go.cc:look(Config.camera.initLook)	
+	GameLogic.isoCam.distance = Config.camera.distance
 end
 
 function ChangePlayer( newGo )
