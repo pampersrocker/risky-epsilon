@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset><contributor><author></author><authoring_tool>FBX COLLADA exporter</authoring_tool><comments></comments></contributor><created>2014-07-02T09:23:23Z</created><keywords></keywords><modified>2014-07-02T09:23:23Z</modified><revision></revision><subject></subject><title></title><unit meter="0.010000" name="centimeter"></unit><up_axis>Y_UP</up_axis></asset>
+  <library_images>
+    <image id="WoodTiled_png_001-image" name="WoodTiled_png_001"><init_from>file://WoodPlaneTiled.dds</init_from></image>
+  </library_images>
+  <library_materials>
+    <material id="Material_002__WoodTiled_png_001" name="Material_002__WoodTiled_png_001">
+      <instance_effect url="#Material_002__WoodTiled_png_001-fx"/>
+    </material>
+    <material id="Material_004" name="Material_004">
+      <instance_effect url="#Material_004-fx"/>
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="Material_002__WoodTiled_png_001-fx" name="Material_002__WoodTiled_png_001">
+      <profile_COMMON>
+        <technique sid="standard">
+          <phong>
+            <emission>
+              <color sid="emission">0.000000  0.000000 0.000000 1.000000</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">1.000000  1.000000 1.000000 1.000000</color>
+            </ambient>
+            <diffuse>
+              <texture texture="WoodTiled_png_001-image" texcoord="CHANNEL2">
+                <extra>
+                  <technique profile="MAYA">
+                    <wrapU sid="wrapU2">TRUE</wrapU>
+                    <wrapV sid="wrapV2">TRUE</wrapV>
+                    <blend_mode>ADD</blend_mode>
+                  </technique>
+                </extra>
+              </texture>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.000000  0.000000 0.000000 1.000000</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">1.071773</float>
+            </shininess>
+            <reflective>
+              <color sid="reflective">0.000000  0.000000 0.000000 1.000000</color>
+            </reflective>
+            <reflectivity>
+              <float sid="reflectivity">1.000000</float>
+            </reflectivity>
+            <transparent opaque="RGB_ZERO">
+              <color sid="transparent">1.000000  1.000000 1.000000 1.000000</color>
+            </transparent>
+            <transparency>
+              <float sid="transparency">0.000000</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="Material_004-fx" name="Material_004">
+      <profile_COMMON>
+        <technique sid="standard">
+          <phong>
+            <emission>
+              <color sid="emission">0.000000  0.000000 0.000000 1.000000</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">1.000000  1.000000 1.000000 1.000000</color>
+            </ambient>
+            <diffuse>
+              <texture texture="WoodTiled_png_001-image" texcoord="CHANNEL0">
+                <extra>
+                  <technique profile="MAYA">
+                    <wrapU sid="wrapU0">TRUE</wrapU>
+                    <wrapV sid="wrapV0">TRUE</wrapV>
+                    <blend_mode>ADD</blend_mode>
+                  </technique>
+                </extra>
+              </texture>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.000000  0.000000 0.000000 1.000000</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">1.071773</float>
+            </shininess>
+            <reflective>
+              <color sid="reflective">0.000000  0.000000 0.000000 1.000000</color>
+            </reflective>
+            <reflectivity>
+              <float sid="reflectivity">1.000000</float>
+            </reflectivity>
+            <transparent opaque="RGB_ZERO">
+              <color sid="transparent">1.000000  1.000000 1.000000 1.000000</color>
+            </transparent>
+            <transparency>
+              <float sid="transparency">0.000000</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry id="Sphere_Fracture_03-lib" name="Sphere_Fracture_03Mesh">
+      <mesh>
+        <source id="Sphere_Fracture_03-POSITION">
+          <float_array id="Sphere_Fracture_03-POSITION-array" count="96">
+0.995917 0.404568 1.302033
+0.942557 0.349340 1.219531
+0.997981 0.406897 1.113417
+1.010070 0.419342 1.200112
+0.938841 0.467725 1.457452
+0.903287 0.445656 1.431843
+0.942433 0.349503 1.180780
+0.995785 0.404764 1.097935
+0.931973 0.475356 1.476093
+0.862420 0.548919 0.741314
+0.867000 0.547202 0.747104
+0.921015 0.501966 1.475769
+0.741415 0.850837 1.070274
+0.772826 0.772825 0.746029
+0.751253 0.826464 1.431994
+0.798826 0.798825 1.471879
+0.729107 0.881761 1.200112
+0.837050 0.837049 1.200112
+0.997981 0.406897 1.113417
+1.010070 0.419342 1.200112
+0.995917 0.404568 1.302033
+0.938841 0.467725 1.457452
+0.995785 0.404764 1.097935
+0.931973 0.475356 1.476093
+0.862420 0.548919 0.741314
+0.867000 0.547202 0.747104
+0.741415 0.850837 1.070274
+0.772826 0.772825 0.746029
+0.921015 0.501966 1.475769
+0.798826 0.798825 1.471879
+0.751253 0.826464 1.431994
+0.729107 0.881761 1.200112
+</float_array>
+          <technique_common>
+            <accessor source="#Sphere_Fracture_03-POSITION-array" count="32" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Sphere_Fracture_03-Normal0">
+          <float_array id="Sphere_Fracture_03-Normal0-array" count="288">
+0.719688 -0.694297 -0.000697
+0.719688 -0.694297 -0.000697
+0.719688 -0.694297 -0.000697
+0.719688 -0.694297 -0.000697
+0.719688 -0.694297 -0.000697
+0.719688 -0.694297 -0.000697
+0.225881 -0.870741 0.436792
+0.225881 -0.870741 0.436792
+0.225881 -0.870741 0.436792
+0.225881 -0.870741 0.436792
+0.225881 -0.870741 0.436792
+0.225881 -0.870741 0.436792
+0.715485 -0.698608 -0.005230
+0.715485 -0.698608 -0.005230
+0.715485 -0.698608 -0.005230
+0.715485 -0.698608 -0.005230
+0.715485 -0.698608 -0.005230
+0.715485 -0.698608 -0.005230
+0.224083 -0.870190 0.438813
+0.224083 -0.870190 0.438813
+0.224083 -0.870190 0.438813
+-0.924937 -0.380117 0.001361
+-0.924937 -0.380117 0.001361
+-0.924937 -0.380117 0.001361
+0.224926 -0.871239 -0.436292
+0.224926 -0.871239 -0.436292
+0.224926 -0.871239 -0.436292
+0.224926 -0.871239 -0.436292
+0.224926 -0.871239 -0.436292
+0.224926 -0.871239 -0.436292
+-0.707357 -0.282692 0.647867
+-0.707357 -0.282692 0.647867
+-0.707357 -0.282692 0.647867
+-0.707357 -0.282692 0.647867
+-0.707357 -0.282692 0.647867
+-0.707357 -0.282692 0.647867
+-0.707357 -0.282692 0.647867
+-0.707357 -0.282692 0.647867
+-0.707357 -0.282692 0.647867
+0.377359 0.908102 -0.181525
+0.377359 0.908102 -0.181525
+0.377359 0.908102 -0.181525
+0.377359 0.908102 -0.181525
+0.377359 0.908102 -0.181525
+0.377359 0.908102 -0.181525
+-0.927214 -0.374530 -0.001134
+-0.927214 -0.374530 -0.001134
+-0.927214 -0.374530 -0.001134
+-0.928720 -0.370783 0.000276
+-0.928720 -0.370783 0.000276
+-0.928720 -0.370783 0.000276
+-0.928720 -0.370783 0.000276
+-0.928720 -0.370783 0.000276
+-0.928720 -0.370783 0.000276
+0.376381 0.908663 0.180744
+0.376381 0.908663 0.180744
+0.376381 0.908663 0.180744
+0.376381 0.908663 0.180744
+0.376381 0.908663 0.180744
+0.376381 0.908663 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+0.908663 0.376381 0.180744
+-0.928446 -0.371466 -0.000592
+-0.928446 -0.371466 -0.000592
+-0.928446 -0.371466 -0.000592
+-0.928446 -0.371466 -0.000592
+-0.928446 -0.371466 -0.000592
+-0.928446 -0.371466 -0.000592
+0.786152 0.325633 -0.525289
+0.786152 0.325633 -0.525289
+0.786152 0.325633 -0.525289
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+0.908365 0.376924 -0.181111
+</float_array>
+          <technique_common>
+            <accessor source="#Sphere_Fracture_03-Normal0-array" count="96" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Sphere_Fracture_03-UV0">
+          <float_array id="Sphere_Fracture_03-UV0-array" count="2">
+0.000000 0.000000
+</float_array>
+          <technique_common>
+            <accessor source="#Sphere_Fracture_03-UV0-array" count="1" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Sphere_Fracture_03-UV1">
+          <float_array id="Sphere_Fracture_03-UV1-array" count="2">
+0.000000 0.000000
+</float_array>
+          <technique_common>
+            <accessor source="#Sphere_Fracture_03-UV1-array" count="1" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Sphere_Fracture_03-UV2">
+          <float_array id="Sphere_Fracture_03-UV2-array" count="2">
+0.000000 0.000000
+</float_array>
+          <technique_common>
+            <accessor source="#Sphere_Fracture_03-UV2-array" count="1" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Sphere_Fracture_03-UV3">
+          <float_array id="Sphere_Fracture_03-UV3-array" count="92">
+1.000000 0.504954
+0.928558 0.928558
+0.776131 0.446477
+0.029509 0.000000
+0.516566 0.516566
+0.029509 0.029509
+0.935080 0.551694
+0.089187 0.608239
+1.000000 0.485135
+1.000000 0.485798
+0.485798 0.485798
+1.000000 0.999999
+0.122953 0.551059
+1.000000 0.000000
+0.134343 0.551059
+1.000000 0.816841
+1.000000 1.000000
+0.892455 0.000000
+0.667672 0.558725
+0.000000 0.000000
+0.051720 0.026216
+1.000000 1.000000
+0.123051 0.427996
+0.077522 0.551059
+0.913177 0.913177
+1.000000 1.000000
+0.674924 0.025346
+0.076684 0.572201
+1.000000 0.019070
+1.000000 0.000000
+1.000000 0.516566
+1.000000 0.107545
+0.085098 0.604439
+0.122953 0.427996
+0.131347 0.515788
+0.495046 0.000000
+0.076707 0.523302
+0.128780 0.599159
+0.816841 0.816841
+0.076824 0.527508
+0.122953 0.607432
+0.913177 0.000000
+0.096332 0.427996
+0.097214 0.426197
+0.086149 0.608306
+0.485135 0.485135
+</float_array>
+          <technique_common>
+            <accessor source="#Sphere_Fracture_03-UV3-array" count="46" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Sphere_Fracture_03-VERTEX">
+          <input semantic="POSITION" source="#Sphere_Fracture_03-POSITION"/>
+        </vertices>
+        <triangles count="14" material="Material_002__WoodTiled_png_001"><input semantic="VERTEX" offset="0" source="#Sphere_Fracture_03-VERTEX"/><input semantic="NORMAL" offset="1" source="#Sphere_Fracture_03-Normal0"/><input semantic="TEXCOORD" offset="2" set="0" source="#Sphere_Fracture_03-UV0"/><input semantic="TEXCOORD" offset="3" set="1" source="#Sphere_Fracture_03-UV1"/><input semantic="TEXCOORD" offset="4" set="2" source="#Sphere_Fracture_03-UV2"/><input semantic="TEXCOORD" offset="5" set="3" source="#Sphere_Fracture_03-UV3"/><p> 17 39 0 0 0 12 12 40 0 0 0 34 31 41 0 0 0 14 12 42 0 0 0 34 17 43 0 0 0 12 13 44 0 0 0 22 17 54 0 0 0 12 30 55 0 0 0 37 29 56 0 0 0 40 30 57 0 0 0 37 17 58 0 0 0 12 31 59 0 0 0 14 28 60 0 0 0 7 21 61 0 0 0 32 20 62 0 0 0 27 28 63 0 0 0 7 17 64 0 0 0 12 29 65 0 0 0 40 17 66 0 0 0 12 28 67 0 0 0 7 20 68 0 0 0 27 21 69 0 0 0 32 28 70 0 0 0 7 23 71 0 0 0 44 17 72 0 0 0 12 20 73 0 0 0 27 19 74 0 0 0 23 13 81 0 0 0 33 25 82 0 0 0 42 24 83 0 0 0 43 17 84 0 0 0 12 22 85 0 0 0 36 25 86 0 0 0 42 17 87 0 0 0 12 25 88 0 0 0 42 13 89 0 0 0 33 18 90 0 0 0 39 17 91 0 0 0 12 19 92 0 0 0 23 22 93 0 0 0 36 17 94 0 0 0 12 18 95 0 0 0 39</p></triangles>
+        <triangles count="18" material="Material_004"><input semantic="VERTEX" offset="0" source="#Sphere_Fracture_03-VERTEX"/><input semantic="NORMAL" offset="1" source="#Sphere_Fracture_03-Normal0"/><input semantic="TEXCOORD" offset="2" set="0" source="#Sphere_Fracture_03-UV0"/><input semantic="TEXCOORD" offset="3" set="1" source="#Sphere_Fracture_03-UV1"/><input semantic="TEXCOORD" offset="4" set="2" source="#Sphere_Fracture_03-UV2"/><input semantic="TEXCOORD" offset="5" set="3" source="#Sphere_Fracture_03-UV3"/><p> 3 0 0 0 0 18 1 1 0 0 0 25 2 2 0 0 0 45 1 3 0 0 0 25 3 4 0 0 0 18 0 5 0 0 0 15 5 6 0 0 0 13 0 7 0 0 0 38 4 8 0 0 0 17 0 9 0 0 0 38 5 10 0 0 0 13 1 11 0 0 0 16 6 12 0 0 0 19 7 13 0 0 0 35 2 14 0 0 0 8 2 15 0 0 0 8 1 16 0 0 0 16 6 17 0 0 0 19 8 18 0 0 0 41 5 19 0 0 0 29 4 20 0 0 0 31 5 21 0 0 0 19 6 22 0 0 0 29 1 23 0 0 0 11 6 24 0 0 0 21 10 25 0 0 0 20 7 26 0 0 0 0 10 27 0 0 0 20 6 28 0 0 0 21 9 29 0 0 0 5 14 30 0 0 0 30 11 31 0 0 0 1 15 32 0 0 0 6 11 33 0 0 0 1 5 34 0 0 0 21 8 35 0 0 0 24 11 36 0 0 0 1 14 37 0 0 0 30 5 38 0 0 0 21 9 45 0 0 0 3 6 46 0 0 0 29 5 47 0 0 0 25 5 48 0 0 0 21 16 49 0 0 0 2 26 50 0 0 0 9 16 51 0 0 0 2 5 52 0 0 0 21 14 53 0 0 0 4 9 75 0 0 0 28 5 76 0 0 0 21 26 77 0 0 0 10 9 78 0 0 0 28 26 79 0 0 0 10 27 80 0 0 0 26</p></triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_animations>
+    <animation id="Sphere_Fracture_03-anim" name="Sphere_Fracture_03"><animation><source id="Sphere_Fracture_03-Matrix-animation-input"><float_array id="Sphere_Fracture_03-Matrix-animation-input-array" count="1">
+
+0.033333</float_array><technique_common><accessor source="#Sphere_Fracture_03-Matrix-animation-input-array" count="1"><param name="TIME" type="float"/></accessor></technique_common></source><source id="Sphere_Fracture_03-Matrix-animation-output-transform"><float_array id="Sphere_Fracture_03-Matrix-animation-output-transform-array" count="16">
+
+1.000000 0.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000 0.000000 1.000000</float_array><technique_common><accessor source="#Sphere_Fracture_03-Matrix-animation-output-transform-array" count="1" stride="16"><param type="float4x4"/></accessor></technique_common></source><source id="Sphere_Fracture_03-Interpolations"><Name_array id="Sphere_Fracture_03-Interpolations-array" count="1">
+ LINEAR</Name_array><technique_common><accessor source="#Sphere_Fracture_03-Interpolations-array" count="1"><param type="name"/></accessor></technique_common></source><sampler id="Sphere_Fracture_03-Matrix-animation-transform"><input semantic="INPUT" source="#Sphere_Fracture_03-Matrix-animation-input"/><input semantic="OUTPUT" source="#Sphere_Fracture_03-Matrix-animation-output-transform"/><input semantic="INTERPOLATION" source="#Sphere_Fracture_03-Interpolations"/></sampler><channel source="#Sphere_Fracture_03-Matrix-animation-transform" target="Sphere_Fracture_03/matrix"/></animation></animation>
+  </library_animations>
+  <library_visual_scenes>
+    <visual_scene id="Sphere_Fracture_03" name="Sphere_Fracture_03">
+      <node name="Sphere_Fracture_03" id="Sphere_Fracture_03" sid="Sphere_Fracture_03"><matrix sid="matrix">1.000000 0.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000 0.000000 1.000000</matrix><instance_geometry url="#Sphere_Fracture_03-lib"><bind_material><technique_common><instance_material symbol="Material_002__WoodTiled_png_001" target="#Material_002__WoodTiled_png_001"/><instance_material symbol="Material_004" target="#Material_004"/></technique_common></bind_material></instance_geometry><extra><technique profile="FCOLLADA"><visibility>1.000000</visibility></technique></extra></node>
+      <extra><technique profile="MAX3D"><frame_rate>30.000000</frame_rate></technique><technique profile="FCOLLADA"><start_time>0.000000</start_time><end_time>3.333333</end_time></technique></extra>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Sphere_Fracture_03"></instance_visual_scene>
+  </scene>
+</COLLADA>
