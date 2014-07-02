@@ -33,7 +33,7 @@ Config = {
 			},
 			stone = {
 				mass = 1370.0,
-				friction = 30.0,
+				friction = 20.0,
 				angularDamping = 0.3,
 				linearDamping = 0.0,
 				restitution = 0.0,
@@ -89,8 +89,8 @@ Config = {
 	fans = {
 		forces = {
 			woodonly = Vec3(0.0,0.0,3123.0),
-			stoneonly =  Vec3(4123.0,0.0,0.0),
-			paperonly = Vec3(0.0,0.0,513.0)
+			stoneonly =  Vec3(5000.0,0.0,0.0),
+			paperonly = Vec3(0.0,0.0,650.0)
 		},
 		
 		fan1 = {
