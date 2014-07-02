@@ -21,6 +21,21 @@ function math.Clamp(val, lower, upper)
     return math.max(lower, math.min(upper, val))
 end
 
+function createPhantomCallbackTriggerBox(guid, halfExtends, position)
+	local trigger = CreateEmptyGameObject( guid )
+	trigger.pc = trigger.go:createPhysicsComponent()
+	local cinfo = RigidBodyCInfo()
+	local boundingShape = PhysicsFactory:createBox(halfExtends)
+	local phantomCallbackShape = PhysicsFactory:createPhantomCallbackShape(halfExtends)
+	cinfo.shape = PhysicsFactory:createBoundingVolumeShape(boundingShape, phantomCallbackShape)
+	cinfo.motionType = MotionType.Fixed
+	cinfo.position = position
+	trigger.pc.rb = trigger.pc:createRigidBody(cinfo)
+	trigger.phantomCallback = phantomCallbackShape
+
+	return trigger
+end
+
 function CreateEmptyGameObject( name )
 	local go = GameObjectManager:getGameObject(name)
 	if IsNull(go) then

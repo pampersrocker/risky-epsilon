@@ -158,11 +158,14 @@ function InitializeWorld(  )
 	-- create transformators
 	local transformator = Config.transformators.transformator1
 	GameLogic.transformator1 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
+	GameLogic.transformator1.au = GameLogic.transformator1.go:createAudioComponent()
+	GameLogic.transformator1.sound = GameLogic.transformator1.au:createSoundInstance("transformator1", "/Cancel")
 	GameLogic.transformator1.phantomCallback:getEnterEvent():registerListener(function(arg)		
 		local go = GetGObyGUID(transformator.transformTo)
 		if not(GameLogic.isoCam.trackingObject == go) then
 			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
 			ChangePlayer(go)
+			GameLogic.transformator1.sound:play()
 		end
 		return EventResult.Handled
 	end)
@@ -172,11 +175,14 @@ function InitializeWorld(  )
 	
 	local transformator = Config.transformators.transformator2
 	GameLogic.transformator2 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
+	GameLogic.transformator2.au = GameLogic.transformator2.go:createAudioComponent()
+	GameLogic.transformator2.sound = GameLogic.transformator2.au:createSoundInstance("transformator2", "/Cancel")
 	GameLogic.transformator2.phantomCallback:getEnterEvent():registerListener(function(arg)		
 		local go = GetGObyGUID(transformator.transformTo)
 		if not(GameLogic.isoCam.trackingObject == go) then
 			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
 			ChangePlayer(go)
+			GameLogic.transformator2.sound:play()
 		end
 		return EventResult.Handled
 	end)
@@ -186,11 +192,14 @@ function InitializeWorld(  )
 	
 	local transformator = Config.transformators.transformator3
 	GameLogic.transformator3 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
+	GameLogic.transformator3.au = GameLogic.transformator3.go:createAudioComponent()
+	GameLogic.transformator3.sound = GameLogic.transformator3.au:createSoundInstance("transformator3", "/Cancel")
 	GameLogic.transformator3.phantomCallback:getEnterEvent():registerListener(function(arg)		
 		local go = GetGObyGUID(transformator.transformTo)
 		if not(GameLogic.isoCam.trackingObject == go) then
 			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
 			ChangePlayer(go)
+			GameLogic.transformator3.sound:play()
 		end
 		return EventResult.Handled
 	end)
@@ -200,11 +209,14 @@ function InitializeWorld(  )
 	
 	local transformator = Config.transformators.transformator4
 	GameLogic.transformator4 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
+	GameLogic.transformator4.au = GameLogic.transformator4.go:createAudioComponent()
+	GameLogic.transformator4.sound = GameLogic.transformator4.au:createSoundInstance("transformator4", "/Cancel")
 	GameLogic.transformator4.phantomCallback:getEnterEvent():registerListener(function(arg)		
 		local go = GetGObyGUID(transformator.transformTo)
 		if not(GameLogic.isoCam.trackingObject == go) then
 			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
 			ChangePlayer(go)
+			GameLogic.transformator4.sound:play()
 		end
 		return EventResult.Handled
 	end)
