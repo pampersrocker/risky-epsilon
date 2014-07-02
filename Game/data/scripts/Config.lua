@@ -17,7 +17,6 @@ Config = {
 		maxAngularVelocity = 100.0,
 		spawnPosition = Vec3(0.0, 0.0, 3.0),
 		torqueMulScalar = 2000,
-		linearVelocityScalar = 100,
 		lastTransformator = Vec3(0.0,0.0,3.0)
 	},
 
@@ -69,7 +68,7 @@ Config = {
 			left = Key.A,
 			right = Key.D,
 			pause = Key.P,
-			restart = Key.O,
+			restart = Key.F3,
 			zoomout = Key.Oem_Minus,
 			zoomin = Key.Oem_Plus,
 			lastTransformator = Key.Back
