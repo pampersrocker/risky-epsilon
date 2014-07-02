@@ -197,8 +197,8 @@ void gpp::Game::update(float elapsedTime)
     auto activeCamObj = g_gameObjectManager.getCurrentCameraObject()->getComponent<CameraComponent>();
     if(activeCamObj)
     {
-        g_globalManager.getSoundSystem()->setListenerPosition(activeCamObj->getWorldPosition());
-        g_globalManager.getSoundSystem()->setListenerOrientation(activeCamObj->getWorldRotation());
+     //   g_globalManager.getSoundSystem()->setListenerPosition(activeCamObj->getWorldPosition());
+     //   g_globalManager.getSoundSystem()->setListenerOrientation(activeCamObj->getWorldRotation());
     }
 }
 
