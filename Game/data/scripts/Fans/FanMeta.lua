@@ -16,7 +16,7 @@ function FanMeta:initializeGameObjectFan1( name, size, pos, active, force)
 		
 		return EventResult.Handled
 	end)
-	--self.sound:play()
+	
 	
 	logMessage("FanMeta:init() end")
 end
@@ -72,6 +72,12 @@ function FanMeta.update( guid, elapsedTime )
 		player.go.angularVelocitySwapped = false
 	end]]
 end
+
+function FanMeta:Activate()
+	self.isActive = true
+	--self.sound:play()
+end
+
 function FanMeta:createPhantomCallbackTriggerBox(guid, halfExtends, position)
 	local trigger = GetGObyGUID( guid )
 	trigger.go.pc = trigger.go:createPhysicsComponent()

@@ -47,10 +47,10 @@ function InitializeWorld(  )
 
 	
 	-- sound banks
-	--SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank")
-	--SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
+	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank")
+	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
 	--SoundSystem:loadLibrary(".\\data\\sound\\trigger.bank")
-	--SoundSystem:loadLibrary(".\\data\\sound\\fan.bank")
+	SoundSystem:loadLibrary(".\\data\\sound\\fan.bank")
 
 
 	--create Level Tracks
@@ -83,9 +83,10 @@ function InitializeWorld(  )
 	GameLogic.fan1 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan1, FanMeta)
 	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	--GameLogic.fan1.go.au = GameLogic.fan1.go:createAudioComponent()
-	--GameLogic.fan1.go.sound = GameLogic.fan1.go.au:createSoundInstance("fan", "/fan/fan")
+	GameLogic.fan1.go.au = GameLogic.fan1.go:createAudioComponent()
+	GameLogic.fan1.sound = GameLogic.fan1.go.au:createSoundInstance("fan", "/fan/fan")
 	GameLogic.fan1:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.stoneonly)
+	GameLogic.fan1.sound:play()
 
 	
 	
@@ -162,16 +163,30 @@ function InitializeWorld(  )
 	end)
 	
 	--create Triggers
-	local gotrigger = CreateEmptyGameObject("trigger for fan2")
-	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for fan2", Vec3(2.0,2.0,2.0), Vec3(-20.0,10.0,0.0))
+	local trigger = Config.triggers.trigger1
+	local gotrigger = CreateEmptyGameObject(trigger.name)
+	trigger = FanMeta:createPhantomCallbackTriggerBox(trigger.name, Config.triggers.triggersize, trigger.position)
 	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
 		local go = GetGObyGUID("playerInstanceStone")
 		if (GameLogic.isoCam.trackingObject == go) then
-			GameLogic.fan2.isActive = true			
+			GameLogic.fan2:Activate()	
 		end
 		
 		return EventResult.Handled
 	end)
+	local trigger = Config.triggers.trigger2
+	local gotrigger = CreateEmptyGameObject(trigger.name)
+	trigger = FanMeta:createPhantomCallbackTriggerBox(trigger.name, Config.triggers.triggersize, trigger.position)
+	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
+		local go = GetGObyGUID("playerInstanceStone")
+		if (GameLogic.isoCam.trackingObject == go) then
+			GameLogic.fan3:Activate() 	
+		end
+		
+		return EventResult.Handled
+	end)
+
+	
 	
 	--create EndTrigger
 	local trigger = Config.triggers.endtrigger
