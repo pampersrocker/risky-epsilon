@@ -185,13 +185,13 @@ void gpp::Game::update(float elapsedTime)
         pRenderer->setVSyncEnabled(!pRenderer->getVSyncEnabled());
 
     auto& debugRenderer = pRenderer->getDebugRenderer();
-    debugRenderer.printText(vec3(0.0f), "Origin");
+    //debugRenderer.printText(vec3(0.0f), "Origin");
 
-    // Draw world axes
-    debugRenderer.drawLocalAxes(vec3(0.0f), 30.0f);
-    debugRenderer.printText(vec3(30.0f, 0.0f,  0.0f ), "X", Color::red());
-    debugRenderer.printText(vec3(0.0f,  30.0f, 0.0f ), "Y", Color::green());
-    debugRenderer.printText(vec3(0.0f,  0.0f,  30.0f), "Z", Color::blue());
+    //// Draw world axes
+    //debugRenderer.drawLocalAxes(vec3(0.0f), 30.0f);
+    //debugRenderer.printText(vec3(30.0f, 0.0f,  0.0f ), "X", Color::red());
+    //debugRenderer.printText(vec3(0.0f,  30.0f, 0.0f ), "Y", Color::green());
+    //debugRenderer.printText(vec3(0.0f,  0.0f,  30.0f), "Z", Color::blue());
     
     g_gameObjectManager.update(elapsedTime);
     auto activeCamObj = g_gameObjectManager.getCurrentCameraObject()->getComponent<CameraComponent>();
