@@ -28,53 +28,14 @@ function FanMeta.update( guid, elapsedTime )
 	if fan.isActive and fan.isTriggered then
 		GameLogic.isoCam.trackingObject.go.rb:applyForce(elapsedTime, fan.force)
 	end
-	
-	
-	--[[local player = GetGObyGUID(guid)
-	
-	DebugRenderer:printText(Vec2(-0.9, 0.65), "Velocity:" .. player.go.rb:getLinearVelocity():length())
-	local viewDir = GameLogic.isoCam.go.cc:getViewDirection()
-	viewDir.z = 0
-	viewDir = viewDir:normalized()
-	local rightDir = viewDir:cross(Vec3(0.0, 0.0, 1.0))
-	local mouseDelta = InputHandler:getMouseDelta()
-
-	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
-		FanMeta.restart()
-	end
-	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
-	if InputHandler:gamepad(0):isConnected() then
-		if(bit32.btest(buttonsTriggered, Config.keys.gamepad.restart) ) then
-			FanMeta.restart()
-		end
-		local leftTorque = viewDir:mulScalar(Config.player.torqueMulScalar):mulScalar(InputHandler:gamepad(0):leftStick().x)
-		local rightTorque = rightDir:mulScalar(Config.player.torqueMulScalar):mulScalar(-InputHandler:gamepad(0):leftStick().y)
-		player.go.rb:applyTorque(elapsedTime, leftTorque + rightTorque)
-	end
-	if (InputHandler:isPressed(Config.keys.keyboard.left)) then
-		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
-		logMessage("PlayerUpdate")
-		player.go.angularVelocitySwapped = false
-		player.go.rb:applyTorque(elapsedTime, -viewDir:mulScalar(Config.player.torqueMulScalar))
-	elseif (InputHandler:isPressed(Config.keys.keyboard.right)) then
-		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
-		player.go.angularVelocitySwapped = false
-		player.go.rb:applyTorque(elapsedTime,viewDir:mulScalar(Config.player.torqueMulScalar))
-	elseif (InputHandler:isPressed(Config.keys.keyboard.forward)) then
-		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
-		player.go.angularVelocitySwapped = false
-		player.go.rb:applyTorque(elapsedTime,-rightDir:mulScalar(Config.player.torqueMulScalar))
-	elseif (InputHandler:isPressed(Config.keys.keyboard.backward)) then
-		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
-		player.go.angularVelocitySwapped = false
-		player.go.rb:applyTorque(elapsedTime,rightDir:mulScalar(Config.player.torqueMulScalar))
-	else
-		player.go.angularVelocitySwapped = false
-	end]]
 end
 
 function FanMeta:Activate()
 	self.isActive = true
+
+	for _, blade in ipairs(self.blades) do
+		blade:Activate()
+	end
 	self.sound:play()
 end
 

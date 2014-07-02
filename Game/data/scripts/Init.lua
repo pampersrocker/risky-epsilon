@@ -75,7 +75,51 @@ function InitializeWorld(  )
 	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
 	GameLogic.level:initializeTrack_wood()
 
-	
+	--create Fanblades
+	FanBladesMeta.__index = FanBladesMeta
+
+	logMessage("Creating FanBlade")
+	local fanblade = Config.fanblades.fanblade1
+	GameLogic.fanblade1 = CreateEmptyGameObject(fanblade.name)
+	setmetatable(GameLogic.fanblade1, FanBladesMeta)
+	CreateScriptComponent(GameLogic.fanblade1, FanBladesMeta.init, FanBladesMeta.update, FanBladesMeta.destroy)
+	GameLogic.fanblade1:initializeGameObjectFanBlade(fanblade.name, fanblade.position, fanblade.active, fanblade.rotationaxis, fanblade.baserotation)
+
+	logMessage("Creating FanBlade")
+	local fanblade = Config.fanblades.fanblade2
+	GameLogic.fanblade2 = CreateEmptyGameObject(fanblade.name)
+	setmetatable(GameLogic.fanblade2, FanBladesMeta)
+	CreateScriptComponent(GameLogic.fanblade2, FanBladesMeta.init, FanBladesMeta.update, FanBladesMeta.destroy)
+	GameLogic.fanblade2:initializeGameObjectFanBlade(fanblade.name, fanblade.position, fanblade.active, fanblade.rotationaxis, fanblade.baserotation)
+
+	logMessage("Creating FanBlade")
+	local fanblade = Config.fanblades.fanblade3
+	GameLogic.fanblade3 = CreateEmptyGameObject(fanblade.name)
+	setmetatable(GameLogic.fanblade3, FanBladesMeta)
+	CreateScriptComponent(GameLogic.fanblade3, FanBladesMeta.init, FanBladesMeta.update, FanBladesMeta.destroy)
+	GameLogic.fanblade3:initializeGameObjectFanBlade(fanblade.name, fanblade.position, fanblade.active, fanblade.rotationaxis, fanblade.baserotation)
+
+	logMessage("Creating FanBlade")
+	local fanblade = Config.fanblades.fanblade4
+	GameLogic.fanblade4 = CreateEmptyGameObject(fanblade.name)
+	setmetatable(GameLogic.fanblade4, FanBladesMeta)
+	CreateScriptComponent(GameLogic.fanblade4, FanBladesMeta.init, FanBladesMeta.update, FanBladesMeta.destroy)
+	GameLogic.fanblade4:initializeGameObjectFanBlade(fanblade.name, fanblade.position, fanblade.active, fanblade.rotationaxis, fanblade.baserotation)
+
+	logMessage("Creating FanBlade")
+	local fanblade = Config.fanblades.fanblade5
+	GameLogic.fanblade5 = CreateEmptyGameObject(fanblade.name)
+	setmetatable(GameLogic.fanblade5, FanBladesMeta)
+	CreateScriptComponent(GameLogic.fanblade5, FanBladesMeta.init, FanBladesMeta.update, FanBladesMeta.destroy)
+	GameLogic.fanblade5:initializeGameObjectFanBlade(fanblade.name, fanblade.position, fanblade.active, fanblade.rotationaxis, fanblade.baserotation)
+
+	logMessage("Creating FanBlade")
+	local fanblade = Config.fanblades.fanblade6
+	GameLogic.fanblade6 = CreateEmptyGameObject(fanblade.name)
+	setmetatable(GameLogic.fanblade6, FanBladesMeta)
+	CreateScriptComponent(GameLogic.fanblade6, FanBladesMeta.init, FanBladesMeta.update, FanBladesMeta.destroy)
+	GameLogic.fanblade6:initializeGameObjectFanBlade(fanblade.name, fanblade.position, fanblade.active, fanblade.rotationaxis, fanblade.baserotation)
+
 	--create Fans
 	FanMeta.__index = FanMeta
 	
@@ -86,17 +130,17 @@ function InitializeWorld(  )
 	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan1.go.au = GameLogic.fan1.go:createAudioComponent()
 	GameLogic.fan1.sound = GameLogic.fan1.go.au:createSoundInstance("fan", "/fan/fan")
+	GameLogic.fan1.blades = {GameLogic.fanblade1}
 	GameLogic.fan1:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.stoneonly)
 	GameLogic.fan1.sound:play()
 
-	
-	
 	logMessage("Creating Fan")
 	local fan = Config.fans.fan2
 	GameLogic.fan2 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan2, FanMeta)
 	GameLogic.fan2.go.au = GameLogic.fan2.go:createAudioComponent()
 	GameLogic.fan2.sound = GameLogic.fan2.go.au:createSoundInstance("fan", "/fan/fan")
+	GameLogic.fan2.blades = {GameLogic.fanblade2}
 	CreateScriptComponent(GameLogic.fan2, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan2:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.paperonly)
 	
@@ -106,6 +150,7 @@ function InitializeWorld(  )
 	setmetatable(GameLogic.fan3, FanMeta)
 	GameLogic.fan3.go.au = GameLogic.fan3.go:createAudioComponent()
 	GameLogic.fan3.sound = GameLogic.fan3.go.au:createSoundInstance("fan", "/fan/fan")
+	GameLogic.fan3.blades = {GameLogic.fanblade3, GameLogic.fanblade4, GameLogic.fanblade5, GameLogic.fanblade6}
 	CreateScriptComponent(GameLogic.fan3, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan3:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.woodonly)
 
