@@ -23,21 +23,6 @@ function LevelMeta:initializeTrack_wood()
 	CreateRenderComponent(self, "data/models/LevelElements/roundtrack_wood.thModel")
 end
 
-function createPhantomCallbackTriggerBox(guid, halfExtends, position)
-	local trigger = GameObjectManager:createGameObject(guid)
-	trigger.pc = trigger:createPhysicsComponent()
-	local cinfo = RigidBodyCInfo()
-	local boundingShape = PhysicsFactory:createBox(halfExtends)
-	local phantomCallbackShape = PhysicsFactory:createPhantomCallbackShape(halfExtends)
-	cinfo.shape = PhysicsFactory:createBoundingVolumeShape(boundingShape, phantomCallbackShape)
-	cinfo.motionType = MotionType.Fixed
-	cinfo.position = position
-	trigger.pc.rb = trigger.pc:createRigidBody(cinfo)
-	trigger.phantomCallback = phantomCallbackShape
-
-	return trigger
-end
-
 function LevelMeta.update( guid, elapsedTime )
 end
 
