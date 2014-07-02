@@ -52,11 +52,24 @@ function GameLogic.updateRunning( updateData )
 	
 	-- show help screen
 	if (GameLogic.showHelp == true) then
-		DebugRenderer:printText(Vec2(0.0, 0.5), "Switches could only be triggered with a stone sphere.")
-		DebugRenderer:printText(Vec2(0.0, 0.45), "Some fans need to be turned on.")
-		DebugRenderer:printText(Vec2(0.0, 0.4), "Backspace - Start at last transformator.")
-		DebugRenderer:printText(Vec2(0.0, 0.3), "F2 - Debug drawings.")
-		DebugRenderer:printText(Vec2(0.0, 0.35), "F3 - Restart level.")
+		DebugRenderer:printText(Vec2(-0.2, 0.55), "Game Mechanics.")
+		DebugRenderer:printText(Vec2(0.0, 0.55), "Switches could only be triggered with a stone sphere.")
+		DebugRenderer:printText(Vec2(0.0, 0.5), "Some fans need to be turned on.")
+
+		DebugRenderer:printText(Vec2(-0.2, 0.4), "Keyboard Usage:")
+		DebugRenderer:printText(Vec2(0.0, 0.4), KeyCodes[Config.keys.keyboard.pause] .." - Pause the game")
+		DebugRenderer:printText(Vec2(0.0, 0.35), KeyCodes[Config.keys.keyboard.lastTransformator] .." - Start at last transformator")
+		DebugRenderer:printText(Vec2(0.0, 0.3), KeyCodes[Config.keys.keyboard.restart] .." - Restart level")
+		DebugRenderer:printText(Vec2(0.0, 0.25), "F2 - Debug drawings")
+
+		DebugRenderer:printText(Vec2(-0.2, 0.15), "Gamepad Usage:")
+		DebugRenderer:printText(Vec2(0.0, 0.15), KeyCodes[Config.keys.gamepad.pause] .." - Pause the game")
+		DebugRenderer:printText(Vec2(0.0, 0.1), KeyCodes[Config.keys.gamepad.lastTransformator] .." - Start at last transformator")
+		DebugRenderer:printText(Vec2(0.0, 0.05), KeyCodes[Config.keys.gamepad.restart] .." - Restart level")
+		DebugRenderer:printText(Vec2(0.0, 0.0), "F2 - Debug drawings")
+
+
+
 	end
 	
 	return EventResult.Handled;
