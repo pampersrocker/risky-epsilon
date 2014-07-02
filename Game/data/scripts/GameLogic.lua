@@ -62,10 +62,13 @@ function GameLogic.updateRunning( updateData )
 		DebugRenderer:printText(Vec2(0.0, 0.3), KeyCodes[Config.keys.keyboard.restart] .." - Restart level")
 		DebugRenderer:printText(Vec2(0.0, 0.25), "F2 - Debug drawings")
 
-		DebugRenderer:printText(Vec2(-0.2, 0.15), "Gamepad Usage:")
-		DebugRenderer:printText(Vec2(0.0, 0.15), KeyCodes[Config.keys.gamepad.pause] .." - Pause the game")
-		DebugRenderer:printText(Vec2(0.0, 0.1), KeyCodes[Config.keys.gamepad.lastTransformator] .." - Start at last transformator")
-		DebugRenderer:printText(Vec2(0.0, 0.05), KeyCodes[Config.keys.gamepad.restart] .." - Restart level")
+		if InputHandler:gamepad(0):isConnected() then
+			DebugRenderer:printText(Vec2(-0.2, 0.15), "Gamepad Usage:")
+			DebugRenderer:printText(Vec2(0.0, 0.15), KeyCodes[Config.keys.gamepad.pause] .." - Pause the game")
+			DebugRenderer:printText(Vec2(0.0, 0.1), KeyCodes[Config.keys.gamepad.lastTransformator] .." - Start at last transformator")
+			DebugRenderer:printText(Vec2(0.0, 0.05), KeyCodes[Config.keys.gamepad.restart] .." - Restart level")
+		end
+
 
 
 
