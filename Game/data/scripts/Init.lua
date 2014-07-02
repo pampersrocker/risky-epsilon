@@ -45,7 +45,11 @@ function InitializeWorld(  )
 	GameLogic.isoCam.isEnabled = true
 
 	
-
+	-- sound banks
+	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank")
+	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
+	SoundSystem:loadLibrary(".\\data\\sound\\trigger.bank")
+	SoundSystem:loadLibrary(".\\data\\sound\\fan.bank")
 
 
 	--create Level Tracks
@@ -97,7 +101,11 @@ function InitializeWorld(  )
 	GameLogic.fan1 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan1, FanMeta)
 	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
+	--GameLogic.fan1.go.au = GameLogic.fan1.go:createAudioComponent()
+	--GameLogic.fan1.go.sound = GameLogic.fan1.go.au:createSoundInstance("fan", "/fan/fan")
 	GameLogic.fan1:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.stoneonly)
+
+	
 	
 	logMessage("Creating Fan")
 	local fan = Config.fans.fan2

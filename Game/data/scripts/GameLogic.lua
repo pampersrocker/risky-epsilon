@@ -81,6 +81,7 @@ function GameLogic.restart()
 	GameLogic.totalElapsedTime = 0
 	GameLogic.isoCam.trackingObject.lastTransformator = Config.player.lastTransformator
 	GameLogic.finished = false
+	GameLogic.deathCount = 0
 	local go = GetGObyGUID("playerInstance")
 	if not(GameLogic.isoCam.trackingObject == go) then
 		ChangePlayer(go)
@@ -89,6 +90,7 @@ function GameLogic.restart()
 end
 
 function GameLogic.lastTransformator()
+	GameLogic.deathCount = GameLogic.deathCount + 1
 	GameLogic.isoCam.trackingObject.go:setPosition(GameLogic.isoCam.trackingObject.lastTransformator)
 	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
 	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
@@ -261,6 +263,9 @@ function GameLogic.updateEnd( updateData )
 	if(InputHandler:wasTriggered(Key.Z)) then
 		GameLogic.Name = GameLogic.Name .. "Z"
 	end
+	if(InputHandler:wasTriggered(Key.Back)) then
+		GameLogic.Name = string.sub(GameLogic.Name, 1, -2)
+	end
 	if(InputHandler:wasTriggered(Key.Return)) then
 		if (GameLogic.notSaved == true) then
 			SaveHighscore()
@@ -292,8 +297,14 @@ end
 function SaveHighscore()
 	local f,err = io.open("highscores.txt","a")
 	if not f then return print(err) end
-	f:write(GameLogic.Name .. " : " .. GameLogic.totalElapsedTime)
+	f:write(GameLogic.Name .. " :")
 	f:write("\n")
+	f:write("Time: "..GameLogic.totalElapsedTime)
+	f:write("\n")
+	f:write("Death count: "..GameLogic.deathCount)
+	f:write("\n")	
+	f:write("---------------------------------------------------")
+	f:write("\n")	
 	f:close()
 	GameLogic.notSaved = false
 end

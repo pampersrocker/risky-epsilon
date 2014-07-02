@@ -16,7 +16,7 @@ function FanMeta:initializeGameObjectFan1( name, size, pos, active, force)
 		
 		return EventResult.Handled
 	end)
-	
+	--self.sound:play()
 	
 	logMessage("FanMeta:init() end")
 end

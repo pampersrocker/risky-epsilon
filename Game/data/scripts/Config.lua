@@ -71,7 +71,7 @@ Config = {
 			restart = Key.F3,
 			zoomout = Key.Oem_Minus,
 			zoomin = Key.Oem_Plus,
-			lastTransformator = Key.Back
+			lastTransformator = Key.F4
 		},
 		gamepad = {
 			restart = Button.Back,
