@@ -46,10 +46,10 @@ function InitializeWorld(  )
 
 	
 	-- sound banks
-	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank")
-	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
-	SoundSystem:loadLibrary(".\\data\\sound\\trigger.bank")
-	SoundSystem:loadLibrary(".\\data\\sound\\fan.bank")
+	--SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank")
+	--SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
+	--SoundSystem:loadLibrary(".\\data\\sound\\trigger.bank")
+	--SoundSystem:loadLibrary(".\\data\\sound\\fan.bank")
 
 
 	--create Level Tracks
