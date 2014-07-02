@@ -51,6 +51,7 @@ function InitializeWorld(  )
 	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
 	--SoundSystem:loadLibrary(".\\data\\sound\\trigger.bank")
 	SoundSystem:loadLibrary(".\\data\\sound\\fan.bank")
+	
 
 
 	--create Level Tracks
@@ -94,6 +95,8 @@ function InitializeWorld(  )
 	local fan = Config.fans.fan2
 	GameLogic.fan2 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan2, FanMeta)
+	GameLogic.fan2.go.au = GameLogic.fan2.go:createAudioComponent()
+	GameLogic.fan2.sound = GameLogic.fan2.go.au:createSoundInstance("fan", "/fan/fan")
 	CreateScriptComponent(GameLogic.fan2, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan2:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.paperonly)
 	
@@ -101,6 +104,8 @@ function InitializeWorld(  )
 	local fan = Config.fans.fan3
 	GameLogic.fan3 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan3, FanMeta)
+	GameLogic.fan3.go.au = GameLogic.fan3.go:createAudioComponent()
+	GameLogic.fan3.sound = GameLogic.fan3.go.au:createSoundInstance("fan", "/fan/fan")
 	CreateScriptComponent(GameLogic.fan3, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan3:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.woodonly)
 
@@ -170,6 +175,7 @@ function InitializeWorld(  )
 		local go = GetGObyGUID("playerInstanceStone")
 		if (GameLogic.isoCam.trackingObject == go) then
 			GameLogic.fan2:Activate()	
+			GameLogic.fan2.sound:play()
 		end
 		
 		return EventResult.Handled
@@ -181,6 +187,7 @@ function InitializeWorld(  )
 		local go = GetGObyGUID("playerInstanceStone")
 		if (GameLogic.isoCam.trackingObject == go) then
 			GameLogic.fan3:Activate() 	
+			GameLogic.fan3.sound:play()
 		end
 		
 		return EventResult.Handled

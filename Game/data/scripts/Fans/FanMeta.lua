@@ -75,7 +75,7 @@ end
 
 function FanMeta:Activate()
 	self.isActive = true
-	--self.sound:play()
+	self.sound:play()
 end
 
 function FanMeta:createPhantomCallbackTriggerBox(guid, halfExtends, position)

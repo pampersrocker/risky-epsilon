@@ -17,6 +17,11 @@ end
 -- Running State
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
+	--GameLogic.isoCam.trackingObject.go:getWorldPosition()
+	--GameLogic.isoCam.go.cc:getWorldRotation()
+	SoundSystem:setListenerPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
+	SoundSystem:setListenerOrientation(GameLogic.isoCam.go.cc:getWorldRotation())
+	
 	DebugRenderer:printText(Vec2(0.8, 0.9), "F1 - help")
 	if (GameLogic.debugDrawings == true)then
 		DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
@@ -101,6 +106,10 @@ function GameLogic.restart()
 	if not(GameLogic.isoCam.trackingObject == go) then
 		ChangePlayer(go)
 	end
+	GameLogic.fan2.isActive = false
+	GameLogic.fan2.sound:stop()
+	GameLogic.fan3.isActive = false
+	GameLogic.fan3.sound:stop()
 	ResetCamera()
 end
 
