@@ -10,6 +10,7 @@ function InitializeWorld(  )
 
 	PlayerMeta.__index = PlayerMeta
 	GameLogic.totalElapsedTime = 0
+	GameLogic.deathCount = 0
 	GameLogic.finished = false
 	GameLogic.debugDrawings = false
 	GameLogic.showHelp = false
