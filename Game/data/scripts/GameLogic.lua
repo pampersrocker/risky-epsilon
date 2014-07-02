@@ -23,10 +23,7 @@ function GameLogic.updateRunning( updateData )
 	end
 	IsoCamera.update( updateData:getElapsedTime() )
 	GameLogic.totalElapsedTime = GameLogic.totalElapsedTime + updateData:getElapsedTime()
-	if (GameLogic.debugDrawings == true)then
-		DebugRenderer:printText(Vec2(-0.9, 0.1), "totalElapsedTime: "..GameLogic.totalElapsedTime)
-	end
-	
+	DebugRenderer:printText(Vec2(-0.2, 0.9), "totalElapsedTime: "..GameLogic.totalElapsedTime)	
 	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
 	if (InputHandler:isPressed(Key._1) or bit32.btest(buttonsTriggered, Button.X)) then
 		local go = GetGObyGUID("playerInstance")
@@ -58,8 +55,8 @@ function GameLogic.updateRunning( updateData )
 		DebugRenderer:printText(Vec2(0.0, 0.5), "Switches could only be triggered with a stone sphere.")
 		DebugRenderer:printText(Vec2(0.0, 0.45), "Some fans need to be turned on.")
 		DebugRenderer:printText(Vec2(0.0, 0.4), "Backspace - Start at last transformator.")
-		DebugRenderer:printText(Vec2(0.0, 0.35), "R - Restart level.")
 		DebugRenderer:printText(Vec2(0.0, 0.3), "F2 - Debug drawings.")
+		DebugRenderer:printText(Vec2(0.0, 0.35), "F3 - Restart level.")
 	end
 	
 	return EventResult.Handled;
@@ -175,6 +172,7 @@ function GameLogic.updateEnd( updateData )
 		end
 	end
 	DebugRenderer:_printText2D(Vec2(0.0, 0.6), "Your time: "..GameLogic.totalElapsedTime,Color(1, 1, 1, 1.0))
+	DebugRenderer:_printText2D(Vec2(0.0, 0.7), "Input your name: "..GameLogic.Name ,Color(1, 1, 1, 1.0))
 	
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
 		GameLogic.restart()
@@ -185,6 +183,90 @@ function GameLogic.updateEnd( updateData )
 			GameLogic.restart()
 		end
 	end
+	if(InputHandler:wasTriggered(Key.A)) then
+		GameLogic.Name = GameLogic.Name .. "A"
+	end
+	if(InputHandler:wasTriggered(Key.B)) then
+		GameLogic.Name = GameLogic.Name .. "B"
+	end
+	if(InputHandler:wasTriggered(Key.C)) then
+		GameLogic.Name = GameLogic.Name .. "C"
+	end
+	if(InputHandler:wasTriggered(Key.D)) then
+		GameLogic.Name = GameLogic.Name .. "D"
+	end
+	if(InputHandler:wasTriggered(Key.E)) then
+		GameLogic.Name = GameLogic.Name .. "E"
+	end
+	if(InputHandler:wasTriggered(Key.F)) then
+		GameLogic.Name = GameLogic.Name .. "F"
+	end
+	if(InputHandler:wasTriggered(Key.G)) then
+		GameLogic.Name = GameLogic.Name .. "G"
+	end
+	if(InputHandler:wasTriggered(Key.H)) then
+		GameLogic.Name = GameLogic.Name .. "H"
+	end
+	if(InputHandler:wasTriggered(Key.I)) then
+		GameLogic.Name = GameLogic.Name .. "I"
+	end
+	if(InputHandler:wasTriggered(Key.J)) then
+		GameLogic.Name = GameLogic.Name .. "J"
+	end
+	if(InputHandler:wasTriggered(Key.K)) then
+		GameLogic.Name = GameLogic.Name .. "K"
+	end
+	if(InputHandler:wasTriggered(Key.L)) then
+		GameLogic.Name = GameLogic.Name .. "L"
+	end
+	if(InputHandler:wasTriggered(Key.M)) then
+		GameLogic.Name = GameLogic.Name .. "M"
+	end
+	if(InputHandler:wasTriggered(Key.N)) then
+		GameLogic.Name = GameLogic.Name .. "N"
+	end
+	if(InputHandler:wasTriggered(Key.O)) then
+		GameLogic.Name = GameLogic.Name .. "O"
+	end
+	if(InputHandler:wasTriggered(Key.P)) then
+		GameLogic.Name = GameLogic.Name .. "P"
+	end
+	if(InputHandler:wasTriggered(Key.Q)) then
+		GameLogic.Name = GameLogic.Name .. "Q"
+	end
+	if(InputHandler:wasTriggered(Key.R)) then
+		GameLogic.Name = GameLogic.Name .. "R"
+	end
+	if(InputHandler:wasTriggered(Key.S)) then
+		GameLogic.Name = GameLogic.Name .. "S"
+	end
+	if(InputHandler:wasTriggered(Key.T)) then
+		GameLogic.Name = GameLogic.Name .. "T"
+	end
+	if(InputHandler:wasTriggered(Key.U)) then
+		GameLogic.Name = GameLogic.Name .. "U"
+	end
+	if(InputHandler:wasTriggered(Key.V)) then
+		GameLogic.Name = GameLogic.Name .. "V"
+	end
+	if(InputHandler:wasTriggered(Key.W)) then
+		GameLogic.Name = GameLogic.Name .. "W"
+	end
+	if(InputHandler:wasTriggered(Key.X)) then
+		GameLogic.Name = GameLogic.Name .. "X"
+	end
+	if(InputHandler:wasTriggered(Key.Y)) then
+		GameLogic.Name = GameLogic.Name .. "Y"
+	end
+	if(InputHandler:wasTriggered(Key.Z)) then
+		GameLogic.Name = GameLogic.Name .. "Z"
+	end
+	if(InputHandler:wasTriggered(Key.Return)) then
+		if (GameLogic.notSaved == true) then
+			SaveHighscore()
+		end
+	end
+	
 	return EventResult.Handled;
 end
 
@@ -193,6 +275,8 @@ function GameLogic.enterEnd( updateData )
 	logMessage("Entering End state");
 	local go = GameLogic.isoCam.trackingObject
 	go.go.pc:setState(ComponentState.Inactive)
+	GameLogic.Name = ""
+	GameLogic.notSaved = true
 	return EventResult.Handled;
 end
 
@@ -205,6 +289,14 @@ function GameLogic.leaveEnd( updateData )
 	return EventResult.Handled;
 end
 
+function SaveHighscore()
+	local f,err = io.open("highscores.txt","a")
+	if not f then return print(err) end
+	f:write(GameLogic.Name .. " : " .. GameLogic.totalElapsedTime)
+	f:write("\n")
+	f:close()
+	GameLogic.notSaved = false
+end
 
 
 -------------------------------------------------------

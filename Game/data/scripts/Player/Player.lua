@@ -146,7 +146,7 @@ function PlayerMeta.update( guid, elapsedTime )
 	if (InputHandler:isPressed(Key.Numpad2)) then
 		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator2.position)
 	end
-	if (InputHandler:isPressed(Key.Numpad3)) then
+	if (InputHandler:isPressed(Key.Numpad3) or InputHandler:isPressed(Key.L)) then
 		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator3.position)
 	end
 	if (InputHandler:isPressed(Key.Numpad4)) then
