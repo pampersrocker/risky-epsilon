@@ -19,10 +19,15 @@ namespace gep
     public:
         virtual ~ISoundSystem(){}
         virtual ResourcePtr<ISoundLibrary> loadLibrary(const char* filename) = 0;
+        virtual void loadLibraryFromLua(const char* filename) =0;
         virtual ResourcePtr<ISound> getSound(const char* path) = 0;
         virtual void setListenerPosition(const vec3& pos) = 0;
         virtual void setListenerOrientation(const Quaternion& orientation) = 0;
         virtual void setListenerVelocity(const vec3& velocity) = 0;
+        
+    LUA_BIND_REFERENCE_TYPE_BEGIN
+        LUA_BIND_FUNCTION_NAMED(loadLibraryFromLua, "loadLibrary")
+    LUA_BIND_REFERENCE_TYPE_END;
     };
 
     /// \brief a library containing multiple sounds
@@ -87,6 +92,7 @@ namespace gep
         virtual void setOrientation(const Quaternion& orientation) = 0;
         virtual void setVelocity(const vec3& velocity) = 0;
         virtual void setVolume(float volume) = 0;
+        virtual float getVolume() = 0;
         virtual void play() = 0;
         virtual void stop() = 0;
         virtual void setPaused(bool paused) = 0;

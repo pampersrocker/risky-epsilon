@@ -78,7 +78,7 @@ namespace gep
         {
             Invalid,
             Dynamic,
-            SphereIntertia,
+            SphereInertia,
             BoxInertia,
             Keyframed,
             Fixed,

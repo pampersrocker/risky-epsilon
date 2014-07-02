@@ -1,4 +1,4 @@
-logMessage("Initializing samples/character_component.lua ...")
+logMessage("Initializing camera_prototype/camera_prototype.lua ...")
 
 --
 -- physics world
@@ -9,6 +9,12 @@ cinfo.worldSize = 4000.0
 local world = PhysicsFactory:createWorld(cinfo)
 PhysicsSystem:setWorld(world)
 PhysicsSystem:setDebugDrawingEnabled(true)
+
+SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank")
+SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
+SoundSystem:loadLibrary(".\\data\\sound\\Vehicles.bank")
+SoundSystem:loadLibrary(".\\data\\sound\\Surround_Ambience.bank")
+
 
 function createCollisionBox(guid, halfExtends, position)
 	local box = GameObjectManager:createGameObject(guid)
@@ -55,12 +61,12 @@ function debugCamUpdate(updateData)
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "debugCamUpdate")
 
 	local mouseDelta = InputHandler:getMouseDelta()
-	local rotationSpeed = 0.2 * updateData:getElapsedTime()
+	local rotationSpeed = 0.2 * updateData:getElapsedTime() * 1000
 	local lookVec = mouseDelta:mulScalar(rotationSpeed)
 	debugCam.cc:look(lookVec)
 	
 	local moveVec = Vec3(0.0, 0.0, 0.0)
-	local moveSpeed = 0.5 * updateData:getElapsedTime()
+	local moveSpeed = 0.5 * updateData:getElapsedTime() * 1000
 	if (InputHandler:isPressed(Key.Shift)) then
 		moveSpeed = moveSpeed * 5
 	end
@@ -103,6 +109,7 @@ normalCam.firstPerson = createDefaultCam("firstPerson")
 function normalCamFirstPersonEnter(enterData)
 	normalCam.firstPerson:setComponentStates(ComponentState.Active)
 	player.firstPersonMode = true
+
 	return EventResult.Handled
 end
 
@@ -116,6 +123,8 @@ end
 
 function normalCamFirstPersonLeave(leaveData)
 	player.firstPersonMode = false
+	logMessage("starting to play ambience")
+
 	return EventResult.Handled
 end
 
@@ -166,7 +175,7 @@ end
 
 function normalCamIsometricUpdate(updateData)
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "isometric")
-	local rotationSpeed = 0.05 * updateData:getElapsedTime()
+	local rotationSpeed = 0.05 * updateData:getElapsedTime() * 1000
 	local mouseDelta = InputHandler:getMouseDelta()
 	mouseDelta.x = mouseDelta.x * rotationSpeed
 	mouseDelta.y = 0.0
@@ -206,7 +215,7 @@ StateMachine{
 		},
 	},
 	transitions = {
-		{ from = "__enter", to = "isometric" },
+		{ from = "__enter", to = "firstPerson" },
 		{ from = "firstPerson", to = "thirdPerson", condition = function() return InputHandler:wasTriggered(Key.V) end },
 		{ from = "thirdPerson", to = "isometric", condition = function() return InputHandler:wasTriggered(Key.V) end },
 		{ from = "isometric", to = "firstPerson", condition = function() return InputHandler:wasTriggered(Key.V) end }
@@ -215,7 +224,7 @@ StateMachine{
 
 StateTransitions{
 	parent = "/game/gameRunning",
-	{ from = "__enter", to = "normalCam(fsm)" },
+	{ from = "__enter", to = "debugCam" },
 	{ from = "debugCam", to = "normalCam(fsm)", condition = function() return InputHandler:wasTriggered(Key.C) end },
 	{ from = "normalCam(fsm)", to = "debugCam", condition = function() return InputHandler:wasTriggered(Key.C) end }
 }
@@ -228,36 +237,77 @@ StateTransitions{
 --
 -- player
 --
-
-function playerCharacterUdpate(characterInput)
-	local eventResult = EventResult.Ignored
-	for k,v in pairs(characterInput) do
-		--print(k,v)
+function playerUpdate(guid, elapsedTime)
+	local position = player:getWorldPosition()
+	local viewDir = player:getViewDirection()
+	DebugRenderer:drawArrow(position, position + viewDir:mulScalar(25.0))
+	local moveSpeed = 1200.0
+	if (InputHandler:isPressed(Key.Shift)) then
+		moveSpeed = moveSpeed * 2.5
 	end
-
-	if InputHandler:isPressed(Key.W) then
-		eventResult = EventResult.Handled
-		characterInput:setInputUD(-1)
-	elseif InputHandler:isPressed(Key.S) then
-		eventResult = EventResult.Handled
-		characterInput:setInputUD(1)
+	if (InputHandler:isPressed(Key.W)) then
+		player.pc.rb:applyLinearImpulse(viewDir:mulScalar(moveSpeed))
+	elseif (InputHandler:isPressed(Key.S)) then
+		player.pc.rb:applyLinearImpulse(viewDir:mulScalar(-0.5 * moveSpeed))
 	end
-
-	if InputHandler:isPressed(Key.Space) then
-		characterInput:setWantJump(true)
+	if (player.firstPersonMode) then
+		DebugRenderer:printText(Vec2(-0.01, 0.05), "X")
+		local rightDir = viewDir:cross(Vec3(0.0, 0.0, 1.0))
+		if (InputHandler:isPressed(Key.A) and InputHandler:isPressed(Key.D)) then
+			-- no sideways walking
+		elseif (InputHandler:isPressed(Key.A)) then
+			player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
+		elseif (InputHandler:isPressed(Key.D)) then
+			player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+		end
+		local mouseDelta = InputHandler:getMouseDelta()
+		local angularVelocity = Vec3(0.0, 0.0, mouseDelta.x * -0.05 * elapsedTime * 1000)
+		player.pc.rb:setAngularVelocity(angularVelocity)
+		player.viewUpDown = player.viewUpDown + mouseDelta.y * -0.05 * elapsedTime * 1000
+		local viewUpDownMax = 100
+		if (player.viewUpDown > viewUpDownMax) then
+			player.viewUpDown = viewUpDownMax
+		end
+		if (player.viewUpDown < -viewUpDownMax) then
+			player.viewUpDown = -viewUpDownMax
+		end
+	else
+		if (InputHandler:isPressed(Key.A) and InputHandler:isPressed(Key.D)) then
+			if (not player.angularVelocitySwapped) then
+				player.currentAngularVelocity = player.currentAngularVelocity:mulScalar(-1.0)
+				player.angularVelocitySwapped = true
+			end
+			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
+		elseif (InputHandler:isPressed(Key.A)) then
+			player.currentAngularVelocity = Vec3(0.0, 0.0, 2.5)
+			player.angularVelocitySwapped = false
+			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
+		elseif (InputHandler:isPressed(Key.D)) then
+			player.currentAngularVelocity = Vec3(0.0, 0.0, -2.5)
+			player.angularVelocitySwapped = false
+			player.pc.rb:setAngularVelocity(player.currentAngularVelocity)
+		else
+			player.angularVelocitySwapped = false
+		end
 	end
-
-	return eventResult
 end
 
 player = GameObjectManager:createGameObject("player")
-player.char = player:createCharacterComponent()
-local cinfo = CharacterRigidBodyCInfo()
+player.pc = player:createPhysicsComponent()
+local cinfo = RigidBodyCInfo()
 cinfo.shape = PhysicsFactory:createBox(Vec3(10.0, 10.0, 20.0))
+cinfo.motionType = MotionType.Dynamic
+cinfo.mass = 100.0
+cinfo.restitution = 0.0
+cinfo.friction = 0.0
+cinfo.maxLinearVelocity = 5000.0
+cinfo.maxAngularVelocity = 250.0
+cinfo.linearDamping = 5.0
+cinfo.angularDamping = 10.0
 cinfo.position = Vec3(0.0, 0.0, 20.5)
-player.char.crb = player.char:createCharacterRigidBody(cinfo)
-player.char.rb = player.char.crb:getRigidBody()
-player.char:getInputUpdateEvent():registerListener(playerCharacterUdpate)
+player.pc.rb = player.pc:createRigidBody(cinfo)
+player.sc = player:createScriptComponent()
+player.sc:setUpdateFunction(playerUpdate)
 player:setBaseViewDirection(Vec3(1.0, 0.0, 0.0))
 -- additional members
 player.firstPersonMode = false
@@ -265,4 +315,16 @@ player.currentAngularVelocity = Vec3()
 player.angularVelocitySwapped = false
 player.viewUpDown = 0.0
 
-logMessage("... finished initializing samples/character_component.lua.")
+player.audio = player:createAudioComponent()
+engine = player.audio:createSoundInstance("playerEngine","/Vehicles/Car Engine")
+engine:setParameter("RPM", 1200)
+engine:setParameter("Load", 0.3)
+logMessage(engine:getParameter("RPM"))
+logMessage(engine:getParameter("Load"))
+engine:play()
+
+ambience = player.audio:createSoundInstance("ambient", "/Ambience/Country")
+ambience:setParameter("Time", 0.85)
+ambience:play()
+
+logMessage("... finished initializing camera_prototype/camera_prototype.lua.")

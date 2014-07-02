@@ -273,6 +273,18 @@ void gep::FmodSoundInstance::setVolume(float volume)
     m_eventInstance.setVolume(volume);
 }
 
+float gep::FmodSoundInstance::getVolume()
+{
+    float volume = 0.0f;
+    auto result = m_eventInstance.getVolume(&volume);
+    
+    if(result != FMOD_OK)
+    {
+        g_globalManager.getLogging()->logWarning("Failed to get volume of sound instance of sound '%s' with error: %s", getLoader()->getSuperResource()->getLoader()->getPath(), FMOD_ErrorString(result));
+    }
+    return volume;
+}
+
 void gep::FmodSoundInstance::play()
 {
     auto result = m_eventInstance.start();
@@ -556,5 +568,10 @@ gep::IResource* gep::FmodDummySoundInstance::getSuperResource()
 const char* gep::FmodDummySoundInstance::getResourceType()
 {
     return "FmodSoundInstance";
+}
+
+float gep::FmodDummySoundInstance::getVolume()
+{
+    return 0.0f;
 }
 

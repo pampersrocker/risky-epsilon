@@ -35,6 +35,9 @@ namespace gpp
         virtual gep::mat4 getTransformationMatrix() const override;
 
         void lookAt(const gep::vec3& target);
+
+        gep::Ray getRayForNormalizedScreenPos(const gep::vec2 screenPos) { return m_pCamera->getRayForNormalizedScreenPos(screenPos);};
+        gep::Ray getRayForAbsoluteScreenPos(const gep::uvec2 screenPos) { return m_pCamera->getRayForAbsoluteScreenPos(screenPos);};
         
         void setViewDirection(const gep::vec3& vector);
         
@@ -119,6 +122,8 @@ namespace gpp
             LUA_BIND_FUNCTION(tilt)
             LUA_BIND_FUNCTION(move)
             LUA_BIND_FUNCTION(look)
+            LUA_BIND_FUNCTION(getRayForNormalizedScreenPos)
+            LUA_BIND_FUNCTION(getRayForAbsoluteScreenPos)
             LUA_BIND_FUNCTION(setNear)
             LUA_BIND_FUNCTION(getNear)
             LUA_BIND_FUNCTION(setFar)

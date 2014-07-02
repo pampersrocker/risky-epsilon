@@ -11,6 +11,7 @@
 #include "gep/interfaces/renderer.h"
 #include "gep/interfaces/scripting.h"
 #include "gep/interfaces/inputHandler.h"
+#include "gep/interfaces/sound.h"
 
 #include "gep/math3d/vec3.h"
 #include "gep/math3d/color.h"
@@ -24,6 +25,8 @@
 #include "gpp/stateMachines/stateMachineFactory.h"
 
 #include "gep/memory/leakDetection.h"
+
+#include "gpp/gameComponents/cameraComponent.h"
 
 namespace
 {
@@ -186,7 +189,14 @@ void gpp::Game::update(float elapsedTime)
     debugRenderer.printText(vec3(30.0f, 0.0f,  0.0f ), "X", Color::red());
     debugRenderer.printText(vec3(0.0f,  30.0f, 0.0f ), "Y", Color::green());
     debugRenderer.printText(vec3(0.0f,  0.0f,  30.0f), "Z", Color::blue());
+    
     g_gameObjectManager.update(elapsedTime);
+    auto activeCamObj = g_gameObjectManager.getCurrentCameraObject()->getComponent<CameraComponent>();
+    if(activeCamObj)
+    {
+        g_globalManager.getSoundSystem()->setListenerPosition(activeCamObj->getWorldPosition());
+        g_globalManager.getSoundSystem()->setListenerOrientation(activeCamObj->getWorldRotation());
+    }
 }
 
 void gpp::Game::render(gep::IRendererExtractor& extractor)

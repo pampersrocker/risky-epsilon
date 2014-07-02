@@ -75,6 +75,7 @@ namespace gep
     /// \brief Renderer interface
     class IRenderer : public ISubsystem
     {
+        friend class InputHandler;
     public:
         virtual ~IRenderer(){}
         /// \brief returns the debug renderer interface
@@ -99,6 +100,27 @@ namespace gep
             LUA_BIND_FUNCTION(toAbsoluteScreenPosition)
             LUA_BIND_FUNCTION(toNormalizedScreenPosition)
         LUA_BIND_REFERENCE_TYPE_END
+
+    private:
+        virtual HWND getWindowHandle() = 0;
+    };
+
+    struct GEP_API Ray
+    {
+        vec3 from;
+        vec3 direction;
+
+        Ray(vec3 from, vec3 direction):
+            from(from),
+            direction(direction)
+        {
+        }
+
+        LUA_BIND_VALUE_TYPE_BEGIN
+            LUA_BIND_VALUE_TYPE_MEMBERS
+            LUA_BIND_MEMBER(from)
+            LUA_BIND_MEMBER(direction)
+        LUA_BIND_VALUE_TYPE_END
     };
 
     /// \brief Camera interface
@@ -109,7 +131,6 @@ namespace gep
         virtual const mat4 getViewMatrix() const = 0;
         virtual const mat4 getProjectionMatrix() const = 0;
     };
-
 
     /// \brief Renderer extractor interface
     class IRendererExtractor

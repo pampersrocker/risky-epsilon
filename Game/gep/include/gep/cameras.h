@@ -34,6 +34,9 @@ namespace gep
         
         void setOrthographic(const bool orthographic) { m_orthographic = orthographic; };
         bool isOrthographic() { return m_orthographic; };
+        
+        virtual gep::Ray getRayForNormalizedScreenPos(const vec2& screenPos);
+        virtual gep::Ray getRayForAbsoluteScreenPos(const uvec2& screenPos);
 
     protected:
         float m_viewAngleInDegrees;
@@ -44,6 +47,7 @@ namespace gep
         Quaternion m_rotation;
         vec3 m_position;
     };
+
     
     class GEP_API FreeCamera : public Camera
     {
