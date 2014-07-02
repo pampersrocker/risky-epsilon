@@ -17,6 +17,7 @@ Config = {
 		maxAngularVelocity = 100.0,
 		spawnPosition = Vec3(0.0, 0.0, 3.0),
 		torqueMulScalar = 2000,
+		linearVelocityScalar = 100,
 		lastTransformator = Vec3(0.0,0.0,3.0)
 	},
 
