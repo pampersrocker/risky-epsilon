@@ -37,6 +37,9 @@ namespace gpp
         GameObject* createGameObject(const std::string& guid);
         GameObject* getGameObject(const std::string& guid);
 
+        GameObject* getCurrentCameraObject(){return m_pCurrentCameraObject;}
+        void setCurrentCameraObject(GameObject* object) {m_pCurrentCameraObject = object;}
+
         virtual void initialize();
         virtual void destroy();
         virtual void update(float elapsedMs);
@@ -57,6 +60,7 @@ namespace gpp
        gep::Hashmap<std::string, GameObject*, gep::StringHashPolicy> m_gameObjects;
        State::Enum m_state;
         gep::StackAllocator m_tempAllocator;
+        GameObject* m_pCurrentCameraObject;
     };
 
     class IComponent
@@ -196,12 +200,14 @@ namespace gpp
             LUA_BIND_FUNCTION_NAMED(createComponent<ScriptComponent>, "createScriptComponent")
             LUA_BIND_FUNCTION_NAMED(createComponent<AnimationComponent>, "createAnimationComponent")
             LUA_BIND_FUNCTION_NAMED(createComponent<CharacterComponent>, "createCharacterComponent")
+            LUA_BIND_FUNCTION_NAMED(createComponent<AudioComponent>, "createAudioComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<CameraComponent>, "getCameraComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<RenderComponent>, "getRenderComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<PhysicsComponent>, "getPhysicsComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<ScriptComponent>, "getScriptComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<AnimationComponent>, "getAnimationComponent")
             LUA_BIND_FUNCTION_NAMED(getComponent<CharacterComponent>, "getCharacterComponent")
+            LUA_BIND_FUNCTION_NAMED(getComponent<AudioComponent>, "getAudioComponent")
             LUA_BIND_FUNCTION(setPosition)
             LUA_BIND_FUNCTION(getPosition)
             LUA_BIND_FUNCTION(getWorldPosition)

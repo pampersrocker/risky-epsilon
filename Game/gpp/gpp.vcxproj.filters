@@ -84,6 +84,9 @@
     <ClCompile Include="src\gpp\gameComponents\animationComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\gpp\gameComponents\audioComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\gpp\gameComponents\animationComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gpp\gameComponents\audioComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

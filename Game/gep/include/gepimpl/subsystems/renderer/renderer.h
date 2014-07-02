@@ -72,6 +72,7 @@ namespace gep
         //windows specific stuff
         HINSTANCE m_hInstance;
         HWND m_hWnd;
+        HWND getWindowHandle() { return m_hWnd; }
 
         static LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 

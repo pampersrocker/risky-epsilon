@@ -306,6 +306,7 @@ void gep::Renderer::createWindow()
         throw Exception("Failed to create window");
 
     ShowWindow( m_hWnd, SW_SHOW );
+	ShowCursor(FALSE);
 }
 
 void gep::Renderer::destroyWindow()
@@ -813,8 +814,8 @@ gep::vec2 gep::Renderer::toNormalizedScreenPosition(const uvec2& screenPos) cons
     GEP_ASSERT(screenPos.x <= m_settings.screenResolution.x);
     GEP_ASSERT(screenPos.y <= m_settings.screenResolution.y);
 
-    auto x(screenPos.x * 2.0f / m_settings.screenResolution.y - 1.0f);
-    auto y(1.0f - 2.0f * screenPos.y / m_settings.screenResolution.x);
+    auto x(screenPos.x * 2.0f / m_settings.screenResolution.x - 1.0f);
+    auto y(1.0f - 2.0f * screenPos.y / m_settings.screenResolution.y);
 
     vec2 result(static_cast<vec2::component_t>(x), static_cast<vec2::component_t>(y));
     return result;

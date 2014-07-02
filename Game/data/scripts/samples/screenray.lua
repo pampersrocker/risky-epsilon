@@ -1,4 +1,4 @@
-logMessage("Initializing camera_prototype/camera_prototype.lua ...")
+logMessage("Initializing samples/screenray.lua ...")
 
 --
 -- physics world
@@ -7,18 +7,56 @@ local cinfo = WorldCInfo()
 cinfo.gravity = Vec3(0, 0, -9.81)
 cinfo.worldSize = 4000.0
 local world = PhysicsFactory:createWorld(cinfo)
+
 PhysicsSystem:setWorld(world)
 PhysicsSystem:setDebugDrawingEnabled(true)
 
-function createCollisionBox(guid, halfExtends, position)
+function createCollisionBox(guid, halfExtends, position, filter)
 	local box = GameObjectManager:createGameObject(guid)
 	box.pc = box:createPhysicsComponent()
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:createBox(halfExtends)
 	cinfo.motionType = MotionType.Fixed
 	cinfo.position = position
+	cinfo.collisionFilterInfo = filter or 0
 	box.pc.rb = box.pc:createRigidBody(cinfo)
+	box.pc.rb:setUserData(box)
 	return box
+end
+
+function createDynamicBall(guid, radius, position)
+	local ball = GameObjectManager:createGameObject(guid)
+	ball.pc = ball:createPhysicsComponent()
+
+	local cinfo = RigidBodyCInfo()
+	cinfo.shape = PhysicsFactory:createSphere(radius)
+	cinfo.motionType = MotionType.Dynamic
+	cinfo.mass = 5.0
+	cinfo.restitution = 0.0
+	cinfo.friction = 0.0
+	cinfo.maxLinearVelocity = 5000.0
+	cinfo.maxAngularVelocity = 250.0
+	cinfo.linearDamping = 10
+	cinfo.angularDamping = 0
+	cinfo.position = position
+	ball.pc.rb = ball.pc:createRigidBody(cinfo)
+
+	return ball
+end
+
+function createPhantomCallbackTriggerBox(guid, halfExtends, position)
+	local trigger = GameObjectManager:createGameObject(guid)
+	trigger.pc = trigger:createPhysicsComponent()
+	local cinfo = RigidBodyCInfo()
+	local boundingShape = PhysicsFactory:createBox(halfExtends)
+	local phantomCallbackShape = PhysicsFactory:createPhantomCallbackShape(halfExtends)
+	cinfo.shape = PhysicsFactory:createBoundingVolumeShape(boundingShape, phantomCallbackShape)
+	cinfo.motionType = MotionType.Fixed
+	cinfo.position = position
+	trigger.pc.rb = trigger.pc:createRigidBody(cinfo)
+	trigger.phantomCallback = phantomCallbackShape
+
+	return trigger
 end
 
 --
@@ -27,15 +65,16 @@ end
 scene = {}
 scene.sponza = GameObjectManager:createGameObject("sponza")
 --scene.sponza.rc = scene.sponza:createRenderComponent()
---scene.sponza.rc:setPath("data/sponza/sponza.thModel")
-scene.ground = createCollisionBox("ground", Vec3(1750.0, 1000.0, 10.0), Vec3(0.0, 0.0, -10.0))
-scene.ground = createCollisionBox("wallRight", Vec3(1000.0, 40.0, 200.0), Vec3(-60.0, 280.0, 200.0))
+--scene.sponza.rc:setPath("data/models/ball.thModel")
+scene.ground = createCollisionBox("ground", Vec3(1750.0, 1000.0, 10.0), Vec3(0.0, 0.0, -10.0), 0)
+scene.wallRight = createCollisionBox("wallRight", Vec3(1000.0, 40.0, 200.0), Vec3(-60.0, 280.0, 200.0), 0)
+scene.wallLeft = createCollisionBox("wallLeft", Vec3(1000.0, 40.0, 200.0), Vec3(-60.0, -280.0, 200.0), 0)
 
 function createDefaultCam(guid)
 	local cam = GameObjectManager:createGameObject(guid)
 	cam.cc = cam:createCameraComponent()
-	cam:setPosition(Vec3(0.0, 0.0, 0.0))
-	cam.cc:setViewDirection(Vec3(1.0, 0.0, 0.0))
+	cam.cc:setPosition(Vec3(0.0, 0.0, 0.0))
+	cam.cc:setViewDirection(Vec3(0.0, 1.0, 0.0))
 	cam.baseViewDir = Vec3(1.0, 0.0, 0.0)
 	cam.cc:setBaseViewDirection(cam.baseViewDir)
 	return cam
@@ -58,7 +97,7 @@ function debugCamUpdate(updateData)
 	local rotationSpeed = 0.2 * updateData:getElapsedTime()
 	local lookVec = mouseDelta:mulScalar(rotationSpeed)
 	debugCam.cc:look(lookVec)
-	
+
 	local moveVec = Vec3(0.0, 0.0, 0.0)
 	local moveSpeed = 0.5 * updateData:getElapsedTime()
 	if (InputHandler:isPressed(Key.Shift)) then
@@ -75,12 +114,12 @@ function debugCamUpdate(updateData)
 		moveVec.x = moveSpeed
 	end
 	debugCam.cc:move(moveVec)
-	
-	local pos = debugCam.cc:getWorldPosition()
+
+	local pos = debugCam:getPosition()
 	DebugRenderer:printText(Vec2(-0.9, 0.80), "  pos: " .. string.format("%5.2f", pos.x) .. ", " .. string.format("%5.2f", pos.y) .. ", " .. string.format("%5.2f", pos.z))
 	local dir = debugCam:getViewDirection()
 	DebugRenderer:printText(Vec2(-0.9, 0.75), "  dir: " .. string.format("%5.2f", dir.x) .. ", " .. string.format("%5.2f", dir.y) .. ", " .. string.format("%5.2f", dir.z))
-	
+
 	return EventResult.Handled
 end
 
@@ -98,27 +137,6 @@ State{
 --
 normalCam = {}
 
-normalCam.firstPerson = createDefaultCam("firstPerson")
-
-function normalCamFirstPersonEnter(enterData)
-	normalCam.firstPerson:setComponentStates(ComponentState.Active)
-	player.firstPersonMode = true
-	return EventResult.Handled
-end
-
-function normalCamFirstPersonUpdate(updateData)
-	DebugRenderer:printText(Vec2(-0.9, 0.85), "firstPerson")
-	local camPos = player:getWorldPosition() + Vec3(0.0, 0.0, 10.0)
-	normalCam.firstPerson:setPosition(camPos)
-	normalCam.firstPerson.cc:lookAt(camPos + player:getViewDirection():mulScalar(100.0) + Vec3(0.0, 0.0, player.viewUpDown))
-	return EventResult.Handled
-end
-
-function normalCamFirstPersonLeave(leaveData)
-	player.firstPersonMode = false
-	return EventResult.Handled
-end
-
 normalCam.thirdPerson = createDefaultCam("thirdPerson")
 normalCam.thirdPerson.pc = normalCam.thirdPerson:createPhysicsComponent()
 local cinfo = RigidBodyCInfo()
@@ -133,48 +151,46 @@ cinfo.gravityFactor = 0.0
 normalCam.thirdPerson.pc.rb = normalCam.thirdPerson.pc:createRigidBody(cinfo)
 normalCam.thirdPerson.pc:setState(ComponentState.Inactive)
 normalCam.thirdPerson.calcPosTo = function()
-	return player:getWorldPosition() + player:getViewDirection():mulScalar(-150.0) + Vec3(0.0, 0.0, 50.0)
+	return player:getPosition() + player:getViewDirection():mulScalar(-150.0) + Vec3(0.0, 0.0, 50.0)
 end
 
 function normalCamThirdPersonEnter(enterData)
 	normalCam.thirdPerson:setPosition(normalCam.thirdPerson.calcPosTo())
 	normalCam.thirdPerson:setComponentStates(ComponentState.Active)
-	normalCam.thirdPerson.cc:setViewTarget(player)
-	normalCam.thirdPerson.cc:setViewTargetPositionOffset(Vec3(0,0,30.0))
 	return EventResult.Handled
 end
 
 function normalCamThirdPersonUpdate(updateData)
+
+	--if InputHandler:isPressed(Key.O) then
+	--	normalCam.thirdPerson.cc:setOrthographic(true)
+	--end
+	--if InputHandler:isPressed(Key.P) then
+	--	normalCam.thirdPerson.cc:setOrthographic(false)
+	--end
+	if InputHandler:isPressed(Key.LButton) then
+		
+		--ray = normalCam.thirdPerson.cc:getRayForNormalizedScreenPos(InputHandler:getMouseNormalizedScreenPosition())
+		ray = normalCam.thirdPerson.cc:getRayForAbsoluteScreenPos(InputHandler:getMouseAbsoluteScreenPosition())
+		local rayIn = RayCastInput()
+		rayIn.from     = ray.from
+		rayIn.to       = rayIn.from + ray.direction:mulScalar(10000)
+		--DebugRenderer:drawArrow(rayIn.from, rayIn.to)
+		local rayOut = world:castRay(rayIn)
+		
+		if rayOut:hasHit() and rayOut.hitBody:getMotionType() == MotionType.SphereInertia then
+			rayOut.hitBody:applyLinearImpulse(ray.direction:mulScalar(10000))
+		end
+	end
+
 	DebugRenderer:printText(Vec2(-0.9, 0.85), "thirdPerson")
 	local camPosTo = normalCam.thirdPerson.calcPosTo()
-	local camPosIs = normalCam.thirdPerson:getWorldPosition()
+	local camPosIs = normalCam.thirdPerson:getPosition()
 	local camPosVel = camPosTo - camPosIs
 	if (camPosVel:length() > 1.0 ) then
 		normalCam.thirdPerson.pc.rb:setLinearVelocity(camPosVel:mulScalar(2.5))
 	end
-	--normalCam.thirdPerson.cc:lookAt(player:getWorldPosition() + Vec3(0.0, 0.0, 30.0))
-	return EventResult.Handled
-end
-
-normalCam.isometric = createDefaultCam("isometric")
-normalCam.isometric.cc:look(Vec2(0.0, 20.0))
-
-function normalCamIsometricEnter(enterData)
-	normalCam.isometric:setComponentStates(ComponentState.Active)
-	return EventResult.Handled
-end
-
-function normalCamIsometricUpdate(updateData)
-	DebugRenderer:printText(Vec2(-0.9, 0.85), "isometric")
-	local rotationSpeed = 0.05 * updateData:getElapsedTime()
-	local mouseDelta = InputHandler:getMouseDelta()
-	mouseDelta.x = mouseDelta.x * rotationSpeed
-	mouseDelta.y = 0.0
-	normalCam.isometric.cc:look(mouseDelta)
-	local viewDir = normalCam.isometric.cc:getViewDirection()
-	viewDir = viewDir:mulScalar(-250.0)
-	viewDir.z = 125.0
-	normalCam.isometric:setPosition(player:getWorldPosition() + viewDir)
+	normalCam.thirdPerson.cc:lookAt(player:getPosition() + Vec3(0.0, 0.0, 30.0))
 	return EventResult.Handled
 end
 
@@ -183,39 +199,21 @@ StateMachine{
 	parent = "/game/gameRunning",
 	states = {
 		{
-			name = "firstPerson",
-			eventListeners = {
-				update = { normalCamFirstPersonUpdate },
-				enter = { normalCamFirstPersonEnter },
-				leave = { normalCamFirstPersonLeave }
-			},
-		},
-		{
 			name = "thirdPerson",
 			eventListeners = {
 				update = { normalCamThirdPersonUpdate },
 				enter = { normalCamThirdPersonEnter }
 			},
 		},
-		{
-			name = "isometric",
-			eventListeners = {
-				update = { normalCamIsometricUpdate },
-				enter = { normalCamIsometricEnter }
-			},
-		},
 	},
 	transitions = {
-		{ from = "__enter", to = "firstPerson" },
-		{ from = "firstPerson", to = "thirdPerson", condition = function() return InputHandler:wasTriggered(Key.V) end },
-		{ from = "thirdPerson", to = "isometric", condition = function() return InputHandler:wasTriggered(Key.V) end },
-		{ from = "isometric", to = "firstPerson", condition = function() return InputHandler:wasTriggered(Key.V) end }
+		{ from = "__enter", to = "thirdPerson" }
 	}
 }
 
 StateTransitions{
 	parent = "/game/gameRunning",
-	{ from = "__enter", to = "debugCam" },
+	{ from = "__enter", to = "normalCam(fsm)" },
 	{ from = "debugCam", to = "normalCam(fsm)", condition = function() return InputHandler:wasTriggered(Key.C) end },
 	{ from = "normalCam(fsm)", to = "debugCam", condition = function() return InputHandler:wasTriggered(Key.C) end }
 }
@@ -229,7 +227,7 @@ StateTransitions{
 -- player
 --
 function playerUpdate(guid, elapsedTime)
-	local position = player:getWorldPosition()
+	local position = player:getPosition()
 	local viewDir = player:getViewDirection()
 	DebugRenderer:drawArrow(position, position + viewDir:mulScalar(25.0))
 	local moveSpeed = 1200.0
@@ -297,6 +295,7 @@ cinfo.linearDamping = 5.0
 cinfo.angularDamping = 10.0
 cinfo.position = Vec3(0.0, 0.0, 20.5)
 player.pc.rb = player.pc:createRigidBody(cinfo)
+player.pc.rb:setUserData(player)
 player.sc = player:createScriptComponent()
 player.sc:setUpdateFunction(playerUpdate)
 player:setBaseViewDirection(Vec3(1.0, 0.0, 0.0))
@@ -306,4 +305,8 @@ player.currentAngularVelocity = Vec3()
 player.angularVelocitySwapped = false
 player.viewUpDown = 0.0
 
-logMessage("... finished initializing camera_prototype/camera_prototype.lua.")
+-- dynamic ball
+ball = createDynamicBall("ball", 10, Vec3(100, 10.0, 30.0))
+
+
+logMessage("... finished initializing samples/collision_filter.lua.")

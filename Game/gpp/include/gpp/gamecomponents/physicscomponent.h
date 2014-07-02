@@ -56,6 +56,8 @@ namespace gpp
             // Component interface
             LUA_BIND_FUNCTION(setState)
             LUA_BIND_FUNCTION(getState)
+//			LUA_BIND_FUNCTION(getParentGameObject)
+			LUA_BIND_FUNCTION_PTR(static_cast<GameObject*(Component::*)()>(&getParentGameObject), "getParentGameObject")
         LUA_BIND_REFERENCE_TYPE_END; 
 
         virtual gep::Quaternion getRotation() const override;

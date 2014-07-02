@@ -14,7 +14,8 @@ gep::Mutex gep::DoubleLockingSingleton<gpp::GameObjectManager>::s_creationMutex;
 gpp::GameObjectManager::GameObjectManager():
     m_gameObjects(),
     m_state(State::PreInitialization),
-    m_tempAllocator(true, 1024)
+    m_tempAllocator(true, 1024),
+    m_pCurrentCameraObject(nullptr)
 {
 }
 

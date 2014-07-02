@@ -10,6 +10,7 @@
 #include "gep/interfaces/inputHandler.h"
 #include "gep/interfaces/logging.h"
 #include "gep/interfaces/animation.h"
+#include "gep/interfaces/sound.h"
 
 #include "gep/interfaces/physics/contact.h"
 #include "gep/interfaces/physics/characterController.h"
@@ -25,6 +26,8 @@
 #include "gpp/gameComponents/scriptComponent.h"
 #include "gpp/gameComponents/characterComponent.h"
 #include "gpp/gameComponents/animationComponent.h"
+#include "gpp/gameComponents/audioComponent.h"
+
 
 #include "gep/interfaces/events.h"
 
@@ -94,6 +97,8 @@ void gpp::Game::bindOther()
     scripting->bind<gpp::CameraComponent>("CameraComponent");
     scripting->bind<gpp::AnimationComponent>("AnimationComponent");
     scripting->bind<gpp::CharacterComponent>("CharacterComponent");
+    scripting->bind<gpp::AudioComponent>("AudioComponent");
+    scripting->bind<gpp::SoundInstanceWrapper>("SoundInstance");
 
     scripting->bind<gep::ICharacterRigidBody>("CharacterRigidBody");
     scripting->bind<gep::CharacterRigidBodyCInfo>("CharacterRigidBodyCInfo");
@@ -107,8 +112,9 @@ void gpp::Game::bindOther()
     scripting->bind<gep::IPhysicsSystem>("PhysicsSystem", g_globalManager.getPhysicsSystem());
     scripting->bind<gep::IScriptingManager>("Scripting", g_globalManager.getScriptingManager());
     scripting->bind<gep::IPhysicsFactory>("PhysicsFactory", g_globalManager.getPhysicsSystem()->getPhysicsFactory());
+    scripting->bind<gep::ISoundSystem>("SoundSystem", g_globalManager.getSoundSystem());
     scripting->bind<gep::ILogging>("Logging", g_globalManager.getLogging());
-    //scripting->bind<gep::IRenderer>("Renderer", g_globalManager.getRenderer());
+    scripting->bind<gep::IRenderer>("Renderer", g_globalManager.getRenderer());
 
     //Cam
     scripting->bind<gep::FreeCamera>("Cam", m_pDummyCam);
@@ -186,7 +192,7 @@ void gpp::Game::bindEnums()
     scripting->bindEnum("MotionType",
         "Invalid",        gep::MotionType::Invalid,
         "Dynamic",        gep::MotionType::Dynamic,
-        "SphereIntertia", gep::MotionType::SphereIntertia,
+        "SphereInertia",  gep::MotionType::SphereInertia,
         "BoxInertia",     gep::MotionType::BoxInertia,
         "Keyframed",      gep::MotionType::Keyframed,
         "Fixed",          gep::MotionType::Fixed,

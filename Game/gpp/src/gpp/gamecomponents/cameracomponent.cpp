@@ -113,6 +113,7 @@ void gpp::CameraComponent::setState(State::Enum state)
     {
     case State::Active:
         g_globalManager.getCameraManager()->setActiveCamera(m_pCamera);
+        g_gameObjectManager.setCurrentCameraObject(m_pParentGameObject);
         break;
     case State::Inactive:
         GEP_ASSERT(false, "Cannot directly set a camera to be Inactive."

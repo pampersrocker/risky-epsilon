@@ -6,7 +6,7 @@
 
 namespace gpp
 {
-    class gep::IAnimationControl;
+   // class gep::IAnimationControl;
 
 
     class AnimationComponent : public Component
