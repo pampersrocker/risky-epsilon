@@ -154,6 +154,11 @@ Config = {
 			name = "endtrigger"
 		}
 	
+	},
+	triggerplates = 
+	{
+		trigger1 = Vec3(-312.5,-105,-31.2),
+		trigger2 = Vec3(-17.6,-202.5,-0.2),
 	}
 		
 	

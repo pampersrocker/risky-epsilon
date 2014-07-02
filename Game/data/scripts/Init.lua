@@ -75,7 +75,7 @@ function InitializeWorld(  )
 	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
 	GameLogic.level:initializeTrack_wood()
 
-
+	
 	--create Fans
 	FanMeta.__index = FanMeta
 	
@@ -167,38 +167,74 @@ function InitializeWorld(  )
 		return EventResult.Handled
 	end)
 	
+	-- create trigger plates
+	
+	GameLogic.triggerPlate1 = CreateEmptyGameObject("triggerPlate1")
+	local cinfo = RigidBodyCInfo()
+	cinfo.shape = PhysicsFactory:createBox(Vec3(1.2,1.2,0.45))
+	cinfo.motionType = MotionType.Fixed
+	cinfo.restitution = Config.materials.track.wood.restitution
+	cinfo.friction = Config.materials.track.wood.friction
+	cinfo.position = Config.triggerplates.trigger1
+	CreatePhysicsComponent( GameLogic.triggerPlate1 , cinfo )
+	CreateRenderComponent(GameLogic.triggerPlate1, "data/models/LevelElements/track_switch_01.thModel")
+	
+	GameLogic.triggerPlate2 = CreateEmptyGameObject("triggerPlate2")
+	local cinfo = RigidBodyCInfo()
+	cinfo.shape = PhysicsFactory:createBox(Vec3(1.2,1.2,0.45))
+	cinfo.motionType = MotionType.Fixed
+	cinfo.restitution = Config.materials.track.ice.restitution
+	cinfo.friction = Config.materials.track.ice.friction
+	cinfo.position = Config.triggerplates.trigger2
+	CreatePhysicsComponent( GameLogic.triggerPlate2 , cinfo )
+	CreateRenderComponent(GameLogic.triggerPlate2, "data/models/LevelElements/track_switch_01.thModel")	
+	
 	--create Triggers
-	local trigger = Config.triggers.trigger1
-	local gotrigger = CreateEmptyGameObject(trigger.name)
-	trigger = FanMeta:createPhantomCallbackTriggerBox(trigger.name, Config.triggers.triggersize, trigger.position)
-	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
+	local triggerC = Config.triggers.trigger1
+	local gotrigger = CreateEmptyGameObject(triggerC.name)
+	GameLogic.trigger1 = FanMeta:createPhantomCallbackTriggerBox(triggerC.name, Config.triggers.triggersize, triggerC.position)
+	GameLogic.trigger1.triggered = false
+	GameLogic.trigger1.go.phantomCallback:getEnterEvent():registerListener(function(arg)
 		local go = GetGObyGUID("playerInstanceStone")
-		if (GameLogic.isoCam.trackingObject == go) then
+		if (GameLogic.isoCam.trackingObject == go and not GameLogic.trigger1.triggered) then
+			GameLogic.trigger1.triggered = true
 			GameLogic.fan2:Activate()	
 			GameLogic.fan2.sound:play()
+			GameLogic.trigger1.sound:play()
+			local position = GameLogic.triggerPlate1.go:getWorldPosition()
+			GameLogic.triggerPlate1.go:setPosition(Vec3(position.x,position.y,position.z - 0.1))
 		end
 		
 		return EventResult.Handled
 	end)
-	local trigger = Config.triggers.trigger2
-	local gotrigger = CreateEmptyGameObject(trigger.name)
-	trigger = FanMeta:createPhantomCallbackTriggerBox(trigger.name, Config.triggers.triggersize, trigger.position)
-	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
+	GameLogic.trigger1.go.au = GameLogic.trigger1.go:createAudioComponent()
+	GameLogic.trigger1.sound = GameLogic.trigger1.go.au:createSoundInstance("fan", "/trigger/Doorknob")
+	
+	local triggerC = Config.triggers.trigger2
+	local gotrigger = CreateEmptyGameObject(triggerC.name)
+	GameLogic.trigger2 = FanMeta:createPhantomCallbackTriggerBox(triggerC.name, Config.triggers.triggersize, triggerC.position)
+	GameLogic.trigger2.triggered = false
+	GameLogic.trigger2.go.phantomCallback:getEnterEvent():registerListener(function(arg)
 		local go = GetGObyGUID("playerInstanceStone")
-		if (GameLogic.isoCam.trackingObject == go) then
+		if (GameLogic.isoCam.trackingObject == go and not GameLogic.trigger2.triggered) then
+			GameLogic.trigger2.triggered = true
 			GameLogic.fan3:Activate() 	
 			GameLogic.fan3.sound:play()
+			GameLogic.trigger2.sound:play()
+			local position = GameLogic.triggerPlate2.go:getWorldPosition()
+			GameLogic.triggerPlate2.go:setPosition(Vec3(position.x,position.y,position.z - 0.1))
 		end
 		
 		return EventResult.Handled
 	end)
-
+	GameLogic.trigger2.go.au = GameLogic.trigger2.go:createAudioComponent()
+	GameLogic.trigger2.sound = GameLogic.trigger2.go.au:createSoundInstance("fan", "/trigger/Doorknob")
 	
 	
 	--create EndTrigger
-	local trigger = Config.triggers.endtrigger
-	local endtrigger = CreateEmptyGameObject(trigger.name)
-	triggerEnd = FanMeta:createPhantomCallbackTriggerBox(trigger.name, Config.triggers.triggersize, trigger.position)
+	local triggerC = Config.triggers.endtrigger
+	local endtrigger = CreateEmptyGameObject(triggerC.name)
+	triggerEnd = FanMeta:createPhantomCallbackTriggerBox(triggerC.name, Config.triggers.triggersize, triggerC.position)
 	triggerEnd.go.phantomCallback:getEnterEvent():registerListener(function(arg)
 		logMessage(GameLogic.isoCam.trackingObject.lastTransformator)
 		logMessage(GameLogic.transformator3.position)
