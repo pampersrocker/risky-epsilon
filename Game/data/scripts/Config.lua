@@ -103,15 +103,15 @@ Config = {
 		position = Vec3(-185,-150,-25),
 		size = Vec3(5,5,7),
 		name = "fan2",
-		--active = false
-		active = true
+		active = false
+		--active = true
 		},
 		fan3 = {
 		position = Vec3(51,-150,-13),
 		size = Vec3(27.5,5,20),
 		name = "fan3",
-		--active = false
-		active = true	
+		active = false
+		--active = true	
 		},
 		
 	},
@@ -142,11 +142,11 @@ Config = {
 	triggers = {
 		triggersize = Vec3(0.7,0.7,0.7),
 		trigger1 = {
-			position = Vec3(0,0,0),
+			position = Vec3(-312.4,-105,-30),
 			name = "trigger1"
 		},
 		trigger2 = {
-			position = Vec3(0,0,0),
+			position = Vec3(-17.2,-202.5,0.8),
 			name = "trigger2"
 		},
 		endtrigger = {
