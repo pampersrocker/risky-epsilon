@@ -66,7 +66,6 @@ function GameLogic.updateRunning( updateData )
 		DebugRenderer:printText(Vec2(0.0, 0.15), KeyCodes[Config.keys.gamepad.pause] .." - Pause the game")
 		DebugRenderer:printText(Vec2(0.0, 0.1), KeyCodes[Config.keys.gamepad.lastTransformator] .." - Start at last transformator")
 		DebugRenderer:printText(Vec2(0.0, 0.05), KeyCodes[Config.keys.gamepad.restart] .." - Restart level")
-		DebugRenderer:printText(Vec2(0.0, 0.0), "F2 - Debug drawings")
 
 
 

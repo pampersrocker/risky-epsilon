@@ -75,6 +75,7 @@ KeyCodes[109] = "-n"
 KeyCodes[110] = ".n"
 KeyCodes[111] = "/n"
 -- Numpad numbers end
+
 KeyCodes[112] = "F1"
 KeyCodes[113] = "F2"
 KeyCodes[114] = "F3"
@@ -101,6 +102,7 @@ KeyCodes[220] = "\\"
 KeyCodes[221] = "]"
 KeyCodes[221] = "'"
 
+-- XPad keys
 KeyCodes[1] = "Up"
 KeyCodes[2] = "Down"
 KeyCodes[4] = "Left"
