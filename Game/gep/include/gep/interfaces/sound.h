@@ -24,9 +24,11 @@ namespace gep
         virtual void setListenerPosition(const vec3& pos) = 0;
         virtual void setListenerOrientation(const Quaternion& orientation) = 0;
         virtual void setListenerVelocity(const vec3& velocity) = 0;
-        
+
     LUA_BIND_REFERENCE_TYPE_BEGIN
         LUA_BIND_FUNCTION_NAMED(loadLibraryFromLua, "loadLibrary")
+		LUA_BIND_FUNCTION(setListenerPosition)
+		LUA_BIND_FUNCTION(setListenerOrientation)
     LUA_BIND_REFERENCE_TYPE_END;
     };
 

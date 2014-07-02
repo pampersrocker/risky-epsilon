@@ -140,16 +140,16 @@ function PlayerMeta.update( guid, elapsedTime )
 	end
 
 	-- development-jump-to-transformator-section
-	if (InputHandler:isPressed(Key.Numpad1)) then
+	if (InputHandler:isPressed(Key.Numpad1) or InputHandler:isPressed(Key.J)) then
 		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator1.position)
 	end
-	if (InputHandler:isPressed(Key.Numpad2)) then
+	if (InputHandler:isPressed(Key.Numpad2)or InputHandler:isPressed(Key.K)) then
 		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator2.position)
 	end
 	if (InputHandler:isPressed(Key.Numpad3) or InputHandler:isPressed(Key.L)) then
 		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator3.position)
 	end
-	if (InputHandler:isPressed(Key.Numpad4)) then
+	if (InputHandler:isPressed(Key.Numpad4)or InputHandler:isPressed(Key.U)) then
 		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator4.position)
 	end
 

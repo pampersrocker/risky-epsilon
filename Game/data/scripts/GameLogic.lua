@@ -17,6 +17,11 @@ end
 -- Running State
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
+	--GameLogic.isoCam.trackingObject.go:getWorldPosition()
+	--GameLogic.isoCam.go.cc:getWorldRotation()
+	SoundSystem:setListenerPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
+	SoundSystem:setListenerOrientation(GameLogic.isoCam.go.cc:getWorldRotation())
+	
 	DebugRenderer:printText(Vec2(0.8, 0.9), "F1 - help")
 	if (GameLogic.debugDrawings == true)then
 		DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
@@ -52,11 +57,26 @@ function GameLogic.updateRunning( updateData )
 	
 	-- show help screen
 	if (GameLogic.showHelp == true) then
-		DebugRenderer:printText(Vec2(0.0, 0.5), "Switches could only be triggered with a stone sphere.")
-		DebugRenderer:printText(Vec2(0.0, 0.45), "Some fans need to be turned on.")
-		DebugRenderer:printText(Vec2(0.0, 0.4), "Backspace - Start at last transformator.")
-		DebugRenderer:printText(Vec2(0.0, 0.3), "F2 - Debug drawings.")
-		DebugRenderer:printText(Vec2(0.0, 0.35), "F3 - Restart level.")
+		DebugRenderer:printText(Vec2(-0.2, 0.55), "Game Mechanics.")
+		DebugRenderer:printText(Vec2(0.0, 0.55), "Switches could only be triggered with a stone sphere.")
+		DebugRenderer:printText(Vec2(0.0, 0.5), "Some fans need to be turned on.")
+
+		DebugRenderer:printText(Vec2(-0.2, 0.4), "Keyboard Usage:")
+		DebugRenderer:printText(Vec2(0.0, 0.4), KeyCodes[Config.keys.keyboard.pause] .." - Pause the game")
+		DebugRenderer:printText(Vec2(0.0, 0.35), KeyCodes[Config.keys.keyboard.lastTransformator] .." - Start at last transformator")
+		DebugRenderer:printText(Vec2(0.0, 0.3), KeyCodes[Config.keys.keyboard.restart] .." - Restart level")
+		DebugRenderer:printText(Vec2(0.0, 0.25), "F2 - Debug drawings")
+
+		if InputHandler:gamepad(0):isConnected() then
+			DebugRenderer:printText(Vec2(-0.2, 0.15), "Gamepad Usage:")
+			DebugRenderer:printText(Vec2(0.0, 0.15), KeyCodes[Config.keys.gamepad.pause] .." - Pause the game")
+			DebugRenderer:printText(Vec2(0.0, 0.1), KeyCodes[Config.keys.gamepad.lastTransformator] .." - Start at last transformator")
+			DebugRenderer:printText(Vec2(0.0, 0.05), KeyCodes[Config.keys.gamepad.restart] .." - Restart level")
+		end
+
+
+
+
 	end
 	
 	return EventResult.Handled;
@@ -81,14 +101,20 @@ function GameLogic.restart()
 	GameLogic.totalElapsedTime = 0
 	GameLogic.isoCam.trackingObject.lastTransformator = Config.player.lastTransformator
 	GameLogic.finished = false
+	GameLogic.deathCount = 0
 	local go = GetGObyGUID("playerInstance")
 	if not(GameLogic.isoCam.trackingObject == go) then
 		ChangePlayer(go)
 	end
+	GameLogic.fan2.isActive = false
+	GameLogic.fan2.sound:stop()
+	GameLogic.fan3.isActive = false
+	GameLogic.fan3.sound:stop()
 	ResetCamera()
 end
 
 function GameLogic.lastTransformator()
+	GameLogic.deathCount = GameLogic.deathCount + 1
 	GameLogic.isoCam.trackingObject.go:setPosition(GameLogic.isoCam.trackingObject.lastTransformator)
 	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
 	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
@@ -261,6 +287,9 @@ function GameLogic.updateEnd( updateData )
 	if(InputHandler:wasTriggered(Key.Z)) then
 		GameLogic.Name = GameLogic.Name .. "Z"
 	end
+	if(InputHandler:wasTriggered(Key.Back)) then
+		GameLogic.Name = string.sub(GameLogic.Name, 1, -2)
+	end
 	if(InputHandler:wasTriggered(Key.Return)) then
 		if (GameLogic.notSaved == true) then
 			SaveHighscore()
@@ -292,8 +321,14 @@ end
 function SaveHighscore()
 	local f,err = io.open("highscores.txt","a")
 	if not f then return print(err) end
-	f:write(GameLogic.Name .. " : " .. GameLogic.totalElapsedTime)
+	f:write(GameLogic.Name .. " :")
 	f:write("\n")
+	f:write("Time: "..GameLogic.totalElapsedTime)
+	f:write("\n")
+	f:write("Death count: "..GameLogic.deathCount)
+	f:write("\n")	
+	f:write("---------------------------------------------------")
+	f:write("\n")	
 	f:close()
 	GameLogic.notSaved = false
 end

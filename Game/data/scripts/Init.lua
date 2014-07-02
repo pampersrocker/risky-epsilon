@@ -10,6 +10,7 @@ function InitializeWorld(  )
 
 	PlayerMeta.__index = PlayerMeta
 	GameLogic.totalElapsedTime = 0
+	GameLogic.deathCount = 0
 	GameLogic.finished = false
 	GameLogic.debugDrawings = false
 	GameLogic.showHelp = false
@@ -45,48 +46,34 @@ function InitializeWorld(  )
 	GameLogic.isoCam.isEnabled = true
 
 	
-
+	-- sound banks
+	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank")
+	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
+	--SoundSystem:loadLibrary(".\\data\\sound\\trigger.bank")
+	SoundSystem:loadLibrary(".\\data\\sound\\fan.bank")
+	
 
 
 	--create Level Tracks
      
 	LevelMeta.__index = LevelMeta
-	logMessage("Creating Level")
-	GameLogic.level = CreateEmptyGameObject("TestLevel")
+	-- logMessage("Creating Level")
+	-- GameLogic.level = CreateEmptyGameObject("TestLevel")
+	-- setmetatable(GameLogic.level, LevelMeta)
+	-- CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	-- GameLogic.level:initializeGameObject()
+
+	logMessage("Creating Track Ice")
+	GameLogic.level = CreateEmptyGameObject("Track_ice")
 	setmetatable(GameLogic.level, LevelMeta)
 	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.level:initializeGameObject()
---[[
-	logMessage("Creating Track1")
-	local name = "track1"
-	GameLogic.track1 = CreateEmptyGameObject(name)
-	setmetatable(GameLogic.track1, LevelMeta)
-	CreateScriptComponent(GameLogic.track1, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.track1:initializeTrack1()
+	GameLogic.level:initializeTrack_ice()
 
-	logMessage("Creating Track2")
-	local name = "track2"
-	GameLogic.track2 = CreateEmptyGameObject(name)
-	setmetatable(GameLogic.track2, LevelMeta)
-	CreateScriptComponent(GameLogic.track2, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.track2:initializeTrack2()
-
-	logMessage("Creating Track3")
-	local name = "track3"
-	GameLogic.track3 = CreateEmptyGameObject(name)
-	setmetatable(GameLogic.track3, LevelMeta)
-	CreateScriptComponent(GameLogic.track3, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.track3:initializeTrack3()
-
-	logMessage("Creating Track4")
-	local name = "track4"
-	GameLogic.track4 = CreateEmptyGameObject(name)
-	setmetatable(GameLogic.track4, LevelMeta)
-	CreateScriptComponent(GameLogic.track4, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.track4:initializeTrack4()
-	]]
-
-
+	logMessage("Creating Track Wood")
+	GameLogic.level = CreateEmptyGameObject("Track_wood")
+	setmetatable(GameLogic.level, LevelMeta)
+	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	GameLogic.level:initializeTrack_wood()
 
 
 	--create Fans
@@ -97,12 +84,19 @@ function InitializeWorld(  )
 	GameLogic.fan1 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan1, FanMeta)
 	CreateScriptComponent(GameLogic.fan1, FanMeta.init, FanMeta.update, FanMeta.destroy)
+	GameLogic.fan1.go.au = GameLogic.fan1.go:createAudioComponent()
+	GameLogic.fan1.sound = GameLogic.fan1.go.au:createSoundInstance("fan", "/fan/fan")
 	GameLogic.fan1:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.stoneonly)
+	GameLogic.fan1.sound:play()
+
+	
 	
 	logMessage("Creating Fan")
 	local fan = Config.fans.fan2
 	GameLogic.fan2 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan2, FanMeta)
+	GameLogic.fan2.go.au = GameLogic.fan2.go:createAudioComponent()
+	GameLogic.fan2.sound = GameLogic.fan2.go.au:createSoundInstance("fan", "/fan/fan")
 	CreateScriptComponent(GameLogic.fan2, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan2:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.paperonly)
 	
@@ -110,6 +104,8 @@ function InitializeWorld(  )
 	local fan = Config.fans.fan3
 	GameLogic.fan3 = CreateEmptyGameObject(fan.name)
 	setmetatable(GameLogic.fan3, FanMeta)
+	GameLogic.fan3.go.au = GameLogic.fan3.go:createAudioComponent()
+	GameLogic.fan3.sound = GameLogic.fan3.go.au:createSoundInstance("fan", "/fan/fan")
 	CreateScriptComponent(GameLogic.fan3, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan3:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.woodonly)
 
@@ -172,16 +168,32 @@ function InitializeWorld(  )
 	end)
 	
 	--create Triggers
-	local gotrigger = CreateEmptyGameObject("trigger for fan2")
-	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for fan2", Vec3(2.0,2.0,2.0), Vec3(-20.0,10.0,0.0))
+	local trigger = Config.triggers.trigger1
+	local gotrigger = CreateEmptyGameObject(trigger.name)
+	trigger = FanMeta:createPhantomCallbackTriggerBox(trigger.name, Config.triggers.triggersize, trigger.position)
 	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
 		local go = GetGObyGUID("playerInstanceStone")
 		if (GameLogic.isoCam.trackingObject == go) then
-			GameLogic.fan2.isActive = true			
+			GameLogic.fan2:Activate()	
+			GameLogic.fan2.sound:play()
 		end
 		
 		return EventResult.Handled
 	end)
+	local trigger = Config.triggers.trigger2
+	local gotrigger = CreateEmptyGameObject(trigger.name)
+	trigger = FanMeta:createPhantomCallbackTriggerBox(trigger.name, Config.triggers.triggersize, trigger.position)
+	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
+		local go = GetGObyGUID("playerInstanceStone")
+		if (GameLogic.isoCam.trackingObject == go) then
+			GameLogic.fan3:Activate() 	
+			GameLogic.fan3.sound:play()
+		end
+		
+		return EventResult.Handled
+	end)
+
+	
 	
 	--create EndTrigger
 	local trigger = Config.triggers.endtrigger

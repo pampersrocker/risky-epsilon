@@ -33,7 +33,7 @@ Config = {
 			},
 			stone = {
 				mass = 1370.0,
-				friction = 30.0,
+				friction = 20.0,
 				angularDamping = 0.3,
 				linearDamping = 0.0,
 				restitution = 0.0,
@@ -72,7 +72,7 @@ Config = {
 			restart = Key.F3,
 			zoomout = Key.Oem_Minus,
 			zoomin = Key.Oem_Plus,
-			lastTransformator = Key.Back
+			lastTransformator = Key.F4
 		},
 		gamepad = {
 			restart = Button.Back,
@@ -89,8 +89,8 @@ Config = {
 	fans = {
 		forces = {
 			woodonly = Vec3(0.0,0.0,3123.0),
-			stoneonly =  Vec3(4123.0,0.0,0.0),
-			paperonly = Vec3(0.0,0.0,513.0)
+			stoneonly =  Vec3(5000.0,0.0,0.0),
+			paperonly = Vec3(0.0,0.0,650.0)
 		},
 		
 		fan1 = {
@@ -103,15 +103,15 @@ Config = {
 		position = Vec3(-185,-150,-25),
 		size = Vec3(5,5,7),
 		name = "fan2",
-		--active = false
-		active = true
+		active = false
+		--active = true
 		},
 		fan3 = {
 		position = Vec3(51,-150,-13),
 		size = Vec3(27.5,5,20),
 		name = "fan3",
-		--active = false
-		active = true	
+		active = false
+		--active = true	
 		},
 		
 	},
@@ -142,11 +142,11 @@ Config = {
 	triggers = {
 		triggersize = Vec3(0.7,0.7,0.7),
 		trigger1 = {
-			position = Vec3(0,0,0),
+			position = Vec3(-312.4,-105,-30),
 			name = "trigger1"
 		},
 		trigger2 = {
-			position = Vec3(0,0,0),
+			position = Vec3(-17.2,-202.5,0.8),
 			name = "trigger2"
 		},
 		endtrigger = {
