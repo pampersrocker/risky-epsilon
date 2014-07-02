@@ -1,61 +1,43 @@
 
 LevelMeta = {}
 
-function LevelMeta:initializeTrack1()
+function LevelMeta:initializeTrack_ice()
 	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_material_test_01.hkx")
+	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/roundtrack_ice.hkx")
 	cinfo.motionType = MotionType.Fixed
 	cinfo.restitution = Config.materials.track.ice.restitution
 	cinfo.friction = Config.materials.track.ice.friction
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 	CreatePhysicsComponent( self , cinfo )
-	CreateRenderComponent(self, "data/models/LevelElements/track_material_test_01.thModel")
+	CreateRenderComponent(self, "data/models/LevelElements/roundtrack_ice.thModel")
 end
-function LevelMeta:initializeTrack2()
+
+function LevelMeta:initializeTrack_wood()
 	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_material_test_02.hkx")
+	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/roundtrack_wood.hkx")
 	cinfo.motionType = MotionType.Fixed
 	cinfo.restitution = Config.materials.track.wood.restitution
 	cinfo.friction = Config.materials.track.wood.friction
 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 	CreatePhysicsComponent( self , cinfo )
-	CreateRenderComponent(self, "data/models/LevelElements/track_material_test_02.thModel")
-end
-function LevelMeta:initializeTrack3()
-	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_material_test_03.hkx")
-	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.track.ice.restitution
-	cinfo.friction = Config.materials.track.ice.friction
-	cinfo.position = Vec3(0.0, 0.0, 0.0)
-	CreatePhysicsComponent( self , cinfo )
-	CreateRenderComponent(self, "data/models/LevelElements/track_material_test_03.thModel")
-end
-function LevelMeta:initializeTrack4()
-	local cinfo = RigidBodyCInfo()
-	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/track_material_test_04.hkx")
-	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.track.wood.restitution
-	cinfo.friction = Config.materials.track.wood.friction
-	cinfo.position = Vec3(0.0, 0.0, 0.0)
-	CreatePhysicsComponent( self , cinfo )
-	CreateRenderComponent(self, "data/models/LevelElements/track_material_test_04.thModel")
+	CreateRenderComponent(self, "data/models/LevelElements/roundtrack_wood.thModel")
 end
 
 
-function LevelMeta:initializeGameObject()
-	logMessage("LevelMeta:init() start ")
-	local cinfo = RigidBodyCInfo()
-	--cinfo.shape = PhysicsFactory:createBox(Vec3(800,800,1))
-	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/roundtrack_02_col.hkx")
-	cinfo.motionType = MotionType.Fixed
-	cinfo.restitution = Config.materials.track.wood.restitution
-	cinfo.friction = Config.materials.track.wood.friction
-	cinfo.position = Vec3(0.0, 0.0, 0.0)
+-- function LevelMeta:initializeGameObject()
+-- 	logMessage("LevelMeta:init() start ")
+-- 	local cinfo = RigidBodyCInfo()
+-- 	--cinfo.shape = PhysicsFactory:createBox(Vec3(800,800,1))
+-- 	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/roundtrack_02_col.hkx")
+-- 	cinfo.motionType = MotionType.Fixed
+-- 	cinfo.restitution = Config.materials.track.wood.restitution
+-- 	cinfo.friction = Config.materials.track.wood.friction
+-- 	cinfo.position = Vec3(0.0, 0.0, 0.0)
 
-	CreatePhysicsComponent( self , cinfo )
-	CreateRenderComponent(self, "data/models/LevelElements/roundtrack_02.thModel")
+-- 	CreatePhysicsComponent( self , cinfo )
+-- 	CreateRenderComponent(self, "data/models/LevelElements/roundtrack_02.thModel")
 	
+
 	
 	
 	--[[
@@ -108,10 +90,10 @@ function LevelMeta:initializeGameObject()
 	logMessage("LevelMeta:init() end")
 	]]
 
-	logMessage("LevelMeta:init() end")
+	--logMessage("LevelMeta:init() end")
 	
 	
-end
+--end
 
 function createPhantomCallbackTriggerBox(guid, halfExtends, position)
 	local trigger = GameObjectManager:createGameObject(guid)

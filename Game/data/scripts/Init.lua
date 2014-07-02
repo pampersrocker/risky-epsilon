@@ -56,42 +56,23 @@ function InitializeWorld(  )
 	--create Level Tracks
      
 	LevelMeta.__index = LevelMeta
-	logMessage("Creating Level")
-	GameLogic.level = CreateEmptyGameObject("TestLevel")
+	-- logMessage("Creating Level")
+	-- GameLogic.level = CreateEmptyGameObject("TestLevel")
+	-- setmetatable(GameLogic.level, LevelMeta)
+	-- CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	-- GameLogic.level:initializeGameObject()
+
+	logMessage("Creating Track Ice")
+	GameLogic.level = CreateEmptyGameObject("Track_ice")
 	setmetatable(GameLogic.level, LevelMeta)
 	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.level:initializeGameObject()
---[[
-	logMessage("Creating Track1")
-	local name = "track1"
-	GameLogic.track1 = CreateEmptyGameObject(name)
-	setmetatable(GameLogic.track1, LevelMeta)
-	CreateScriptComponent(GameLogic.track1, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.track1:initializeTrack1()
+	GameLogic.level:initializeTrack_ice()
 
-	logMessage("Creating Track2")
-	local name = "track2"
-	GameLogic.track2 = CreateEmptyGameObject(name)
-	setmetatable(GameLogic.track2, LevelMeta)
-	CreateScriptComponent(GameLogic.track2, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.track2:initializeTrack2()
-
-	logMessage("Creating Track3")
-	local name = "track3"
-	GameLogic.track3 = CreateEmptyGameObject(name)
-	setmetatable(GameLogic.track3, LevelMeta)
-	CreateScriptComponent(GameLogic.track3, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.track3:initializeTrack3()
-
-	logMessage("Creating Track4")
-	local name = "track4"
-	GameLogic.track4 = CreateEmptyGameObject(name)
-	setmetatable(GameLogic.track4, LevelMeta)
-	CreateScriptComponent(GameLogic.track4, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	GameLogic.track4:initializeTrack4()
-	]]
-
-
+	logMessage("Creating Track Wood")
+	GameLogic.level = CreateEmptyGameObject("Track_wood")
+	setmetatable(GameLogic.level, LevelMeta)
+	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
+	GameLogic.level:initializeTrack_wood()
 
 
 	--create Fans

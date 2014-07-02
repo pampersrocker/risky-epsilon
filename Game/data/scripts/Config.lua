@@ -90,7 +90,7 @@ Config = {
 		forces = {
 			woodonly = Vec3(0.0,0.0,3123.0),
 			stoneonly =  Vec3(4123.0,0.0,0.0),
-			paperonly = Vec3(0.0,0.0,513.0)
+			paperonly = Vec3(0.0,0.0,650.0)
 		},
 		
 		fan1 = {
