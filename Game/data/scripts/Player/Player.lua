@@ -152,7 +152,8 @@ function PlayerMeta.update( guid, elapsedTime )
 	if (InputHandler:isPressed(Key.Numpad4)) then
 		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator4.position)
 	end
-	
+
+	local linearVelocity = Vec3(movementDirection.y,-movementDirection.x,movementDirection.z)
 	player.go.rb:applyLinearImpulse(linearVelocity:mulScalar(Config.player.linearVelocityScalar*elapsedTime))
 	player.go.rb:applyTorque(elapsedTime, movementDirection:mulScalar(Config.player.torqueMulScalar))
 end
