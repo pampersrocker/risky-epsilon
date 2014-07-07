@@ -118,7 +118,6 @@ function PlayerMeta.update( guid, elapsedTime )
 
 	if (InputHandler:isPressed(Config.keys.keyboard.left)) then
 		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
-		logMessage("PlayerUpdate")
 		player.go.angularVelocitySwapped = false
 		movementDirection = movementDirection:add(-viewDir)
 	end
@@ -162,10 +161,10 @@ end
 
 function PlayerMeta.init( guid )
 	-- body
-	local go = GetGObyGUID(guid)
+	logMessage("PlayerMeta.init!")
 end
 
 function PlayerMeta.destroy( ... )
 	-- body
-	logMessage("DESTROY!")
+	logMessage("PlayerMeta.destroy!")
 end

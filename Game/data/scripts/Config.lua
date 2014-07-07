@@ -115,6 +115,52 @@ Config = {
 		},
 		
 	},
+
+	fanblades = {		
+		fanblade1 = {
+			position = Vec3(-191,-70,-26),
+			rotationaxis = Vec3(-1, 0, 0),
+			baserotation = Quaternion(Vec3(0,0,0), 0),
+			name = "fanblade1",
+			active = true	
+		},
+		fanblade2 = {
+			position = Vec3(-185,-150,-32.1),
+			rotationaxis = Vec3(-1, 0, 0),
+			baserotation = Quaternion(Vec3(0,1,0), 90),
+			name = "fanblade2",
+			active = false
+		},
+		fanblade3 = {
+			position = Vec3(27,-150,-32.1),
+			rotationaxis = Vec3(-1, 0, 0),
+			baserotation = Quaternion(Vec3(0,1,0), 90),
+			name = "fanblade3",
+			active = false
+		},
+		fanblade4 = {
+			position = Vec3(42.6,-150,-32.1),
+			rotationaxis = Vec3(-1, 0, 0),
+			baserotation = Quaternion(Vec3(0,1,0), 90),
+			name = "fanblade4",
+			active = false
+		},
+		fanblade5 = {
+			position = Vec3(57.6,-150,-32.1),
+			rotationaxis = Vec3(-1, 0, 0),
+			baserotation = Quaternion(Vec3(0,1,0), 90),
+			name = "fanblade5",
+			active = false
+		},
+		fanblade6 = {
+			position = Vec3(72.7,-150,-32.1),
+			rotationaxis = Vec3(-1, 0, 0),
+			baserotation = Quaternion(Vec3(0,1,0), 90),
+			name = "fanblade6",
+			active = false
+		},
+		
+	},
 	
 	transformators = {
 		transformatorsize = Vec3(0.7,0.7,0.7),
@@ -154,6 +200,11 @@ Config = {
 			name = "endtrigger"
 		}
 	
+	},
+	triggerplates = 
+	{
+		trigger1 = Vec3(-312.5,-105,-31.2),
+		trigger2 = Vec3(-17.6,-202.5,-0.2),
 	}
 		
 	
