@@ -13,6 +13,7 @@ Scripting:registerScript("Levels/MaterialTest.lua")
 Scripting:registerScript("Fans/FanMeta.lua")
 Scripting:registerScript("Fans/FanBladesMeta.lua")
 Scripting:registerScript("GameLogic.lua")
+Scripting:registerScript("Fracture.lua")
 Scripting:registerScript("Init.lua")
 
 print("Finished initializing from lua.")

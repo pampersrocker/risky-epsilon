@@ -14,7 +14,7 @@ function InitializeWorld(  )
 	GameLogic.finished = false
 	GameLogic.debugDrawings = false
 	GameLogic.showHelp = false
-	
+
 	-- create player
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
@@ -45,17 +45,17 @@ function InitializeWorld(  )
 	--CreateScriptComponent(GameLogic.isoCam, IsoCamera.init, IsoCamera.update, IsoCamera.destroy)
 	GameLogic.isoCam.isEnabled = true
 
-	
+
 	-- sound banks
 	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank")
 	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
 	--SoundSystem:loadLibrary(".\\data\\sound\\trigger.bank")
 	SoundSystem:loadLibrary(".\\data\\sound\\fan.bank")
-	
+
 
 
 	--create Level Tracks
-     
+
 	LevelMeta.__index = LevelMeta
 	-- logMessage("Creating Level")
 	-- GameLogic.level = CreateEmptyGameObject("TestLevel")
@@ -122,7 +122,7 @@ function InitializeWorld(  )
 
 	--create Fans
 	FanMeta.__index = FanMeta
-	
+
 	logMessage("Creating Fan")
 	local fan = Config.fans.fan1
 	GameLogic.fan1 = CreateEmptyGameObject(fan.name)
@@ -143,7 +143,7 @@ function InitializeWorld(  )
 	GameLogic.fan2.blades = {GameLogic.fanblade2}
 	CreateScriptComponent(GameLogic.fan2, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan2:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.paperonly)
-	
+
 	logMessage("Creating Fan")
 	local fan = Config.fans.fan3
 	GameLogic.fan3 = CreateEmptyGameObject(fan.name)
@@ -154,13 +154,13 @@ function InitializeWorld(  )
 	CreateScriptComponent(GameLogic.fan3, FanMeta.init, FanMeta.update, FanMeta.destroy)
 	GameLogic.fan3:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.woodonly)
 
-	
+
 	-- create transformators
 	local transformator = Config.transformators.transformator1
 	GameLogic.transformator1 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
 	GameLogic.transformator1.au = GameLogic.transformator1.go:createAudioComponent()
 	GameLogic.transformator1.sound = GameLogic.transformator1.au:createSoundInstance("transformator1", "/Cancel")
-	GameLogic.transformator1.phantomCallback:getEnterEvent():registerListener(function(arg)		
+	GameLogic.transformator1.phantomCallback:getEnterEvent():registerListener(function(arg)
 		local go = GetGObyGUID(transformator.transformTo)
 		if not(GameLogic.isoCam.trackingObject == go) then
 			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
@@ -172,12 +172,12 @@ function InitializeWorld(  )
 	GameLogic.transformator1.phantomCallback:getLeaveEvent():registerListener(function(arg)
 		return EventResult.Handled
 	end)
-	
+
 	local transformator = Config.transformators.transformator2
 	GameLogic.transformator2 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
 	GameLogic.transformator2.au = GameLogic.transformator2.go:createAudioComponent()
 	GameLogic.transformator2.sound = GameLogic.transformator2.au:createSoundInstance("transformator2", "/Cancel")
-	GameLogic.transformator2.phantomCallback:getEnterEvent():registerListener(function(arg)		
+	GameLogic.transformator2.phantomCallback:getEnterEvent():registerListener(function(arg)
 		local go = GetGObyGUID(transformator.transformTo)
 		if not(GameLogic.isoCam.trackingObject == go) then
 			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
@@ -189,12 +189,12 @@ function InitializeWorld(  )
 	GameLogic.transformator2.phantomCallback:getLeaveEvent():registerListener(function(arg)
 		return EventResult.Handled
 	end)
-	
+
 	local transformator = Config.transformators.transformator3
 	GameLogic.transformator3 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
 	GameLogic.transformator3.au = GameLogic.transformator3.go:createAudioComponent()
 	GameLogic.transformator3.sound = GameLogic.transformator3.au:createSoundInstance("transformator3", "/Cancel")
-	GameLogic.transformator3.phantomCallback:getEnterEvent():registerListener(function(arg)		
+	GameLogic.transformator3.phantomCallback:getEnterEvent():registerListener(function(arg)
 		local go = GetGObyGUID(transformator.transformTo)
 		if not(GameLogic.isoCam.trackingObject == go) then
 			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
@@ -206,12 +206,12 @@ function InitializeWorld(  )
 	GameLogic.transformator3.phantomCallback:getLeaveEvent():registerListener(function(arg)
 		return EventResult.Handled
 	end)
-	
+
 	local transformator = Config.transformators.transformator4
 	GameLogic.transformator4 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
 	GameLogic.transformator4.au = GameLogic.transformator4.go:createAudioComponent()
 	GameLogic.transformator4.sound = GameLogic.transformator4.au:createSoundInstance("transformator4", "/Cancel")
-	GameLogic.transformator4.phantomCallback:getEnterEvent():registerListener(function(arg)		
+	GameLogic.transformator4.phantomCallback:getEnterEvent():registerListener(function(arg)
 		local go = GetGObyGUID(transformator.transformTo)
 		if not(GameLogic.isoCam.trackingObject == go) then
 			GameLogic.isoCam.trackingObject.lastTransformator = transformator.position
@@ -223,9 +223,9 @@ function InitializeWorld(  )
 	GameLogic.transformator4.phantomCallback:getLeaveEvent():registerListener(function(arg)
 		return EventResult.Handled
 	end)
-	
+
 	-- create trigger plates
-	
+
 	GameLogic.triggerPlate1 = CreateEmptyGameObject("triggerPlate1")
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:createBox(Vec3(1.2,1.2,0.45))
@@ -235,7 +235,7 @@ function InitializeWorld(  )
 	cinfo.position = Config.triggerplates.trigger1
 	CreatePhysicsComponent( GameLogic.triggerPlate1 , cinfo )
 	CreateRenderComponent(GameLogic.triggerPlate1, "data/models/LevelElements/track_switch_01.thModel")
-	
+
 	GameLogic.triggerPlate2 = CreateEmptyGameObject("triggerPlate2")
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:createBox(Vec3(1.2,1.2,0.45))
@@ -244,8 +244,8 @@ function InitializeWorld(  )
 	cinfo.friction = Config.materials.track.ice.friction
 	cinfo.position = Config.triggerplates.trigger2
 	CreatePhysicsComponent( GameLogic.triggerPlate2 , cinfo )
-	CreateRenderComponent(GameLogic.triggerPlate2, "data/models/LevelElements/track_switch_01.thModel")	
-	
+	CreateRenderComponent(GameLogic.triggerPlate2, "data/models/LevelElements/track_switch_01.thModel")
+
 	--create Triggers
 	local triggerC = Config.triggers.trigger1
 	local gotrigger = CreateEmptyGameObject(triggerC.name)
@@ -255,18 +255,18 @@ function InitializeWorld(  )
 		local go = GetGObyGUID("playerInstanceStone")
 		if (GameLogic.isoCam.trackingObject == go and not GameLogic.trigger1.triggered) then
 			GameLogic.trigger1.triggered = true
-			GameLogic.fan2:Activate()	
+			GameLogic.fan2:Activate()
 			GameLogic.fan2.sound:play()
 			GameLogic.trigger1.sound:play()
 			local position = GameLogic.triggerPlate1.go:getWorldPosition()
 			GameLogic.triggerPlate1.go:setPosition(Vec3(position.x,position.y,position.z - 0.1))
 		end
-		
+
 		return EventResult.Handled
 	end)
 	GameLogic.trigger1.go.au = GameLogic.trigger1.go:createAudioComponent()
 	GameLogic.trigger1.sound = GameLogic.trigger1.go.au:createSoundInstance("fan", "/trigger/Doorknob")
-	
+
 	local triggerC = Config.triggers.trigger2
 	local gotrigger = CreateEmptyGameObject(triggerC.name)
 	GameLogic.trigger2 = FanMeta:createPhantomCallbackTriggerBox(triggerC.name, Config.triggers.triggersize, triggerC.position)
@@ -275,19 +275,19 @@ function InitializeWorld(  )
 		local go = GetGObyGUID("playerInstanceStone")
 		if (GameLogic.isoCam.trackingObject == go and not GameLogic.trigger2.triggered) then
 			GameLogic.trigger2.triggered = true
-			GameLogic.fan3:Activate() 	
+			GameLogic.fan3:Activate()
 			GameLogic.fan3.sound:play()
 			GameLogic.trigger2.sound:play()
 			local position = GameLogic.triggerPlate2.go:getWorldPosition()
 			GameLogic.triggerPlate2.go:setPosition(Vec3(position.x,position.y,position.z - 0.1))
 		end
-		
+
 		return EventResult.Handled
 	end)
 	GameLogic.trigger2.go.au = GameLogic.trigger2.go:createAudioComponent()
 	GameLogic.trigger2.sound = GameLogic.trigger2.go.au:createSoundInstance("fan", "/trigger/Doorknob")
-	
-	
+
+
 	--create EndTrigger
 	local triggerC = Config.triggers.endtrigger
 	local endtrigger = CreateEmptyGameObject(triggerC.name)
@@ -299,20 +299,34 @@ function InitializeWorld(  )
 		if (GameLogic.isoCam.trackingObject == go) then
 			GameLogic.finished = true
 		end
-		
+
 		return EventResult.Handled
 	end)
-	
+
 	--create trigger for groundfall
 	local gotrigger = CreateEmptyGameObject("trigger for groundfall")
 	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for groundfall", Vec3(Config.world.worldSize/2.0,Config.world.worldSize/2.0,3.0), Vec3(0.0,0.0,-Config.world.worldSize/2.5))
 	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
-		GameLogic.restart()		
+		GameLogic.restart()
 		return EventResult.Handled
 	end)
-	
-		
-	
+	GameLogic.fractures = {}
+
+	for i=1,13 do
+		local name = "fracture"
+		if i < 10 then
+			name = name .. "0"
+		end
+		name = name .. tostring(i)
+		logMessage("Creating Fracture " .. name)
+		GameLogic[name] = CreateEmptyGameObject( Config.fractures[name].name )
+		setmetatable(GameLogic[name], FractureMeta)
+		GameLogic[name]:InitializeWoodFracture( Config.fractures[name] )
+		GameLogic[name].go:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
+		GameLogic.fractures[i] = GameLogic[name]
+		GameLogic[name].go:setComponentStates(ComponentState.Inactive)
+	end
+	--GameLogic.fractures[0].go:setActive(false)
 end
 
 InitializeWorld()

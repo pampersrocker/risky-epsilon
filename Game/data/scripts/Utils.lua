@@ -138,4 +138,9 @@ function ChangePlayer( newGo )
 	-- change cam-lockAT
 	GameLogic.isoCam.trackingObject = newGo
 
+	for k,v in pairs(GameLogic.fractures) do
+		v.go:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
+		v.go:setComponentStates(ComponentState.Active)
+	end
+
 end
