@@ -312,7 +312,7 @@ function InitializeWorld(  )
 	end)
 	GameLogic.fractures = {}
 
-	for i=1,13 do
+	for i=1,Config.fractures.fractureCount do
 		local name = "fracture"
 		if i < 10 then
 			name = name .. "0"

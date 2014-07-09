@@ -140,6 +140,13 @@ function ChangePlayer( newGo )
 
 	for k,v in pairs(GameLogic.fractures) do
 		v.go:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
+		local quat = _Quaternion()
+		quat.x = 0
+		quat.y = 0
+		quat.z = 0
+		quat.w = 1
+		v.go:setRotation(quat)
+
 		v.go:setComponentStates(ComponentState.Active)
 	end
 

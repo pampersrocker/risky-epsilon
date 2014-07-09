@@ -208,6 +208,7 @@ Config = {
 	},
 	fractures =
 	{
+		fractureCount = 1,
 		fracture01 =
 		{
 			name = "fracture01",
