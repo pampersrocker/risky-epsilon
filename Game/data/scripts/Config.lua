@@ -54,12 +54,12 @@ Config = {
 				restitution = 0.75,
 			},
 			ice = {
-				friction = 0.01, 
+				friction = 0.01,
 				restitution = 0.0
 			}
 		}
 
-		
+
 	},
 
 	keys = {
@@ -82,22 +82,22 @@ Config = {
 	},
 
 	world = {
-		gravity = Vec3(0,0,-9.81), 
+		gravity = Vec3(0,0,-9.81),
 		worldSize = 4000
 	},
-	
+
 	fans = {
 		forces = {
 			woodonly = Vec3(0.0,0.0,3123.0),
 			stoneonly =  Vec3(5000.0,0.0,0.0),
 			paperonly = Vec3(0.0,0.0,650.0)
 		},
-		
+
 		fan1 = {
 		position = Vec3(-170,-70,-30),
 		size = Vec3(20,5,5),
 		name = "fan1",
-		active = true	
+		active = true
 		},
 		fan2 = {
 		position = Vec3(-185,-150,-25),
@@ -111,18 +111,18 @@ Config = {
 		size = Vec3(27.5,5,20),
 		name = "fan3",
 		active = false
-		--active = true	
+		--active = true
 		},
-		
+
 	},
 
-	fanblades = {		
+	fanblades = {
 		fanblade1 = {
 			position = Vec3(-191,-70,-26),
 			rotationaxis = Vec3(-1, 0, 0),
 			baserotation = Quaternion(Vec3(0,0,0), 0),
 			name = "fanblade1",
-			active = true	
+			active = true
 		},
 		fanblade2 = {
 			position = Vec3(-185,-150,-32.1),
@@ -159,32 +159,32 @@ Config = {
 			name = "fanblade6",
 			active = false
 		},
-		
+
 	},
-	
+
 	transformators = {
 		transformatorsize = Vec3(0.7,0.7,0.7),
 		transformator1 = {
 			name = "transformator1",
 			position = Vec3(-69.9,-77.2,1),
-			transformTo = "playerInstanceStone"		
+			transformTo = "playerInstanceStone"
 		},
 		transformator2 = {
 			name = "transformator2",
 			position = Vec3(-177.3,-135,-30),
-			transformTo = "playerInstancePaper"		
+			transformTo = "playerInstancePaper"
 		},
 		transformator3 = {
 			name = "transformator3",
 				position = Vec3(22.3,-163,0.8),
-				transformTo = "playerInstance"		
+				transformTo = "playerInstance"
 		},
 		transformator4 = {
 			name = "transformator4",
 				position = Vec3(12,-118,0.8),
-				transformTo = "playerInstanceStone"		
+				transformTo = "playerInstanceStone"
 		},
-	},	
+	},
 	triggers = {
 		triggersize = Vec3(0.7,0.7,0.7),
 		trigger1 = {
@@ -199,15 +199,15 @@ Config = {
 			position = Vec3(100,0,-20),
 			name = "endtrigger"
 		}
-	
+
 	},
-	triggerplates = 
+	triggerplates =
 	{
 		trigger1 = Vec3(-312.5,-105,-31.2),
 		trigger2 = Vec3(-17.6,-202.5,-0.2),
 	}
-		
-	
+
+
 }
 
 

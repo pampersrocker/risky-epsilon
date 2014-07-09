@@ -15,7 +15,7 @@ function FanBladesMeta.update( guid, elapsedTime )
 	local fan = GetGObyGUID(guid)
 		
 	if fan.isActive then
-		fan.go:setRotation(fan.go:getRotation() * Quaternion(fan.rotationaxis, 9))
+		fan.go:setRotation(fan.go:getRotation() * Quaternion(fan.rotationaxis, 9 * elapsedTime * 60))
 	end
 end
 

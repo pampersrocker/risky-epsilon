@@ -7,14 +7,14 @@ Prototyping:
 -Behaviour of different materials.
 
 Materials - Sphere:
-- Paper: light, destroyed by fire/water/everything, small momentum, 
-- Stone: heavy, sphere gets smaller when heavy collided, big momentum, cant roll on:  water,  
-- Wood: medium, default material, floats on water, destroyed by fire, moving objects, cant roll on:  
+- Paper: light, destroyed by fire/water/everything, small momentum,
+- Stone: heavy, sphere gets smaller when heavy collided, big momentum, cant roll on:  water,
+- Wood: medium, default material, floats on water, destroyed by fire, moving objects, cant roll on:
 - Rubber: medium-light, bounces, floats on water, destroyed by fire, cant roll just jump, can the sphere jump by itself?, begin on high terrain
-- Magnet: very heavy, magnetic, cant roll on:  water, 
+- Magnet: very heavy, magnetic, cant roll on:  water,
 - Soap bubble: very light, floats in the air, destroyed on collision
-- Ice: destroyed when collided, floats on water,  good friction on: wood, 
-- Plastic: light, destoryed by fire, small momentum, LEGO-mannequin walks inside 
+- Ice: destroyed when collided, floats on water,  good friction on: wood,
+- Plastic: light, destoryed by fire, small momentum, LEGO-mannequin walks inside
 
 
 Materials - Ground:
@@ -22,7 +22,7 @@ Materials - Ground:
 - Metal(Iron, Nickel, Cobalt): good friction for rubber and magnet sphere, bad friction for the rest
 - Ice: very low friction, (what about rubber?)
 - Stone: good friction, higher jumps of rubber than on wood
-- Water: 
+- Water:
 
 Behaviour/Features:
 - Change material sphere with "transformators"
@@ -34,7 +34,7 @@ Behaviour/Features:
 - Fire objects
 - Water pits
 - Freeze water to ice
--  
+-
 
 Prios:
 - Wood
@@ -55,5 +55,5 @@ Balancing:
 - magnetic force( distance to source)
 - restitution
 - damping
-- camera min/max distance 
-- 
+- camera min/max distance
+-
