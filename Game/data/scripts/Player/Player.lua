@@ -16,6 +16,7 @@ function PlayerMeta:initializeGameObjectWood( )
 	--cinfo.linearDamping = materialTable.linearDamping
 	cinfo.angularDamping = materialTable.angularDamping
 	cinfo.position = Config.player.spawnPosition
+	cinfo.collisionFilterInfo = 1
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/SphereWood.thmodel")
 	
@@ -44,6 +45,7 @@ function PlayerMeta:initializeGameObjectStone( )
 	--cinfo.linearDamping = materialTable.linearDamping
 	cinfo.angularDamping = materialTable.angularDamping 
 	cinfo.position = Config.player.spawnPosition
+	cinfo.collisionFilterInfo = 1
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/SphereMarble.thmodel")
 	self.lastTransformator = Config.player.lastTransformator
@@ -64,6 +66,7 @@ function PlayerMeta:initializeGameObjectPaper( )
 	--cinfo.linearDamping = materialTable.linearDamping
 	cinfo.angularDamping = materialTable.angularDamping 
 	cinfo.position = Config.player.spawnPosition
+	cinfo.collisionFilterInfo = 1
 	CreatePhysicsComponent( self , cinfo )
 	CreateRenderComponent(self, "data/models/Sphere/SpherePaper.thmodel")
 	self.lastTransformator = Config.player.lastTransformator

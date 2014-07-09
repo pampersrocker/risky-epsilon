@@ -48,6 +48,7 @@ function FanMeta:createPhantomCallbackTriggerBox(guid, halfExtends, position)
 	cinfo.shape = PhysicsFactory:createBoundingVolumeShape(boundingShape, phantomCallbackShape)
 	cinfo.motionType = MotionType.Fixed
 	cinfo.position = position
+	cinfo.collisionFilterInfo = 1
 	trigger.go.pc.rb = trigger.go.pc:createRigidBody(cinfo)
 	trigger.go.phantomCallback = phantomCallbackShape
 

@@ -307,7 +307,9 @@ function InitializeWorld(  )
 	local gotrigger = CreateEmptyGameObject("trigger for groundfall")
 	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for groundfall", Vec3(Config.world.worldSize/2.0,Config.world.worldSize/2.0,3.0), Vec3(0.0,0.0,-Config.world.worldSize/2.5))
 	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
-		GameLogic.restart()
+		if arg == GameLogic.isoCam.trackingObject then
+			GameLogic.restart()
+		end
 		return EventResult.Handled
 	end)
 	GameLogic.fractures = {}
