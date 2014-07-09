@@ -80,6 +80,8 @@ namespace gep
             if (m_pScriptingManager == nullptr) { m_pScriptingManager = &EventScriptingManager::instance(); }
 
             if(cinfo.initializer) { cinfo.initializer(*this); }
+
+            startUpdating();
         }
 
         ~Event()
@@ -163,7 +165,6 @@ namespace gep
                 return DelayedEventIdType::invalidValue();
             }
 
-            startUpdating();
             DelayedEvent delayedEvent;
             delayedEvent.remainingSeconds = delayInSeconds;
             delayedEvent.data = data;
@@ -311,20 +312,15 @@ namespace gep
             }
         }
 
-        inline void updateDelayedEvents(float elapsedMilliseconds)
+        inline void updateDelayedEvents(float elapsedSeconds)
         {
-            float elapsedSeconds = elapsedMilliseconds / 1000.0f;
+            // If there are no delayed events, there is no need to update
+            if(m_delayedEvents.count() == 0){ return; }
 
             m_delayedEvents.removeWhere([&](DelayedEventIdType& id, DelayedEvent& delayedEvent){
                 delayedEvent.remainingSeconds -= elapsedSeconds;
                 return processDelayedEvent(delayedEvent);
             });
-
-            // If there are no more delayed events, there is no need to update
-            if (m_delayedEvents.count() == 0)
-            {
-                stopUpdating();
-            }
         }
 
         /// \brief returns \c true if the delayed event is finished, \c false otherwise.

@@ -9,7 +9,17 @@ namespace gep
 {
     class IPhysicsEntity;
     class ICharacterRigidBody;
+    class CollisionArgs;
     class ContactPointArgs;
+
+    class ICollisionFilter : public ReferenceCounted
+    {
+    public:
+        virtual ~ICollisionFilter() = 0 {}
+
+        LUA_BIND_REFERENCE_TYPE_BEGIN
+        LUA_BIND_REFERENCE_TYPE_END
+    };
 
     /// \brief Construction info for a physics world instance.
     struct WorldCInfo
@@ -33,6 +43,36 @@ namespace gep
     class IWorld : public ReferenceCounted
     {
     public:
+        struct ScopedRead
+        {
+        private:
+            IWorld* m_pWorld;
+
+        public:
+            ScopedRead(IWorld* pWorld) : m_pWorld(pWorld) { m_pWorld->markForRead(); }
+            ~ScopedRead() { m_pWorld->unmarkForRead(); m_pWorld = nullptr; }
+        };
+
+        struct ScopedWrite
+        {
+        private:
+            IWorld* m_pWorld;
+
+        public:
+            ScopedWrite(IWorld* pWorld) : m_pWorld(pWorld) { m_pWorld->markForWrite(); }
+            ~ScopedWrite() { m_pWorld->unmarkForWrite(); m_pWorld = nullptr; }
+        };
+
+        struct ScopedLock
+        {
+        private:
+            IWorld* m_pWorld;
+
+        public:
+            ScopedLock(IWorld* pWorld) : m_pWorld(pWorld) { m_pWorld->lock(); }
+            ~ScopedLock() { m_pWorld->unlock(); m_pWorld = nullptr; }
+        };
+    public:
         virtual ~IWorld(){}
 
         /// \brief Adds a physics entity to this world.
@@ -53,15 +93,39 @@ namespace gep
         /// The ownership of the character rigid body is transfered to the caller.
         virtual void removeCharacter(ICharacterRigidBody* character) = 0;
 
+        /// \brief
+        //////////////////////////////////////////////////////////////////////////
+        virtual void setCollisionFilter(ICollisionFilter* pFilter) = 0;
+
         /// \brief Register a contact listener for all collision events
         virtual Event<ContactPointArgs*>* getContactPointEvent() = 0;
+        virtual Event<CollisionArgs*>* getCollisionAddedEvent() = 0;
+        virtual Event<CollisionArgs*>* getCollisionRemovedEvent() = 0;
 
         /// \brief Casts a ray defined in \a input into this world. The output is represented by the \a output argument.
         virtual void castRay(const RayCastInput& input, RayCastOutput& output) const = 0;
 
+        virtual void   markForRead() const = 0;
+        virtual void unmarkForRead() const = 0;
+        virtual void   markForWrite() = 0;
+        virtual void unmarkForWrite() = 0;
+        virtual void   lock() = 0;
+        virtual void unlock() = 0;
+
         LUA_BIND_REFERENCE_TYPE_BEGIN
-            //LUA_BIND_FUNCTION(castRay)
+            LUA_BIND_FUNCTION_PTR(static_cast<RayCastOutput(IWorld::*)(const RayCastInput&)>(&castRay), "castRay")
+            LUA_BIND_FUNCTION(setCollisionFilter)
             LUA_BIND_FUNCTION(getContactPointEvent)
+            LUA_BIND_FUNCTION(getCollisionAddedEvent)
+            LUA_BIND_FUNCTION(getCollisionRemovedEvent)
         LUA_BIND_REFERENCE_TYPE_END
+
+    private:
+        RayCastOutput castRay(const RayCastInput& input)
+        {
+            RayCastOutput out;
+            castRay(input, out);
+            return out;
+        }
     };
 }

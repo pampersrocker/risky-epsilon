@@ -305,24 +305,5 @@ namespace gep
         virtual void setDebugDrawingEnabled(bool value) override;
         virtual bool getDebugDrawingEnabled() const override;
         virtual void toggleDebugDrawing() override;
-
     };
-
-    class Animation : public IAnimation
-    {
-
-        Model* m_pModel;
-    public:
-        Animation(Model* model);
-        virtual ~Animation();
-
-        virtual void update(float elapsedSeconds) override;
-
-        void setModel(Model* model) { m_pModel = model; }
-        Model* getModel() const { return m_pModel; }
-
-    private:
-        void updateGlobalBoneTransforms(float elapedSeconds);
-    };
-    
 }

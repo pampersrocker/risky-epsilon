@@ -78,7 +78,7 @@ namespace gep
     struct CommandDrawText : public CommandBase
     {
         static const CommandType TYPE = CommandType::Text;
-        ivec2 position;
+        uvec2 position;
         Color color;
         union
         {

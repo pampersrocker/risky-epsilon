@@ -58,7 +58,7 @@ int gep::UnittestManager::runAllTests()
     }
     else
     {
-      log.logSuccess("All tests passed in %f ms\n", testsEnd - testsBegin);
+      log.logSuccess("All tests passed in %f s\n", testsEnd - testsBegin);
     }
     return numFailedTests;
 }
@@ -118,7 +118,7 @@ int gep::UnittestGroup::runAllSubtests(UnittestLog& log)
                 }
                 else
                 {
-                    log.logSuccess("  Subtest %s passed in %f ms\n", (*it)->getName(), afterTest - beforeTest);
+                    log.logSuccess("  Subtest %s passed in %f s\n", (*it)->getName(), afterTest - beforeTest);
                 }
             }
         }
@@ -145,7 +145,7 @@ int gep::UnittestGroup::runAllSubtests(UnittestLog& log)
     }
     else
     {
-        log.logSuccess("All Tests in group %s passed in %f ms\n\n", m_name, testsEnd - testsBegin);
+        log.logSuccess("All Tests in group %s passed in %f s\n\n", m_name, testsEnd - testsBegin);
     }
     return numTestsFailed;
 }

@@ -15,8 +15,9 @@ namespace gep
     class CollisionMesh : public ICollisionMesh
     {
         friend class CollisionMeshFileLoader;
-
+        
         IShape* m_pShape;
+        Transform* m_pTransform;
         CollisionMeshFileLoader* m_pCollisionMeshFileLoader;
     public:
         CollisionMesh();
@@ -44,16 +45,18 @@ namespace gep
         virtual const IShape* getShape() const override;
 
     private:
-
+        
         void setShape(IShape* shape);
+        void setTransform(Transform* transform);
 
     };
 
     class CollisionMeshFileLoader : public IResourceLoader
     {
+        IAllocator* m_pAllocator;
         std::string m_path;
     public:
-        CollisionMeshFileLoader(const char* path);
+        CollisionMeshFileLoader(IAllocator* pAllocator, const char* path);
         virtual ~CollisionMeshFileLoader();
 
         virtual IResource* loadResource(IResource* pInPlace);
@@ -94,5 +97,25 @@ namespace gep
 
         virtual ResourcePtr<ICollisionMesh> loadCollisionMesh(const char* path);
         virtual IShape* loadCollisionMeshFromLua(const char* path);
+
+        virtual IBoxShape* createBox(const vec3& halfExtends) override;
+        virtual ISphereShape* createSphere(float radius) override;
+        virtual ICapsuleShape* createCapsule(const vec3& start, const vec3& end, float radius) override;
+        virtual ICylinderShape* createCylinder(const vec3& start, const vec3& end, float radius) override;
+        virtual ITriangleShape* createTriangle(const vec3& vertex0, const vec3& vertex1, const vec3& vertex2) override;
+        virtual IConvexTranslateShape* createConvexTranslateShape(IShape* pShape, const vec3& translation) override;
+        virtual ITransformShape* createTransformShape(IShape* pShape, const vec3& translation, const Quaternion& rotation) override;
+        virtual IBoundingVolumeShape* createBoundingVolumeShape(IShape* pBounding, IShape* pChild) override;
+        virtual IPhantomCallbackShape* createPhantomCallbackShape() override;
+
+        virtual ICollisionFilter* createCollisionFilter_Simple() override;
+
+    private:
+        template<typename T_Shape>
+        T_Shape* postProcessNewShape(T_Shape* pShape)
+        {
+            pShape->initialize();
+            return pShape;
+        }
     };
 }

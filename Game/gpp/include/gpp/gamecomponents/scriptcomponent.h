@@ -22,6 +22,7 @@ namespace gpp
             LUA_BIND_FUNCTION(setInitializationFunction)
             LUA_BIND_FUNCTION(setDestroyFunction)
             LUA_BIND_FUNCTION(setUpdateFunction)
+            LUA_BIND_FUNCTION(setState)
         LUA_BIND_REFERENCE_TYPE_END
 
     private:

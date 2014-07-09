@@ -11,6 +11,29 @@
 
 namespace gep
 {
+    namespace detail
+    {
+        void destroyScriptTypeInfoMap()
+        {
+            getScriptTypeInfoMap().clear();
+        }
+
+        ScriptTypeInfoMap_t& getScriptTypeInfoMap()
+        {
+            static ScriptTypeInfoMap_t scriptTypeInfos;
+            static bool initialized = false;
+
+            if (!initialized)
+            {
+                initialized = true;
+                gep::atexit(&destroyScriptTypeInfoMap);
+            }
+            
+            return scriptTypeInfos;
+        }
+    }
+
+
     void* scriptAllocator(void* userData, void* ptr, size_t originalSize, size_t newSize)
     {
         GEP_ASSERT(userData != nullptr, "Lua allocation called with invalid user data!");

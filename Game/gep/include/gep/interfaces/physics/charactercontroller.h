@@ -52,22 +52,18 @@ namespace gep
 
         /// Set this if you want the character to try and jump
         bool wantJump;
-
         // Orientation information
         //////////////////////////////////////////////////////////////////////////
 
         /// Up vector in world space - should generally point in the opposite direction to gravity
         vec3 up;
-
         /// Forward vector in world space - point in the direction the character is facing
         vec3 forward;
-
         // Spatial info
         //////////////////////////////////////////////////////////////////////////
 
         /// Set this if the character is at a ladder and you want it to start to climb
         bool atLadder;
-
         /// The surface information.
         SurfaceInfo surfaceInfo;
 
@@ -82,10 +78,8 @@ namespace gep
 
         /// Set this to the current Velocity
         vec3 velocity;
-
         /// The gravity that is applied to the character when in the air
         vec3 characterGravity;
-
         CharacterInput() :
             inputLR(0.0f),
             inputUD(0.0f),
@@ -100,6 +94,57 @@ namespace gep
             characterGravity(0.0f)
         {
         }
+
+        // Functions needed for scripting
+        //////////////////////////////////////////////////////////////////////////
+
+        inline float getInputLR() { return inputLR; }
+        inline void setInputLR(float lr) { inputLR = lr; }
+
+        inline float getInputUD() { return inputUD; }
+        inline void setInputUD(float ud) { inputUD = ud; }
+
+        inline vec3 getPosition() { return position; }
+        inline void setPosition(const vec3& pos) { position = pos; }
+
+        inline bool getWantJump() const { return wantJump; }
+        inline void setWantJump(bool value) { wantJump = value; }
+
+        inline gep::vec3 getUp() const { return up; }
+        inline void setUp(gep::vec3 value) { up = value; }
+
+        inline gep::vec3 getForward() const { return forward; }
+        inline void setForward(gep::vec3 value) { forward = value; }
+
+        inline bool getAtLadder() const { return atLadder; }
+        inline void setAtLadder(bool value) { atLadder = value; }
+
+        inline gep::vec3 getVelocity() const { return velocity; }
+        inline void setVelocity(gep::vec3 value) { velocity = value; }
+
+        inline gep::vec3 getCharacterGravity() const { return characterGravity; }
+        inline void setCharacterGravity(gep::vec3 value) { characterGravity = value; }
+
+        LUA_BIND_REFERENCE_TYPE_BEGIN
+            LUA_BIND_FUNCTION(getInputLR)
+            LUA_BIND_FUNCTION(setInputLR)
+            LUA_BIND_FUNCTION(getInputUD)
+            LUA_BIND_FUNCTION(setInputUD)
+            LUA_BIND_FUNCTION(getPosition)
+            LUA_BIND_FUNCTION(setPosition)
+            LUA_BIND_FUNCTION(getWantJump)
+            LUA_BIND_FUNCTION(setWantJump)
+            LUA_BIND_FUNCTION(getUp)
+            LUA_BIND_FUNCTION(setUp)
+            LUA_BIND_FUNCTION(getForward)
+            LUA_BIND_FUNCTION(setForward)
+            LUA_BIND_FUNCTION(getAtLadder)
+            LUA_BIND_FUNCTION(setAtLadder)
+            LUA_BIND_FUNCTION(getVelocity)
+            LUA_BIND_FUNCTION(setVelocity)
+            LUA_BIND_FUNCTION(getCharacterGravity)
+            LUA_BIND_FUNCTION(setCharacterGravity)
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 
     /// The output from the state machine
@@ -207,6 +252,21 @@ namespace gep
 
         LUA_BIND_VALUE_TYPE_BEGIN
         LUA_BIND_VALUE_TYPE_MEMBERS
+            LUA_BIND_MEMBER(mass)
+            LUA_BIND_MEMBER(maxForce)
+            LUA_BIND_MEMBER(friction)
+            LUA_BIND_MEMBER(maxSlope)
+            LUA_BIND_MEMBER(unweldingHeightOffsetFactor)
+            LUA_BIND_MEMBER(up)
+            LUA_BIND_MEMBER(maxLinearVelocity)
+            LUA_BIND_MEMBER(allowedPenetrationDepth)
+            LUA_BIND_MEMBER(maxSpeedForSimplexSolver)
+            LUA_BIND_MEMBER(collisionFilterInfo)
+            LUA_BIND_MEMBER(position)
+            LUA_BIND_MEMBER(rotation)
+            LUA_BIND_MEMBER(supportDistance)
+            LUA_BIND_MEMBER(hardSupportDistance)
+            LUA_BIND_MEMBER(shape)
         LUA_BIND_VALUE_TYPE_END
     };
 
@@ -265,7 +325,7 @@ namespace gep
     public:
         virtual ~ICharacterRigidBody() {}
 
-        virtual IRigidBody* getRigidBody() const = 0;
+        virtual IRigidBody* getRigidBody() = 0;
 
         virtual void initialize() = 0;
         virtual void destroy() = 0;
@@ -280,6 +340,7 @@ namespace gep
         virtual CharacterState::Enum getState() const = 0;
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
+            LUA_BIND_FUNCTION(getRigidBody)
             LUA_BIND_FUNCTION(getState)
         LUA_BIND_REFERENCE_TYPE_END
     };

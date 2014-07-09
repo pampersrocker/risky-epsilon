@@ -9,7 +9,7 @@ gep::Timer::Timer()
         throw Exception("no performance timer available");
     }
     QueryPerformanceCounter((LARGE_INTEGER*)&m_start);
-    m_resolution = 1000.0 / (double)m_frequency;
+    m_resolution = 1.0 / (double)m_frequency;
     m_pausedTime = 0;
 }
 

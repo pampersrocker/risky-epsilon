@@ -11,6 +11,7 @@
 #include "gep/interfaces/renderer.h"
 #include "gep/interfaces/scripting.h"
 #include "gep/interfaces/inputHandler.h"
+#include "gep/interfaces/sound.h"
 
 #include "gep/math3d/vec3.h"
 #include "gep/math3d/color.h"
@@ -24,6 +25,8 @@
 #include "gpp/stateMachines/stateMachineFactory.h"
 
 #include "gep/memory/leakDetection.h"
+
+#include "gpp/gameComponents/cameraComponent.h"
 
 namespace
 {
@@ -101,6 +104,10 @@ void gpp::Game::initialize()
         g_globalManager.getLogging()->logError(message);
     }
 
+    auto pPhysicsWorld = g_globalManager.getPhysicsSystem()->getWorld();
+    GEP_ASSERT(pPhysicsWorld, "You need to create a proper physics world!");
+    gep::IWorld::ScopedLock physicsWorldLock(pPhysicsWorld);
+
     m_pStateMachine->run();
     g_gameObjectManager.initialize();
 }
@@ -137,7 +144,7 @@ void gpp::Game::update(float elapsedTime)
         g_globalManager.getScriptingManager()->collectGarbage();
     }
 
-    /*  
+    /*
     vec2 mouseDelta;
     if(pInputHandler->getMouseDelta(mouseDelta))
     {
@@ -153,7 +160,7 @@ void gpp::Game::update(float elapsedTime)
     if(pInputHandler->isPressed(gep::Key::A))
     moveDelta.x -= 1.0f;
 
-    moveDelta *= elapsedTime; 
+    moveDelta *= elapsedTime;
 
     m_pFreeCamera->move(moveDelta);
 
@@ -178,14 +185,21 @@ void gpp::Game::update(float elapsedTime)
         pRenderer->setVSyncEnabled(!pRenderer->getVSyncEnabled());
 
     auto& debugRenderer = pRenderer->getDebugRenderer();
-    debugRenderer.printText(vec3(0.0f), "Origin");
+    //debugRenderer.printText(vec3(0.0f), "Origin");
 
-    // Draw world axes
-    debugRenderer.drawLocalAxes(vec3(0.0f), 30.0f);
-    debugRenderer.printText(vec3(30.0f, 0.0f,  0.0f ), "X", Color::red());
-    debugRenderer.printText(vec3(0.0f,  30.0f, 0.0f ), "Y", Color::green());
-    debugRenderer.printText(vec3(0.0f,  0.0f,  30.0f), "Z", Color::blue());
+    //// Draw world axes
+    //debugRenderer.drawLocalAxes(vec3(0.0f), 30.0f);
+    //debugRenderer.printText(vec3(30.0f, 0.0f,  0.0f ), "X", Color::red());
+    //debugRenderer.printText(vec3(0.0f,  30.0f, 0.0f ), "Y", Color::green());
+    //debugRenderer.printText(vec3(0.0f,  0.0f,  30.0f), "Z", Color::blue());
+    
     g_gameObjectManager.update(elapsedTime);
+    auto activeCamObj = g_gameObjectManager.getCurrentCameraObject()->getComponent<CameraComponent>();
+    if(activeCamObj)
+    {
+     //   g_globalManager.getSoundSystem()->setListenerPosition(activeCamObj->getWorldPosition());
+     //   g_globalManager.getSoundSystem()->setListenerOrientation(activeCamObj->getWorldRotation());
+    }
 }
 
 void gpp::Game::render(gep::IRendererExtractor& extractor)
@@ -196,13 +210,10 @@ void gpp::Game::render(gep::IRendererExtractor& extractor)
 
     auto& context2D = extractor.getContext2D();
     float avg = g_globalManager.getUpdateFramework()->calcElapsedTimeAverage(60);
-    float fps = 1000.0f / avg;
-   
+    float fps = 1.0f / avg;
 
-    context2D.printText(g_globalManager.getRenderer()->toNormalizedScreenPosition(ivec2(10, 5)), gep::format("FPS: %f", fps).c_str());
-    context2D.printText(g_globalManager.getRenderer()->toNormalizedScreenPosition(ivec2(10, 20)), gep::format("Memory used by lua: %d KB", g_globalManager.getScriptingManager()->memoryUsed()).c_str());
-    //context2D.printText(g_globalManager.getRenderer()->toNormalizedScreenPosition(ivec2(30, 20)), gep::format("Camera Position: [%f, %f, %f]", camPos.x, camPos.y, camPos.z).c_str());
-    //context2D.printText(g_globalManager.getRenderer()->toNormalizedScreenPosition(ivec2(30, 35)), gep::format("Camera View Angle: %f", m_pFreeCamera->getViewAngle()).c_str());
+    context2D.printText(g_globalManager.getRenderer()->toNormalizedScreenPosition(uvec2(10, 5)), gep::format("FPS: %f", fps).c_str());
+    context2D.printText(g_globalManager.getRenderer()->toNormalizedScreenPosition(uvec2(10, 20)), gep::format("Memory used by lua: %d KB", g_globalManager.getScriptingManager()->memoryUsed()).c_str());
 }
 
 void gpp::Game::setUpStateMachine()

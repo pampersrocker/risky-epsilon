@@ -5,11 +5,26 @@
 #include "gepimpl/subsystems/physics/havok/entity.h"
 #include "gepimpl/subsystems/physics/havok/conversion/shape.h"
 
+#include "gep/globalManager.h"
+#include "gep/interfaces/logging.h"
+
+void gep::HavokEntityInternals::setUserData(ScriptTableWrapper table)
+{
+    m_userData = table;
+}
+
+gep::ScriptTableWrapper gep::HavokEntityInternals::getUserData()
+{
+    return m_userData;
+}
+
 gep::HavokRigidBody::HavokRigidBody(hkpRigidBody* rigidBody) :
     m_pTriggerVolume(nullptr),
     m_positionChangedCallbacks(),
     m_shape(),
-    m_entity(rigidBody)
+    m_entity(rigidBody),
+    m_initialTransformDefault(),
+    m_pInitialTransform(&m_initialTransformDefault)
 {
     GEP_ASSERT(rigidBody && m_entity.getHkpEntity(), "Must not pass a nullptr!");
 }
@@ -18,7 +33,9 @@ gep::HavokRigidBody::HavokRigidBody(const RigidBodyCInfo& cinfo) :
     m_pTriggerVolume(nullptr),
     m_positionChangedCallbacks(),
     m_shape(cinfo.shape),
-    m_entity(nullptr)
+    m_entity(nullptr),
+    m_initialTransformDefault(),
+    m_pInitialTransform(&m_initialTransformDefault)
 {
     hkpRigidBodyCinfo hkcinfo;
 
@@ -28,7 +45,6 @@ gep::HavokRigidBody::HavokRigidBody(const RigidBodyCInfo& cinfo) :
     hkcinfo.m_shape = conversion::hk::to(cinfo.shape);
 
     // Set up mass of the rigid body.
-    //TODO: Should this be done only if cinfo.motionType != Motion::Fixed?
     {
         const hkReal mass = cinfo.mass;
 
@@ -61,18 +77,36 @@ gep::HavokRigidBody::HavokRigidBody(const RigidBodyCInfo& cinfo) :
     hkcinfo.m_numShapeKeysInContactPointProperties = cinfo.numShapeKeysInContactPointProperties;
 
     m_entity.setHkpEntity(new hkpRigidBody(hkcinfo));
-    if (hkcinfo.m_shape) hkcinfo.m_shape->removeReference();
+
+    if (cinfo.isTriggerVolume)
+    {
+        convertToTriggerVolume();
+    }
 }
 
 gep::HavokRigidBody::~HavokRigidBody()
 {
     m_entity.getHkpEntity()->setUserData(0);
-    m_pTriggerVolume = nullptr;
+    hk::removeRefAndNull(m_pTriggerVolume);
 }
 
 void gep::HavokRigidBody::initialize()
 {
     m_entity.getHkpEntity()->setUserData(reinterpret_cast<hkUlong>(this));
+}
+
+void gep::HavokRigidBody::setCollisionFilterInfo(uint32 value)
+{
+    auto pBody = getHkpRigidBody();
+    pBody->setCollisionFilterInfo(value);
+    auto pWorld = pBody->getWorld();
+    {
+        pWorld->lock();
+        pWorld->markForWrite();
+        pWorld->updateCollisionFilterOnEntity(pBody, HK_UPDATE_FILTER_ON_ENTITY_FULL_CHECK, HK_UPDATE_COLLECTION_FILTER_PROCESS_SHAPE_COLLECTIONS);
+        pWorld->unmarkForWrite();
+        pWorld->unlock();
+    }
 }
 
 gep::CallbackId gep::HavokRigidBody::registerSimulationCallback(PositionChangedCallback callback)
@@ -114,6 +148,45 @@ void gep::HavokRigidBody::reset()
                                        hkQuaternion::getIdentity());
     pRigidBody->setLinearVelocity(hkVector4(0.0f, 0.0f, 0.0f));
     pRigidBody->setAngularVelocity(hkVector4(0.0f, 0.0f, 0.0f));
+}
+
+void gep::HavokRigidBody::convertToTriggerVolume()
+{
+    if(!isTriggerVolume())
+    {
+        // Note: Not storing this pointer does not cause a memory leak!
+        // From the doc: "The object manages its own memory and keeps itself alive so long as its triggerBody is alive."
+        m_pTriggerVolume = new HavokTriggerVolume(this);
+        m_pTriggerVolume->removeReference();
+    }
+}
+
+gep::Event<gep::ITriggerEventArgs*>* gep::HavokRigidBody::getTriggerEvent()
+{
+    if (!isTriggerVolume())
+    {
+        g_globalManager.getLogging()->logWarning("Attempt to get trigger event for non-trigger-volume rigid body.");
+        return nullptr;
+    }
+    
+    return m_pTriggerVolume->getTriggerEvent();
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+gep::HavokTriggerVolume::HavokTriggerVolume(HavokRigidBody* pRigidBody) :
+    hkpTriggerVolume(pRigidBody->getHkpRigidBody()),
+    m_triggerEvent()
+{
+}
+
+void gep::HavokTriggerVolume::triggerEventCallback(hkpRigidBody* body, EventType type)
+{
+    auto pGepBody = reinterpret_cast<HavokRigidBody*>(body->getUserData());
+    GEP_ASSERT(pGepBody, "Invalid user data for incoming rigid body!");
+
+    TriggerEventArgs args(pGepBody, TriggerEventArgs::Type::Enum(type));
+    m_triggerEvent.trigger(&args);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -16,41 +16,32 @@ gpp::PhysicsComponent::PhysicsComponent():
 
 gpp::PhysicsComponent::~PhysicsComponent()
 {
-    m_pRigidBody = nullptr;
-    m_pWorld = nullptr;
 }
 
 void gpp::PhysicsComponent::initalize()
 {
-
+    GEP_ASSERT(m_pRigidBody, "Physics component needs a valid rigid body! "
+                             "Use createRigidBody to create one.");
     if (m_state != State::Initial) { return; } // User already the state.
     setState(State::Active);
 }
 
 void gpp::PhysicsComponent::update(float elapsedMS)
 {
-    if(m_pRigidBody)
-    {
-        if(m_pRigidBody->isTriggerVolume())   
-        {
-            m_pRigidBody->setPosition(m_transform.getWorldPosition());
-            m_pRigidBody->setRotation(m_transform.getWorldRotation());
-        }
-        else
-        {
-            if(m_transform.getParent())
-            {
-                m_transform.setPosition( m_pRigidBody->getPosition()  - m_transform.getParent()->getWorldPosition());
-                m_transform.setRotation(m_transform.getParent()->getWorldRotation().inverse() * m_pRigidBody->getRotation() );
-            }
-            else
-            {
-                m_transform.setPosition( m_pRigidBody->getPosition());
-                m_transform.setRotation( m_pRigidBody->getRotation() );
-            }
+    GEP_UNUSED(elapsedMS);
 
-        }
-    }   
+    gep::IWorld::ScopedLock raii(m_pWorld.get());
+
+    if(m_pRigidBody->isTriggerVolume() || m_pRigidBody->getMotionType() == gep::MotionType::Fixed)
+    {
+        m_pRigidBody->setPosition(m_transform.getWorldPosition());
+        m_pRigidBody->setRotation(m_transform.getWorldRotation());
+    }
+    else
+    {
+        m_transform.setPosition(m_pRigidBody->getPosition() - m_transform.getParent()->getWorldPosition());
+        m_transform.setRotation(m_transform.getParent()->getWorldRotation().inverse() * m_pRigidBody->getRotation());
+    }
 }
 
 void gpp::PhysicsComponent::destroy()
@@ -61,7 +52,6 @@ void gpp::PhysicsComponent::destroy()
 void gpp::PhysicsComponent::setBaseOrientation(const gep::Quaternion& viewDir)
 {
     m_baseOrientation = viewDir;
-
 }
 
 void gpp::PhysicsComponent::setBaseViewDirection(const gep::vec3& direction)
@@ -84,12 +74,6 @@ void gpp::PhysicsComponent::setRotation(const gep::Quaternion& rot)
     m_pRigidBody->setRotation(m_transform.getWorldRotation());
 }
 
-void gpp::PhysicsComponent::setScale(const gep::vec3& scale)
-{
-    GEP_ASSERT(false, "The engine currently doesn't support scaling of rigid bodies!");
-    GEP_ASSERT(m_pRigidBody, "When calling this method, the rigid body must not be null!");
-}
-
 gep::mat4 gpp::PhysicsComponent::getWorldTransformationMatrix() const
 {
     GEP_ASSERT(m_pRigidBody, "When calling this method, the rigid body must not be null!");
@@ -109,12 +93,6 @@ gep::Quaternion gpp::PhysicsComponent::getWorldRotation() const
     return m_transform.getWorldRotation();
 }
 
-gep::vec3 gpp::PhysicsComponent::getWorldScale() const
-{
-   GEP_ASSERT(false, "The engine currently doesn't (and probably never will) support scaling of rigid bodies!");
-   return gep::vec3(1.0f, 1.0f, 1.0f);
-}
-
 gep::mat4 gpp::PhysicsComponent::getTransformationMatrix()const
 {
     return m_transform.getTransformationMatrix();
@@ -130,22 +108,20 @@ gep::Quaternion gpp::PhysicsComponent::getRotation() const
     return m_transform.getRotation();
 }
 
-gep::vec3 gpp::PhysicsComponent::getScale() const
-{
-    return m_transform.getScale();
-}
-
-void gpp::PhysicsComponent::setParent(const gep::ITransform* parent)
+void gpp::PhysicsComponent::setParent(gep::ITransform* parent)
 {
    m_transform.setParent(parent);
 }
 
-const gep::ITransform* gpp::PhysicsComponent::getParent()
+gep::ITransform* gpp::PhysicsComponent::getParent()
 {
     return m_transform.getParent();
 }
 
-
+const gep::ITransform* gpp::PhysicsComponent::getParent() const
+{
+    return m_transform.getParent();
+}
 
 gep::IRigidBody* gpp::PhysicsComponent::getRigidBody()
 {
@@ -154,21 +130,41 @@ gep::IRigidBody* gpp::PhysicsComponent::getRigidBody()
 
 gep::IRigidBody* gpp::PhysicsComponent::createRigidBody(gep::RigidBodyCInfo& cinfo)
 {
-    GEP_ASSERT(m_pWorld != nullptr, "The Physics World for of the PhysicsComponent on has not been set.", m_pParentGameObject->getName().c_str());
+    GEP_ASSERT(m_pWorld.get() != nullptr, "The Physics World for of the PhysicsComponent on has not been set.", m_pParentGameObject->getName().c_str());
     GEP_ASSERT(!bool(m_pRigidBody), "The rigid body for of the PhysicsComponent has already been set.", m_pParentGameObject->getName().c_str());
     
-    if (m_pParentGameObject->getParent())
+    if (m_pParentGameObject->getParent() != gep::getIdentityTransform())
     {
         this->setParent(m_pParentGameObject->getParent());
     }
 
     m_pParentGameObject->setTransform(*this); //TODO: Set parent gameObject in Component Constructor!
 
-    auto* physicsSystem = g_globalManager.getPhysicsSystem();
-    auto* physicsFactory = physicsSystem->getPhysicsFactory();
+    // cinfo.position > 0
+    if(!gep::epsilonCompare(cinfo.position.squaredLength(), 0.0f))
+    {
+        m_transform.setPosition(m_transform.getWorldPosition() + cinfo.position);
+    }
+
+    if(!cinfo.rotation.isIdentity())
+    {
+        m_transform.setRotation(m_transform.getWorldRotation() * cinfo.rotation);
+    }
+
+
+
+    auto physicsSystem = g_globalManager.getPhysicsSystem();
+    auto physicsFactory = physicsSystem->getPhysicsFactory();
 
     m_pRigidBody = physicsFactory->createRigidBody(cinfo);
     m_pRigidBody->initialize();
+
+    if(cinfo.shape->getShapeType() == gep::ShapeType::Triangle)
+    {
+        auto shapeTransform = cinfo.shape->getTransform();
+        m_pRigidBody->setInitialTransform(shapeTransform);
+    }
+     
     return m_pRigidBody.get();
 }
 
@@ -181,7 +177,6 @@ void gpp::PhysicsComponent::setRigidBody(gep::IRigidBody* rigidBody)
 
 void gpp::PhysicsComponent::contactPointCallback(const gep::ContactPointArgs& evt)
 {
-    
     m_event_contactPoint.trigger(&const_cast<gep::ContactPointArgs&>(evt));
 }
 

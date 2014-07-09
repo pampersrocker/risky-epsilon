@@ -18,6 +18,7 @@ gpp::RenderComponent::RenderComponent():
     Component(),
     m_path(),
     m_pModel(nullptr),
+    m_scale(1, 1, 1),
     m_extractionCallbackId(0),
     m_bones()
 {
@@ -51,12 +52,12 @@ void gpp::RenderComponent::update(float elapsedMS)
 
 void gpp::RenderComponent::destroy()
 {
-    g_globalManager.getRendererExtractor()->deregisterExtractionCallback(m_extractionCallbackId);
+    setState(State::Inactive);
 }
 
 void gpp::RenderComponent::extract(gep::IRendererExtractor& extractor)
 {
-    m_pModel->extract(extractor, m_pParentGameObject->getWorldTransformationMatrix());
+    m_pModel->extract(extractor, m_pParentGameObject->getWorldTransformationMatrix() * gep::mat4::scaleMatrix(m_scale));
 }
 
 gep::DynamicArray<const char*> gpp::RenderComponent::getBoneNames()
@@ -98,12 +99,7 @@ void gpp::RenderComponent::setState(State::Enum state)
                 m_extractionCallbackId = g_globalManager.getRendererExtractor()->registerExtractionCallback(
                     std::bind(&RenderComponent::extract,this,std::placeholders::_1));
             }
-            else
-            {
-                g_globalManager.getLogging()->logWarning(
-                    "You should not set your render component's state to Active twice in a row.");
             }
-        }
         break;
     case State::Inactive:
         {
@@ -112,15 +108,10 @@ void gpp::RenderComponent::setState(State::Enum state)
                 g_globalManager.getRendererExtractor()->deregisterExtractionCallback(m_extractionCallbackId);
                 m_extractionCallbackId.id = 0;
             }
-            else
-            {
-                g_globalManager.getLogging()->logWarning(
-                    "You should not set your render component's state to Inactive twice in a row.");
-            }
         }
         break;
     default:
-        GEP_ASSERT(false, "Invalid State!");
+        GEP_ASSERT(false, "Invalid State!", m_state, state);
         break;
     }
 }

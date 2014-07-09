@@ -27,6 +27,11 @@ namespace gep
         ReferenceCounted() :
             m_referenceCount(0)
         {
+            GEP_ASSERT(m_pAllocator != nullptr,
+                       "The allocator should have been set by GEP_NEW! "
+                       "To ensure correct behavior, ReferenceCounted should "
+                       "be the first thing your class/struct inherits from "
+                       "(yes, the order of inheritance does matter!)");
         }
 
         virtual ~ReferenceCounted() { }

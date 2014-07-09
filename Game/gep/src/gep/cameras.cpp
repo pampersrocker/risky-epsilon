@@ -10,15 +10,27 @@ gep::Camera::Camera() :
     m_aspectRatio(9.0f / 16.0f),
     m_viewAngleInDegrees(60),
     m_near(0.1f),
-    m_far(10000.0f)
+    m_far(10000.0f),
+    m_orthographic(false)
 {
 
 }
 
 const gep::mat4 gep::Camera::getProjectionMatrix() const
 {
-    return mat4::projectionMatrix(m_viewAngleInDegrees, m_aspectRatio, m_near, m_far);
-    //return mat4::ortho(-30.0f, 30.0f, -15.0f, 15.0f, m_near, m_far);
+    if(m_orthographic)
+    {
+        float distance = (m_far - m_near) / 8; // use 1/8 view distance as adjacent length to calculate frustum
+        float viewAngleHalfInRad = gep::toRadians(m_viewAngleInDegrees/2);
+        float tangens = gep::sin(viewAngleHalfInRad) / gep::cos(viewAngleHalfInRad);
+        float topDist = tangens * distance; // tan * adjacent = opposite
+        float rightDist = m_aspectRatio * topDist;
+        return mat4::ortho(-topDist, topDist, -rightDist, rightDist, m_near, m_far);
+    }
+    else
+    {
+        return mat4::projectionMatrix(m_viewAngleInDegrees, m_aspectRatio, m_near, m_far);
+    }
 }
 
 
@@ -45,6 +57,53 @@ void gep::FreeCamera::lookAt(const gep::vec3& target)
 {
     mat4 lookAtMat = mat4::lookAtMatrix(getPosition(), target, getUpVector());
     m_rotation = Quaternion::fromMat4(lookAtMat);
+}
+
+
+gep::Ray gep::Camera::getRayForNormalizedScreenPos(const vec2& screenPos)
+{
+    vec3 from = vec3();
+    vec3 to = vec3();
+    Ray result = Ray(from, to);
+
+    // TODO: This doesn't work yet. Try to get view- and right-direction in world space
+    if (isOrthographic())
+    {
+        to = getViewMatrix().rotationPart() * vec3(0,1,0);
+        vec3 rightDir = getViewMatrix().rotationPart() * vec3(1,0,0);
+        vec3 upDir = getViewMatrix().rotationPart() * vec3(0,0,1);
+
+        float distance = (m_far - m_near) / 8; // use 1/8 view distance as adjacent length to calculate frustum
+        float viewAngleHalfInRad = gep::toRadians(m_viewAngleInDegrees/2);
+        float tangens = gep::sin(viewAngleHalfInRad) / gep::cos(viewAngleHalfInRad);
+        float topDist = tangens * distance; // tan * adjacent = opposite
+        float rightDist = m_aspectRatio * topDist;
+
+        vec3 offsetOnViewPlane = vec3(0,0,0);
+        offsetOnViewPlane.x = screenPos.x * rightDist;
+        offsetOnViewPlane.y = screenPos.y * topDist;
+        from = m_position + upDir * offsetOnViewPlane.x;
+        from = from + rightDir * offsetOnViewPlane.y;
+
+        result = Ray(from, to);
+    }
+    else
+    {
+        mat4 inverseViewProjeciton = getProjectionMatrix() * getViewMatrix();
+        inverseViewProjeciton = inverseViewProjeciton.inverse();
+        vec4 temp = inverseViewProjeciton * vec4(screenPos.x, screenPos.y, 1, 1);
+        to = vec3(temp.x, temp.y, temp.z).normalized();
+
+        result = Ray(m_position, to);
+    }
+
+    return result;
+}
+
+gep::Ray gep::Camera::getRayForAbsoluteScreenPos( const uvec2& screenPos )
+{
+    vec2 normalizedPos = g_globalManager.getRenderer()->toNormalizedScreenPosition(screenPos);
+    return getRayForNormalizedScreenPos(normalizedPos);
 }
 
 void gep::FreeCamera::look(vec2 delta)
@@ -186,46 +245,53 @@ void gep::CameraLookAtHorizon::tilt(float amount)
     m_tilt += amount;
 }
 
-const  gep::mat4  gep::CameraLookAtHorizon::getViewMatrix() const
+const gep::mat4  gep::CameraLookAtHorizon::getViewMatrix() const
 {
     vec3 up = Quaternion(m_viewDir, -m_tilt).toMat3() * m_upVector;
 
     return mat4::lookAtMatrix(m_position, m_position + m_viewDir, up);
 }
 
-void  gep::CameraLookAtHorizon::setUpVector(const vec3& vector)
+void gep::CameraLookAtHorizon::setUpVector(const vec3& vector)
 {
     m_upVector = vector.normalized();
 }
 
-void  gep::CameraLookAtHorizon::setViewVector(const vec3& vector)
+void gep::CameraLookAtHorizon::setViewVector(const vec3& vector)
 {
     m_viewDir = vector.normalized();
 }
 
+
 void gep::CameraLookAtHorizon::lookAt(const gep::vec3& target)
 {
-     m_viewDir = (target - m_position).normalized();
-
+    if (target.epsilonCompare(m_position))
+    {
+        m_viewDir = vec3(0, 0, 0);
+    }
+    else
+    {
+        m_viewDir = (target - m_position).normalized();
+    }
 }
 
 
-void  gep::CameraLookAtHorizon::setPosition(const gep::vec3& pos)
+void gep::CameraLookAtHorizon::setPosition(const gep::vec3& pos)
 {
     m_position = pos;
 }
 
-void  gep::CameraLookAtHorizon::setRotation(const gep::Quaternion& rot)
+void gep::CameraLookAtHorizon::setRotation(const gep::Quaternion& rot)
 {
    m_rotation = rot;
 }
 
-gep::vec3  gep::CameraLookAtHorizon::getPosition()
+gep::vec3 gep::CameraLookAtHorizon::getPosition()
 {
     return m_position;
 }
 
-gep::Quaternion  gep::CameraLookAtHorizon::getRotation()
+gep::Quaternion gep::CameraLookAtHorizon::getRotation()
 {
     return m_rotation;
 }

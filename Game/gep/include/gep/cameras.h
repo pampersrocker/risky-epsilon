@@ -31,15 +31,23 @@ namespace gep
         void setFar(float value) { m_far = value; }
 
         void setPosition(const vec3& pos){m_position = pos;}
+        
+        void setOrthographic(const bool orthographic) { m_orthographic = orthographic; };
+        bool isOrthographic() { return m_orthographic; };
+        
+        virtual gep::Ray getRayForNormalizedScreenPos(const vec2& screenPos);
+        virtual gep::Ray getRayForAbsoluteScreenPos(const uvec2& screenPos);
 
     protected:
         float m_viewAngleInDegrees;
         float m_aspectRatio;
         float m_near;
         float m_far;
+        bool m_orthographic;
         Quaternion m_rotation;
         vec3 m_position;
     };
+
     
     class GEP_API FreeCamera : public Camera
     {
