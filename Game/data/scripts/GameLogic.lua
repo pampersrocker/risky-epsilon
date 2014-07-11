@@ -202,7 +202,7 @@ function GameLogic.updateEnd( updateData )
 	DebugRenderer:_printText2D(Vec2(0.0, 0.65), "(Confirm with Enter)" ,Color(1, 1, 1, 1.0))
 	DebugRenderer:_printText2D(Vec2(0.0, 0.6), "Your time: "..GameLogic.totalElapsedTime,Color(1, 1, 1, 1.0))
 	DebugRenderer:_printText2D(Vec2(0.0, 0.55), "Death Count: "..GameLogic.deathCount ,Color(1, 1, 1, 1.0))
-	DebugRenderer:_printText2D(Vec2(0.0, 0.-0.7), "This wonderful game was brought to your by:" ,Color(1, 1, 1, 1.0))
+	DebugRenderer:_printText2D(Vec2(0.0, 0.-0.7), "This wonderful game was brought to you by:" ,Color(1, 1, 1, 1.0))
 	DebugRenderer:_printText2D(Vec2(0.0, 0.-0.75), "Maria Floruss, Marvin Pohl, Michael Mueller and Ruben Mueller" ,Color(1, 1, 1, 1.0))
 	
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
