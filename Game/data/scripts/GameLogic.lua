@@ -54,6 +54,10 @@ function GameLogic.updateRunning( updateData )
 			GameLogic.showHelp = false
 		end
 	end	
+
+	if InputHandler:wasTriggered(Key.H) then
+		GetBestTimeFromHighscore()
+	end
 	
 	-- show help screen
 	if (GameLogic.showHelp == true) then
@@ -197,6 +201,14 @@ function GameLogic.updateEnd( updateData )
 			DebugRenderer:_printText2D(Vec2(j, i), "End!!! ",Color(red, green, blue, 1.0))
 		end
 	end
+
+	bestTime, name = GetBestTimeFromHighscore()
+	if bestTime > GameLogic.totalElapsedTime then
+		DebugRenderer:_printText2D(Vec2(0.0, 0.85), "Congratulations!" ,Color(1, 1, 1, 1.0))
+		DebugRenderer:_printText2D(Vec2(0.0, 0.8), "NEW RECORD:  "..GameLogic.totalElapsedTime ,Color(1, 1, 1, 1.0))
+	else
+		DebugRenderer:_printText2D(Vec2(0.0, 0.85), "Current best time: "..bestTime.. " by ".. name ,Color(1, 1, 1, 1.0))
+	end
 	
 	DebugRenderer:_printText2D(Vec2(0.0, 0.7), "Input your name: "..GameLogic.Name ,Color(1, 1, 1, 1.0))
 	DebugRenderer:_printText2D(Vec2(0.0, 0.65), "(Confirm with Enter)" ,Color(1, 1, 1, 1.0))
@@ -326,7 +338,7 @@ end
 function SaveHighscore()
 	local f,err = io.open("highscores.txt","a")
 	if not f then return print(err) end
-	f:write(GameLogic.Name .. " :")
+	f:write(GameLogic.Name)
 	f:write("\n")
 	f:write("Time: "..GameLogic.totalElapsedTime)
 	f:write("\n")
@@ -336,6 +348,34 @@ function SaveHighscore()
 	f:write("\n")	
 	f:close()
 	GameLogic.notSaved = false
+end
+
+function GetBestTimeFromHighscore()
+	logMessage("getting best time")
+	bestTime = 999.99
+	name = ""
+	local f,err = io.open("highscores.txt")
+	if not f then return logMessage(err) end
+	lastLine = ""
+	while true do
+        line = f:read()
+        if line == nil then break end
+        if startsWith(line, "Time:") then
+        	rawTime = string.sub(line, 7, 12)
+        	time = tonumber(rawTime)
+        	if bestTime > time then
+        		bestTime = time
+        		name = lastLine
+        	end
+        end
+        lastLine = line
+	end
+	f:close()
+	return bestTime, name
+end
+
+function startsWith(string, substring)
+  return string.sub(string, 1, string.len(substring)) == substring
 end
 
 
