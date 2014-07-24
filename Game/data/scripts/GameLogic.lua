@@ -54,10 +54,6 @@ function GameLogic.updateRunning( updateData )
 			GameLogic.showHelp = false
 		end
 	end	
-
-	if InputHandler:wasTriggered(Key.H) then
-		GetBestTimeFromHighscore()
-	end
 	
 	-- show help screen
 	if (GameLogic.showHelp == true) then
