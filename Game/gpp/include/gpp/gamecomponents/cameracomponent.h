@@ -7,7 +7,6 @@
 
 namespace gpp 
 {
-    // TODO inherit from ITransform
     class CameraComponent : public Component, public gep::ITransform
     {
     public:
@@ -27,11 +26,7 @@ namespace gpp
 
         virtual gep::Quaternion getWorldRotation() const  override;
         
-        virtual gep::vec3 getWorldScale() const  override;
-        
         virtual gep::mat4 getWorldTransformationMatrix() const override;
-
-        virtual gep::vec3 getScale() const override;
 
         virtual gep::Quaternion getRotation()const override;
 
@@ -40,6 +35,9 @@ namespace gpp
         virtual gep::mat4 getTransformationMatrix() const override;
 
         void lookAt(const gep::vec3& target);
+
+        gep::Ray getRayForNormalizedScreenPos(const gep::vec2 screenPos) { return m_pCamera->getRayForNormalizedScreenPos(screenPos);};
+        gep::Ray getRayForAbsoluteScreenPos(const gep::uvec2 screenPos) { return m_pCamera->getRayForAbsoluteScreenPos(screenPos);};
         
         void setViewDirection(const gep::vec3& vector);
         
@@ -64,11 +62,12 @@ namespace gpp
         void setFar(float farValue){m_pCamera->setFar(farValue);}
 
         float getFar(){return m_pCamera->getFar();}
-
+        
         float getAspectRatio(){return m_pCamera->getAspectRatio();}
-
         void setAspectRatio(float ratio){m_pCamera->setAspectRatio(ratio);}
 
+        void setOrthographic(const bool orthographic);
+        bool isOrthographic();
 
         virtual gep::vec3 getRightDirection() const override;
         
@@ -79,17 +78,15 @@ namespace gpp
         virtual void setBaseViewDirection(const gep::vec3& direction) override;
         
         virtual void setBaseOrientation(const gep::Quaternion& orientation) override;
-        
-        virtual void setScale(const gep::vec3& scale) override;
 
         virtual void setState(State::Enum state) override;
 
-        virtual const gep::ITransform* getParent() override;
-
-        virtual void setParent(const gep::ITransform* parent) override;
+        virtual       gep::ITransform* getParent()       override;
+        virtual const gep::ITransform* getParent() const override;
+        virtual void setParent(gep::ITransform* parent) override;
         
-        void setViewTarget(const gep::ITransform* view);
-        void setUpTarget(const gep::ITransform* view);
+        void setViewTarget(gep::ITransform* view);
+        void setUpTarget(gep::ITransform* view);
         
         void unsetViewTarget() { m_viewTarget.setParent(nullptr); };
         void unsetUpTarget() { m_upTarget.setParent(nullptr); };
@@ -108,7 +105,9 @@ namespace gpp
             LUA_BIND_FUNCTION(getRightDirection)
             LUA_BIND_FUNCTION(getUpDirection)
             LUA_BIND_FUNCTION(setUpDirection)
+            LUA_BIND_FUNCTION(getPosition)
             LUA_BIND_FUNCTION(getWorldPosition)
+            LUA_BIND_FUNCTION(getRotation)
             LUA_BIND_FUNCTION(getWorldRotation)
             LUA_BIND_FUNCTION(setViewTarget)
             LUA_BIND_FUNCTION(setUpTarget)
@@ -123,12 +122,16 @@ namespace gpp
             LUA_BIND_FUNCTION(tilt)
             LUA_BIND_FUNCTION(move)
             LUA_BIND_FUNCTION(look)
+            LUA_BIND_FUNCTION(getRayForNormalizedScreenPos)
+            LUA_BIND_FUNCTION(getRayForAbsoluteScreenPos)
             LUA_BIND_FUNCTION(setNear)
             LUA_BIND_FUNCTION(getNear)
             LUA_BIND_FUNCTION(setFar)
             LUA_BIND_FUNCTION(getFar)
             LUA_BIND_FUNCTION(setAspectRatio)
             LUA_BIND_FUNCTION(getAspectRatio)
+            LUA_BIND_FUNCTION(isOrthographic)
+            LUA_BIND_FUNCTION(setOrthographic)
             LUA_BIND_FUNCTION(unsetUpTarget)
             LUA_BIND_FUNCTION(unsetViewTarget)
         LUA_BIND_REFERENCE_TYPE_END ;

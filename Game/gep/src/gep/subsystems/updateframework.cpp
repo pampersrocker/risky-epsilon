@@ -16,11 +16,12 @@ gep::UpdateFramework::UpdateFramework() :
     , m_gameThread(this)
 {
     // initialize the frame times array to some default value
-    const float defaultTime = 1000.0f / 60.0f;
+    const float defaultTime = 1.0f / 60.0f;
     for (auto& frametime : m_FrameTimesPtr)
     {
         frametime = defaultTime;
     }
+
 }
 
 void gep::UpdateFramework::stop()

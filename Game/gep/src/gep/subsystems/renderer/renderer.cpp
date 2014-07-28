@@ -306,6 +306,7 @@ void gep::Renderer::createWindow()
         throw Exception("Failed to create window");
 
     ShowWindow( m_hWnd, SW_SHOW );
+	ShowCursor(FALSE);
 }
 
 void gep::Renderer::destroyWindow()
@@ -597,7 +598,6 @@ void gep::Renderer::executeCommands(RendererExtractor& extractor, CommandBase* c
         }
 
         currentCommand = extractor.nextCommand(currentCommand);
-        
     }
 }
 
@@ -724,7 +724,7 @@ gep::RenderTextInfo gep::Renderer::prepareText(const char* text, FontHorizontalO
     return result;
 }
 
-void gep::Renderer::renderText(const ivec2& screenPosition, Color color, const RenderTextInfo& info)
+void gep::Renderer::renderText(const uvec2& screenPosition, Color color, const RenderTextInfo& info)
 {
     m_fontPosition.set(vec2((float)screenPosition.x, (float)screenPosition.y));
     m_fontColor.set(color);
@@ -797,7 +797,7 @@ gep::ResourcePtr<gep::IResource> gep::Renderer::createGeneratedTexture(uint32 wi
     return g_globalManager.getResourceManager()->loadResource<Texture2D>(loader, LoadAsync::No);
 }
 
-gep::ivec2 gep::Renderer::toAbsoluteScreenPosition(const vec2& screenPosNormalized) const
+gep::uvec2 gep::Renderer::toAbsoluteScreenPosition(const vec2& screenPosNormalized) const
 {
     GEP_ASSERT(screenPosNormalized.x >= -1.0f && screenPosNormalized.x <= 1.0f);
     GEP_ASSERT(screenPosNormalized.y >= -1.0f && screenPosNormalized.y <= 1.0f);
@@ -805,17 +805,17 @@ gep::ivec2 gep::Renderer::toAbsoluteScreenPosition(const vec2& screenPosNormaliz
     auto x(m_settings.screenResolution.x * ((screenPosNormalized.x + 1.0f) / 2.0f));
     auto y(m_settings.screenResolution.y * (1.0f - ((screenPosNormalized.y + 1.0f) / 2.0f)));
 
-    ivec2 result(static_cast<ivec2::component_t>(x), static_cast<ivec2::component_t>(y));
+    uvec2 result(static_cast<uvec2::component_t>(x), static_cast<uvec2::component_t>(y));
     return result;
 }
 
-gep::vec2 gep::Renderer::toNormalizedScreenPosition(const ivec2& screenPos) const
+gep::vec2 gep::Renderer::toNormalizedScreenPosition(const uvec2& screenPos) const
 {
-    GEP_ASSERT(screenPos.x >= 0 && uint32(screenPos.x) <= m_settings.screenResolution.x);
-    GEP_ASSERT(screenPos.y >= 0 && uint32(screenPos.y) <= m_settings.screenResolution.y);
+    GEP_ASSERT(screenPos.x <= m_settings.screenResolution.x);
+    GEP_ASSERT(screenPos.y <= m_settings.screenResolution.y);
 
-    auto x(screenPos.x * 2.0f / m_settings.screenResolution.y - 1.0f);
-    auto y(1.0f - 2.0f * screenPos.y / m_settings.screenResolution.x);
+    auto x(screenPos.x * 2.0f / m_settings.screenResolution.x - 1.0f);
+    auto y(1.0f - 2.0f * screenPos.y / m_settings.screenResolution.y);
 
     vec2 result(static_cast<vec2::component_t>(x), static_cast<vec2::component_t>(y));
     return result;
@@ -1083,8 +1083,9 @@ void gep::DebugRenderer::extract(IRendererExtractor& extractor)
         }
     }
 
-    m_textInfos.resize(0);
-    m_lineGroups.resize(0);
+    m_lineGroups.clear();
+    m_lineGroups2D.clear();
+    m_textInfos.clear();
     if(m_frameAllocator.getMarker() != m_pStartMarker)
         m_frameAllocator.freeToMarker(m_pStartMarker);
 }

@@ -4,34 +4,45 @@ IsoCamera = {}
 --[[CreateEmptyGameObject("camera")
 ]]
 
-function IsoCamera.update( guid, elapsedTime )
-	if (InputHandler:isPressed(Key.Oem_Minus)) then
-		if ( Config.camera.initialDistance > Config.camera.distanceMin) then
-			Config.camera.initialDistance = Config.camera.initialDistance - Config.camera.distanceDelta
+function IsoCamera.update( elapsedTime )
+		elapsedTime = elapsedTime
+		if(GameLogic.debugDrawings == true) then
+			DebugRenderer:printText(Vec2(-0.9, 0.75), "elapsedTime: "..elapsedTime)
 		end
-	elseif (InputHandler:isPressed(Key.Oem_Plus)) then
-		if ( Config.camera.initialDistance < Config.camera.distanceMax) then
-			Config.camera.initialDistance = Config.camera.initialDistance + Config.camera.distanceDelta
+		if (InputHandler:isPressed(Config.keys.keyboard.zoomin) ) then
+			GameLogic.isoCam.distance = GameLogic.isoCam.distance - Config.camera.distanceDelta*elapsedTime
+		elseif (InputHandler:isPressed(Config.keys.keyboard.zoomout)) then
+			GameLogic.isoCam.distance = GameLogic.isoCam.distance + Config.camera.distanceDelta*elapsedTime
+			
 		end
-	end
-	DebugRenderer:printText(Vec2(-0.9, 0.85), "isometric")
-	DebugRenderer:printText(Vec2(-0.9, 0.80), "Camera distance:" .. Config.camera.initialDistance)
-	local rotationSpeed = Config.camera.rotationSpeedFactor * elapsedTime
-	local mouseDelta = InputHandler:getMouseDelta()
-	mouseDelta.x = mouseDelta.x * rotationSpeed
-	mouseDelta.y = 0.0
-	cam = GetGObyGUID(guid)
-	cam.go.cc:look(mouseDelta)
-	local viewDir = cam.go.cc:getViewDirection()
-	viewDir = viewDir:mulScalar(-Config.camera.initialDistance)
-	viewDir.z = Config.camera.initialDistance * Config.camera.hightFactor 
-	--TODO: get guid from player the right way!!
-	-- by cam.trackingobject = playerobject in gamelogic.lua
-	cam.go.cc:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition() + viewDir)
+		if(GameLogic.debugDrawings == true) then
+			DebugRenderer:printText(Vec2(-0.9, 0.80), "Camera distance:" .. GameLogic.isoCam.distance)
+		end
+		local rotationSpeed = Config.camera.rotationSpeedFactor * elapsedTime
+		local cameraDelta = InputHandler:getMouseDelta()
+		GameLogic.isoCam.distance = GameLogic.isoCam.distance - cameraDelta.z
+		cameraDelta.x = cameraDelta.x * rotationSpeed
+		cameraDelta.y = 0.0
+		cam = GameLogic.isoCam
+		if InputHandler:gamepad(0):isConnected() then
+			cameraDelta.x = cameraDelta.x + InputHandler:gamepad(0):rightStick().x * Config.camera.rotationSpeedFactorGamePad * elapsedTime
+			local zoomvalue = InputHandler:gamepad(0):rightStick().y
+			
+			GameLogic.isoCam.distance = GameLogic.isoCam.distance - zoomvalue*Config.camera.zoomfactorgamepad * elapsedTime		
+		end
+		cam.go.cc:look(cameraDelta)
+		local viewDir = cam.go.cc:getViewDirection()
+		GameLogic.isoCam.distance = math.Clamp(GameLogic.isoCam.distance,Config.camera.distanceMin,Config.camera.distanceMax)
+		viewDir = viewDir:mulScalar(-GameLogic.isoCam.distance)
+		viewDir.z = GameLogic.isoCam.distance * Config.camera.hightFactor
+		--TODO: get guid from player the right way!!
+		-- by cam.trackingobject = playerobject in gamelogic.lua
+		cam.go.cc:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition() + viewDir)
+	
 end
 
 function IsoCamera.init( ... )
-
+	
 	logMessage("IsoCamera:init() ")
 end
 

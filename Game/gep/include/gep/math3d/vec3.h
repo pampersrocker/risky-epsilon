@@ -170,6 +170,14 @@ namespace gep
             return vec3_t<T>(-x,-y,-z);
         }
 
+        /// \brief Sets all components to the specified value
+        inline void set(T x, T y, T z)
+        {
+            this->x = x;
+            this->y = y;
+            this->z = z;
+        }
+
         /// \brief comparing two instances with an epsilon
         inline bool epsilonCompare (const vec3_t<T>& rh, const T e = GetEpsilon<T>::value()) const
         {
@@ -216,6 +224,7 @@ namespace gep
             LUA_BIND_FUNCTION(length)
             LUA_BIND_FUNCTION(squaredLength)
             LUA_BIND_FUNCTION(normalized)
+            LUA_BIND_FUNCTION(set)
             LUA_BIND_FUNCTION_NAMED(negate, "negate")
             LUA_BIND_FUNCTION_NAMED(negate, "__unm")
             LUA_BIND_FUNCTION_NAMED(addFromScript, "add")

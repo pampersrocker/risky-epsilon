@@ -68,10 +68,9 @@ void gpp::AnimationComponent::initalize()
     setState(State::Active);
 }
 
-void gpp::AnimationComponent::update( float elapsedMS )
+void gpp::AnimationComponent::update( float elapsedSeconds )
 {
-
-    m_AnimatedSkeleton->update(elapsedMS);
+    m_AnimatedSkeleton->update(elapsedSeconds);
 
     RenderComponent* rc = m_pParentGameObject->getComponent<RenderComponent>();
     if (rc != nullptr)

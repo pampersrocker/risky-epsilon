@@ -119,6 +119,9 @@ namespace gep
         virtual bool isLoaded() override;
         virtual IResource* getSuperResource() override;
         virtual const char* getResourceType() override;
+
+        virtual float getVolume();
+
     };
 
     class FmodSoundParameter : public ISoundParameter
@@ -209,5 +212,8 @@ namespace gep
         virtual bool isLoaded() override;
         virtual IResource* getSuperResource() override;
         virtual const char* getResourceType() override;
+
+        virtual float getVolume();
+
     };
 };

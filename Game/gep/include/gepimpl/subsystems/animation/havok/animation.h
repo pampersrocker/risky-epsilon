@@ -20,25 +20,22 @@ namespace gep{
 
         virtual void destroy();
 
-        virtual void update( float elapsedTime );
+        virtual void update(float elapsedSeconds);
     private:
         IAnimationFactory* m_pAnimationFactory;
 
     };
 
-
-    
-
     class AnimationFileLoader;
     class AnimationResource : public IAnimationResource
     {
-    public: 
+    public:
         AnimationResource();
         virtual ~AnimationResource();
 
         virtual IResourceLoader* getLoader() override;
 
-        virtual void setLoader( IResourceLoader* loader ) override;
+        virtual void setLoader(IResourceLoader* loader) override;
 
         virtual void unload() override;
 
@@ -68,18 +65,18 @@ namespace gep{
     public:
         AnimatedSkeleton(AnimationResource* skeleton);
         virtual  ~AnimatedSkeleton() override;
-        virtual void update( float elapsedMS ) override;
+        virtual void update(float elapsedSeconds) override;
         virtual IAnimationControl* addAnimationControl(ResourcePtr<IAnimationResource> anim) override;
         virtual uint32 findBoneForName(const char* name) override;
         virtual void getBoneTransformations(DynamicArray<mat4>& result) override;
-        virtual void setBoneDebugDrawingEnabled(const bool enabled) override {m_drawDebug = enabled;};
-        virtual void setParentTransform(ITransform* parent) override {m_pTransform = parent;};
-        virtual void setReferencePoseWeightThreshold(const float threshold) override {m_pHkaAnimatedSkeleton->setReferencePoseWeightThreshold(threshold);};
-        virtual IBone* getBoneByName(std:: string name) override;
+        virtual void setBoneDebugDrawingEnabled(const bool enabled) override { m_drawDebug = enabled; };
+        virtual void setParentTransform(ITransform* parent) override { m_pTransform = parent; };
+        virtual void setReferencePoseWeightThreshold(const float threshold) override { m_pHkaAnimatedSkeleton->setReferencePoseWeightThreshold(threshold); };
+        virtual IBone* getBoneByName(std::string name) override;
     private:
         void renderDebug();
 
-        virtual void setBoneDebugDrawingScale(const float scale) override {m_debugDrawingScale = scale;};
+        virtual void setBoneDebugDrawingScale(const float scale) override { m_debugDrawingScale = scale; };
 
         DynamicArray<IAnimationControl*> m_animationControls;
         hkaAnimatedSkeleton* m_pHkaAnimatedSkeleton;
@@ -100,15 +97,11 @@ namespace gep{
 
         virtual void setRotation(const gep::Quaternion& rot) override;
 
-        virtual void setScale(const gep::vec3& scale) override;
-
         virtual gep::mat4 getTransformationMatrix() const override;
 
         virtual gep::vec3 getPosition() const override;
 
         virtual gep::Quaternion getRotation() const override;
-
-        virtual gep::vec3 getScale() const override;
 
         virtual gep::vec3 getViewDirection() const override;
 
@@ -122,11 +115,7 @@ namespace gep{
 
         virtual gep::Quaternion getWorldRotation() const override;
 
-        virtual gep::vec3 getWorldScale() const override;
-       
-        void update(float elapsedMS);
-
-
+        void update(float elapsedSeconds);
 
     private:
         const int m_boneID;
@@ -134,25 +123,24 @@ namespace gep{
         const hkQsTransform* m_pBone;
 
     };
+
     class AnimationControl : public IAnimationControl
     {
     public:
         AnimationControl(hkRefPtr<hkaAnimationBinding> binding);
         virtual  ~AnimationControl();
         virtual void setMasterWeight(const float weight) override;
-        virtual float getMasterWeight() override {return m_pHkaDefaultAnimationControl->getMasterWeight();};
+        virtual float getMasterWeight() override { return m_pHkaDefaultAnimationControl->getMasterWeight(); };
         virtual void setPlaybackSpeed(const float speed) override;
         virtual hkaDefaultAnimationControl* getHkaAnimationControl();
-        virtual float getAnimationDuration() override {return m_pHkaDefaultAnimationControl->getAnimationBinding()->m_animation->m_duration;};
-        virtual float getLocalTime() override {return m_pHkaDefaultAnimationControl->getLocalTime();}
-        virtual void setLocalTime(const float time) override {return m_pHkaDefaultAnimationControl->setLocalTime(time);};
-        virtual float ease(const float duration, const bool easeInIfTrue) override { return m_pHkaDefaultAnimationControl->ease(duration, easeInIfTrue);}
-
+        virtual float getAnimationDuration() override { return m_pHkaDefaultAnimationControl->getAnimationBinding()->m_animation->m_duration; };
+        virtual float getLocalTime() override { return m_pHkaDefaultAnimationControl->getLocalTime(); }
+        virtual void setLocalTime(const float time) override { return m_pHkaDefaultAnimationControl->setLocalTime(time); };
+        virtual float ease(const float duration, const bool easeInIfTrue) override { return m_pHkaDefaultAnimationControl->ease(duration, easeInIfTrue); }
 
     private:
         hkaDefaultAnimationControl* m_pHkaDefaultAnimationControl;
     };
-
 
     class AnimationFileLoader : public IResourceLoader
     {

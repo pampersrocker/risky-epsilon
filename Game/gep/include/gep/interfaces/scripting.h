@@ -10,10 +10,6 @@
 namespace gep
 {
     // TODO inheritance
-    // TODO update calls
-    // TODO events
-    // TODO error recovery with reasonable messages
-    // TODO loading scripts from lua
     // TODO resource type and hot reloading of scripts
 
     typedef lua::FunctionWrapper ScriptFunctionWrapper;
@@ -187,20 +183,21 @@ namespace gep
         void addGlobalInstance(T* ptr)
         {
             lua::structs::objectHandling<lua::structs::ReferenceTypeMarker>::push(getState(), ptr);
-            lua_setglobal(getState(), ScriptTypeInfo<T>::instance().getClassName());
+            lua_setglobal(getState(), getScriptTypeInfo<T>().getClassName());
         }
     };
-    
-    template<typename T>
+
     class ScriptTypeInfo
     {
+        uint8 m_numBindings;
         char m_className[64];
         char m_metaTableName[64];
     public:
-        inline static ScriptTypeInfo<T>& instance()
+
+        ScriptTypeInfo() : m_numBindings(0)
         {
-            static ScriptTypeInfo<T> info;
-            return info;
+            m_className[0] = '\0';
+            m_metaTableName[0] = '\0';
         }
 
         inline void setClassName(const char* name)
@@ -212,7 +209,27 @@ namespace gep
         }
         inline const char* getClassName() const { return m_className; }
         inline const char* getMetaTableName() const { return m_metaTableName; }
+
+        inline uint8 getNumBindings() const { return m_numBindings; }
+        inline void addNumBindings() { ++m_numBindings; }
     };
+
+    namespace detail
+    {
+        typedef Hashmap<std::string, ScriptTypeInfo, StringHashPolicy, MallocAllocatorPolicy> ScriptTypeInfoMap_t;
+
+        // Have to use an exported hashmap because static instances are different across dlls...
+        GEP_API ScriptTypeInfoMap_t& getScriptTypeInfoMap();
+    }
+
+    template<typename T>
+    inline ScriptTypeInfo& getScriptTypeInfo()
+    {
+        auto key = typeid(T).name();
+        auto& scriptTypeInfoMap = detail::getScriptTypeInfoMap();
+        ScriptTypeInfo& value = scriptTypeInfoMap[key];
+        return value;
+    }
 
     // Inspired by http://en.wikibooks.org/wiki/More_C++_Idioms/Member_Detector
     template<typename T>

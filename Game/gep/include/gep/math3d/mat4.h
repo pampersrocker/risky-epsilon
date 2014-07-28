@@ -2,6 +2,7 @@
 
 #include "gep/math3d/constants.h"
 #include "gep/math3d/vec3.h"
+#include "gep/math3d/vec4.h"
 #include "gep/math3d/mat3.h"
 
 namespace gep
@@ -63,6 +64,18 @@ namespace gep
             }
             return result;
         }
+
+        
+        /// \brief * operator for multiplying this matrix with a 4 component vector
+        inline const vec4_t<T> operator * (const vec4_t<T>& v) const {
+            vec4_t<T> temp(DO_NOT_INITIALIZE);
+            temp.x = v.x * this->data[0] + v.y * this->data[4] + v.z * this->data[8] + v.w * this->data[12];
+            temp.y = v.x * this->data[1] + v.y * this->data[5] + v.z * this->data[9] + v.w * this->data[13];
+            temp.z = v.x * this->data[2] + v.y * this->data[6] + v.z * this->data[10] + v.w * this->data[14];
+            temp.w = v.x * this->data[3] + v.y * this->data[7] + v.z * this->data[11] + v.w * this->data[15];
+            return temp;
+        }
+
 
         /// \brief transforms a direction vector
         inline const vec3_t<T> transformDirection(const vec3_t<T>& v) const

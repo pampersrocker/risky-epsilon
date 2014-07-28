@@ -1,17 +1,20 @@
 #pragma once
 #include "gep/math3d/vec3.h"
 #include "gep/math3d/quaternion.h"
+#include "gep/math3d/transform.h"
 #include "gep/interfaces/updateFramework.h"
 
 #include <functional>
 
 #include "gep/ReferenceCounting.h"
 #include "gep/interfaces/scripting.h"
+#include "gep/interfaces/events.h"
 
 namespace gep
 {
     class IContactListener;
     class IShape;
+    class IRigidBody;
 
     class IPhysicsEntity : public ReferenceCounted
     {
@@ -28,6 +31,44 @@ namespace gep
         virtual void requestDeactivation() = 0;
         virtual bool isActive() const = 0;
 
+        virtual void setUserData(ScriptTableWrapper table) = 0;
+        virtual ScriptTableWrapper getUserData() = 0;
+
+        LUA_BIND_REFERENCE_TYPE_BEGIN
+            LUA_BIND_FUNCTION(setUserData)
+            LUA_BIND_FUNCTION(getUserData)
+        LUA_BIND_REFERENCE_TYPE_END;
+    };
+
+    /// \brief Used for trigger volume events.
+    class ITriggerEventArgs
+    {
+    public:
+        struct Type
+        {
+            enum Enum
+            {
+                Entered = 1,
+                Left = 2,
+                EnteredAndLeft = Entered | Left,
+
+                /// Fired for any overlapping body when the trigger body leaves the world or is
+                /// deleted.
+                TriggerBodyLeft = 4 | Left
+            };
+
+            GEP_DISALLOW_CONSTRUCTION(Type);
+        };
+
+    public:
+
+        virtual IRigidBody* getRigidBody() = 0;
+        virtual Type::Enum getEventType() = 0;
+
+        LUA_BIND_REFERENCE_TYPE_BEGIN
+            LUA_BIND_FUNCTION_PTR(static_cast<IRigidBody*(ITriggerEventArgs::*)()>(&getRigidBody), "getRigidBody")
+            LUA_BIND_FUNCTION_PTR(static_cast<Type::Enum(ITriggerEventArgs::*)()>(&getEventType), "getEventType")
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 
     /// \brief Purely static struct that serves as an enum.
@@ -37,7 +78,7 @@ namespace gep
         {
             Invalid,
             Dynamic,
-            SphereIntertia,
+            SphereInertia,
             BoxInertia,
             Keyframed,
             Fixed,
@@ -175,6 +216,8 @@ namespace gep
 
         virtual Quaternion getRotation() const = 0;
         virtual void setRotation(const Quaternion& value) = 0;
+        
+        virtual void setInitialTransform(const ITransform* transform) = 0;
 
         virtual float getFriction() const = 0;
         virtual void setFriction(float value) = 0;
@@ -212,6 +255,10 @@ namespace gep
         /// \brief converts this rigid body to a trigger volume.
         virtual void convertToTriggerVolume() = 0;
         virtual bool isTriggerVolume() const = 0;
+        /// \brief Returns a pointer to the event object that will trigger
+        ///        events related to this rigid body's trigger volume properties.
+        /// \remark Will return \c nullptr in case this rigid body is not a trigger volume!
+        virtual Event<ITriggerEventArgs*>* getTriggerEvent() = 0;
 
         virtual CallbackId registerSimulationCallback(PositionChangedCallback callback) = 0;
         virtual void deregisterSimulationCallback(CallbackId id) = 0;
@@ -227,7 +274,11 @@ namespace gep
         virtual void reset() = 0;
 
         LUA_BIND_REFERENCE_TYPE_BEGIN
-            LUA_BIND_FUNCTION(getLinearVelocity)
+            
+			LUA_BIND_FUNCTION(getCollisionFilterInfo)
+			LUA_BIND_FUNCTION(setCollisionFilterInfo)
+
+			LUA_BIND_FUNCTION(getLinearVelocity)
             LUA_BIND_FUNCTION(setLinearVelocity)
             LUA_BIND_FUNCTION(getAngularVelocity)
             LUA_BIND_FUNCTION(setAngularVelocity)
@@ -250,6 +301,7 @@ namespace gep
 
             LUA_BIND_FUNCTION(convertToTriggerVolume)
             LUA_BIND_FUNCTION(isTriggerVolume)
+            LUA_BIND_FUNCTION(getTriggerEvent)
             
             LUA_BIND_FUNCTION(applyForce)
             LUA_BIND_FUNCTION(applyForceAt)
@@ -267,7 +319,10 @@ namespace gep
 
             LUA_BIND_FUNCTION(reset)
 
-        LUA_BIND_REFERENCE_TYPE_END
+            LUA_BIND_FUNCTION(setUserData)
+            LUA_BIND_FUNCTION(getUserData)
+
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 
     //TODO: Needs more wrapping!
@@ -283,5 +338,8 @@ namespace gep
         virtual void setShape(IShape* shape) = 0;
         virtual IShape* getShape() = 0;
         virtual const IShape* getShape() const = 0;
+
+        LUA_BIND_REFERENCE_TYPE_BEGIN
+        LUA_BIND_REFERENCE_TYPE_END;
     };
 }

@@ -603,24 +603,3 @@ const char* gep::ModelLoaderFromData::getResourceId()
     return m_resourceID.c_str();
 }
 
-// TODO: Remove this old stuff
-void gep::Animation::update(float elapsedSeconds)
-{
-    updateGlobalBoneTransforms(elapsedSeconds);
-}
-
-gep::Animation::Animation(Model* model) :
-    m_pModel(model)
-{
-}
-
-gep::Animation::~Animation()
-{
-    m_pModel = nullptr;
-}
-
-void gep::Animation::updateGlobalBoneTransforms(float elapedSeconds)
-{
-    // TODO implement me. Traverse bone hierarchy and update bone transformations.
-}
-

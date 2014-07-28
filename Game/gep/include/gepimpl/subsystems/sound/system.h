@@ -50,5 +50,8 @@ namespace gep
         virtual void initialize() override;
         virtual void destroy() override;
         virtual void update(float elapsedTime) override;
+
+        virtual void loadLibraryFromLua( const char* filename );
+
     };
 }

@@ -65,6 +65,10 @@ gep::ResourcePtr<gep::ISoundLibrary> gep::FmodSoundSystem::loadLibrary(const cha
 {
     return g_globalManager.getResourceManager()->loadResource<FmodSoundLibrary>(FmodSoundLibraryFileLoader(filename), LoadAsync::No);
 }
+void gep::FmodSoundSystem::loadLibraryFromLua( const char* filename )
+{
+    loadLibrary(filename);
+}
 
 gep::ResourcePtr<gep::ISound> gep::FmodSoundSystem::getSound(const char* name)
 {
@@ -89,6 +93,13 @@ void gep::FmodSoundSystem::setListenerPosition(const vec3& pos)
 
 void gep::FmodSoundSystem::setListenerOrientation(const Quaternion& orientation)
 {
+
+    /// TODO HAAAAACK
+    if (!orientation.isValid())
+    {
+        return;
+    }
+    
     auto m = orientation.toMat3();
     vec3 forward(-m.data[3], -m.data[4], -m.data[5]);
     memcpy(&m_listenerAttributes.forward, &forward, sizeof(float) * 3);

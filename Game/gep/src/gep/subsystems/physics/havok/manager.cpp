@@ -58,7 +58,7 @@ void gep::HavokPhysicsManager::initialize()
     processNames.pushBack(hkpShapeDisplayViewer::getName());
     processNames.pushBack(hkpBroadphaseViewer::getName());
     processNames.pushBack(hkpActiveContactPointViewer::getName());
-
+    processNames.pushBack("Trigger Volumes");
 
     for (const char* processName : processNames)
     {
