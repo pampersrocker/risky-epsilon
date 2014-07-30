@@ -98,6 +98,7 @@ function GameLogic.restart()
 	GameLogic.isoCam.trackingObject.go:setPosition(Config.player.spawnPosition)
 	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
 	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
+	GameLogic.isoCam.trackingObject.go.rb:setMotionType(MotionType.Dynamic)
 	GameLogic.totalElapsedTime = 0
 	GameLogic.isoCam.trackingObject.lastTransformator = Config.player.lastTransformator
 	GameLogic.finished = false
@@ -118,6 +119,7 @@ function GameLogic.lastTransformator()
 	GameLogic.isoCam.trackingObject.go:setPosition(GameLogic.isoCam.trackingObject.lastTransformator)
 	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
 	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
+	-- GameLogic.isoCam.trackingObject.go.rb:applyTorque(0,Vec3(0,0,0))
 	
 end
 
