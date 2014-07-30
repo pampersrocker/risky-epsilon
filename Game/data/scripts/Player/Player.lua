@@ -87,6 +87,8 @@ function PlayerMeta.update( guid, elapsedTime )
 	local mouseDelta = InputHandler:getMouseDelta()
 
 	local movementDirection = Vec3(0,0,0)
+	local buttonpressed = false
+
 	-- restart game
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
 		GameLogic.restart()
@@ -106,28 +108,36 @@ function PlayerMeta.update( guid, elapsedTime )
 		if (bit32.btest(buttonsTriggered, Config.keys.gamepad.lastTransformator) ) then
 			GameLogic.lastTransformator()
 		end
-		movementDirection = movementDirection:add(viewDir:mulScalar(InputHandler:gamepad(0):leftStick().x))
-		movementDirection = movementDirection:add(rightDir:mulScalar(-InputHandler:gamepad(0):leftStick().y))
 	end
 
 	-- movement
 
 	if (InputHandler:isPressed(Config.keys.keyboard.left)) then
+		buttonpressed = true
 		player.go.angularVelocitySwapped = false
 		movementDirection = movementDirection:add(-viewDir)
 	end
 	if (InputHandler:isPressed(Config.keys.keyboard.right)) then
+		buttonpressed = true
 		player.go.angularVelocitySwapped = false
 		movementDirection = movementDirection:add(viewDir)
 	end
 
 	if (InputHandler:isPressed(Config.keys.keyboard.forward)) then
+		buttonpressed = true
 		player.go.angularVelocitySwapped = false
 		movementDirection = movementDirection:add(-rightDir)
 	end
 	if (InputHandler:isPressed(Config.keys.keyboard.backward)) then
+		buttonpressed = true
 		player.go.angularVelocitySwapped = false
 		movementDirection = movementDirection:add(rightDir)
+	end
+
+	if InputHandler:gamepad(0):isConnected() then
+		buttonpressed = true
+		movementDirection = movementDirection:add(viewDir:mulScalar(InputHandler:gamepad(0):leftStick().x))
+		movementDirection = movementDirection:add(rightDir:mulScalar(-InputHandler:gamepad(0):leftStick().y))
 	end
 
 	-- development-jump-to-transformator-section
@@ -144,9 +154,11 @@ function PlayerMeta.update( guid, elapsedTime )
 		jumpToPosition(Config.transformators.transformator4.position)
 	end
 
-	local linearVelocity = Vec3(movementDirection.y,-movementDirection.x,movementDirection.z)
-	player.go.rb:applyLinearImpulse(linearVelocity:mulScalar(Config.player.linearVelocityScalar*elapsedTime))
-	player.go.rb:applyTorque(elapsedTime, movementDirection:mulScalar(Config.player.torqueMulScalar))
+	if buttonpressed then
+		local linearVelocity = Vec3(movementDirection.y,-movementDirection.x,movementDirection.z)
+		player.go.rb:applyLinearImpulse(linearVelocity:mulScalar(Config.player.linearVelocityScalar*elapsedTime))
+		player.go.rb:applyTorque(elapsedTime, movementDirection:mulScalar(Config.player.torqueMulScalar))
+	end
 end
 
 function jumpToPosition( pos )

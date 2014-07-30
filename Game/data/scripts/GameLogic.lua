@@ -111,6 +111,7 @@ function GameLogic.restart()
 	GameLogic.fan2.sound:stop()
 	GameLogic.fan3.isActive = false
 	GameLogic.fan3.sound:stop()
+	-- reset buttons. 
 	ResetCamera()
 end
 
@@ -119,8 +120,7 @@ function GameLogic.lastTransformator()
 	GameLogic.isoCam.trackingObject.go:setPosition(GameLogic.isoCam.trackingObject.lastTransformator)
 	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
 	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
-	-- GameLogic.isoCam.trackingObject.go.rb:applyTorque(0,Vec3(0,0,0))
-	
+
 end
 
 

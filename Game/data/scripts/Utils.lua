@@ -126,16 +126,22 @@ function ResetCamera()
 end
 
 function ChangePlayer( newGo )
-	-- inactivate current player
-	GameLogic.isoCam.trackingObject.go:setComponentStates(ComponentState.Inactive)
+	local oldGo = GameLogic.isoCam.trackingObject
+	
+	if newGo.go:getName() == oldGo.go:getName() then
+		return
+	end
 
-	-- activate newGo player
-	newGo.go.rb:setAngularVelocity(GameLogic.isoCam.trackingObject.go.rb:getAngularVelocity())
-	newGo.go.rb:setLinearVelocity(GameLogic.isoCam.trackingObject.go.rb:getLinearVelocity())
-	newGo.go:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
+		-- activate newGo player
 	newGo.go:setComponentStates(ComponentState.Active)
-	newGo.lastTransformator = GameLogic.isoCam.trackingObject.lastTransformator
+	newGo.go.rb:setAngularVelocity(oldGo.go.rb:getAngularVelocity())
+	newGo.go.rb:setLinearVelocity(oldGo.go.rb:getLinearVelocity())
+	newGo.go:setPosition(oldGo.go:getWorldPosition())
+	newGo.lastTransformator = oldGo.lastTransformator
+
 	-- change cam-lockAT
 	GameLogic.isoCam.trackingObject = newGo
 
+	-- inactivate current player
+	oldGo.go:setComponentStates(ComponentState.Inactive)
 end
