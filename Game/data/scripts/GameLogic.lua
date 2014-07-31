@@ -17,29 +17,21 @@ end
 -- Running State
 -------------------------------------------------------
 function GameLogic.updateRunning( updateData )
-	--GameLogic.isoCam.trackingObject.go:getWorldPosition()
-	--GameLogic.isoCam.go.cc:getWorldRotation()
+
 	SoundSystem:setListenerPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
 	SoundSystem:setListenerOrientation(GameLogic.isoCam.go.cc:getWorldRotation())
 	
+
+	-- Drawing 'HUD and debug drawings'
 	DebugRenderer:printText(Vec2(0.8, 0.9), "F1 - help")
 	if (GameLogic.debugDrawings == true)then
 		DebugRenderer:printText(Vec2(-0.9, 0.9), "State: running")
 	end
+
 	IsoCamera.update( updateData:getElapsedTime() )
 	GameLogic.totalElapsedTime = GameLogic.totalElapsedTime + updateData:getElapsedTime()
 	DebugRenderer:printText(Vec2(-0.2, 0.9), "totalElapsedTime: "..GameLogic.totalElapsedTime)	
-	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
-	if (InputHandler:isPressed(Key._1) or bit32.btest(buttonsTriggered, Button.X)) then
-		local go = GetGObyGUID("playerInstance")
-		ChangePlayer(go)
-	elseif (InputHandler:isPressed(Key._2) or bit32.btest(buttonsTriggered, Button.Y)) then
-		local go = GetGObyGUID("playerInstanceStone")
-		ChangePlayer(go)
-	elseif (InputHandler:isPressed(Key._3) or bit32.btest(buttonsTriggered, Button.A)) then
-		local go = GetGObyGUID("playerInstancePaper")
-		ChangePlayer(go)
-	end	
+
 	if (InputHandler:wasTriggered(Key.F2) ) then
 		if not GameLogic.debugDrawings then
 			GameLogic.debugDrawings = true
@@ -54,7 +46,7 @@ function GameLogic.updateRunning( updateData )
 			GameLogic.showHelp = false
 		end
 	end	
-	
+
 	-- show help screen
 	if (GameLogic.showHelp == true) then
 		DebugRenderer:printText(Vec2(-0.2, 0.55), "Game Mechanics.")
@@ -73,12 +65,24 @@ function GameLogic.updateRunning( updateData )
 			DebugRenderer:printText(Vec2(0.0, 0.1), KeyCodes[Config.keys.gamepad.lastTransformator] .." - Start at last transformator")
 			DebugRenderer:printText(Vec2(0.0, 0.05), KeyCodes[Config.keys.gamepad.restart] .." - Restart level")
 		end
-
-
-
-
 	end
 	
+
+	-- DEBUG: change material on key pressed
+	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
+
+	if (InputHandler:isPressed(Key._1) or bit32.btest(buttonsTriggered, Button.X)) then
+		local go = GetGObyGUID("playerInstance")
+		ChangePlayer(go)
+	elseif (InputHandler:isPressed(Key._2) or bit32.btest(buttonsTriggered, Button.Y)) then
+		local go = GetGObyGUID("playerInstanceStone")
+		ChangePlayer(go)
+	elseif (InputHandler:isPressed(Key._3) or bit32.btest(buttonsTriggered, Button.A)) then
+		local go = GetGObyGUID("playerInstancePaper")
+		ChangePlayer(go)
+	end	
+
+
 	return EventResult.Handled;
 end
 
@@ -94,6 +98,8 @@ function GameLogic.leaveRunning( updateData )
 	return EventResult.Handled;
 end
 
+
+-- if F3 is pressed the game is restarted. 
 function GameLogic.restart()
 	GameLogic.isoCam.trackingObject.go:setPosition(Config.player.spawnPosition)
 	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
@@ -116,6 +122,7 @@ function GameLogic.restart()
 	ResetCamera()
 end
 
+-- if F4 is pressed the sphere jumps to the last visited transformator. 
 function GameLogic.lastTransformator()
 	GameLogic.deathCount = GameLogic.deathCount + 1
 	GameLogic.isoCam.trackingObject.go:setPosition(GameLogic.isoCam.trackingObject.lastTransformator)
@@ -130,7 +137,7 @@ end
 -------------------------------------------------------
 
 function GameLogic.updatePause( updateData )
-	-- body
+
 	if (GameLogic.debugDrawings == true)then
 		DebugRenderer:printText(Vec2(-0.9, 0.9), "State: pause")
 	end
@@ -209,6 +216,7 @@ function GameLogic.updateEnd( updateData )
 		DebugRenderer:_printText2D(Vec2(0.0, 0.85), "Current best time: "..bestTime.. " by ".. name ,Color(1, 1, 1, 1.0))
 	end
 	
+	-- show stats and credits. 
 	DebugRenderer:_printText2D(Vec2(0.0, 0.7), "Input your name: "..GameLogic.Name ,Color(1, 1, 1, 1.0))
 	DebugRenderer:_printText2D(Vec2(0.0, 0.65), "(Confirm with Enter)" ,Color(1, 1, 1, 1.0))
 	DebugRenderer:_printText2D(Vec2(0.0, 0.6), "Your time: "..GameLogic.totalElapsedTime,Color(1, 1, 1, 1.0))
@@ -216,6 +224,9 @@ function GameLogic.updateEnd( updateData )
 	DebugRenderer:_printText2D(Vec2(0.0, 0.-0.7), "This wonderful game was brought to your by:" ,Color(1, 1, 1, 1.0))
 	DebugRenderer:_printText2D(Vec2(0.0, 0.-0.75), "Maria Floruss, Marvin Pohl, Michael Mueller and Ruben Mueller" ,Color(1, 1, 1, 1.0))
 	
+
+
+	-- restart if according key is pressed. 
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
 		GameLogic.restart()
 	end
@@ -225,6 +236,10 @@ function GameLogic.updateEnd( updateData )
 			GameLogic.restart()
 		end
 	end
+
+	----------------------------
+	-- handle user name input --
+	----------------------------
 	if(InputHandler:wasTriggered(Key.A)) then
 		GameLogic.Name = GameLogic.Name .. "A"
 	end
@@ -334,6 +349,7 @@ function GameLogic.leaveEnd( updateData )
 	return EventResult.Handled;
 end
 
+-- write new entry to high score file. 
 function SaveHighscore()
 	local f,err = io.open("highscores.txt","a")
 	if not f then return print(err) end
@@ -349,9 +365,10 @@ function SaveHighscore()
 	GameLogic.notSaved = false
 end
 
+-- get best time from high score file. 
 function GetBestTimeFromHighscore()
 	logMessage("getting best time")
-	bestTime = 999.99
+	bestTime = 99999.99
 	name = ""
 	local f,err = io.open("highscores.txt")
 	if not f then return logMessage(err) end
