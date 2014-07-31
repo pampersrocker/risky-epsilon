@@ -148,7 +148,7 @@ function InitializeWorld(  )
 	GameLogic.fan1.go.au = GameLogic.fan1.go:createAudioComponent()
 	GameLogic.fan1.sound = GameLogic.fan1.go.au:createSoundInstance("fan", "/fan/fan")
 	GameLogic.fan1.blades = {GameLogic.fanblade1}
-	GameLogic.fan1:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.stoneonly)
+	GameLogic.fan1:initializeGameObjectFan(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.stoneonly)
 	GameLogic.fan1.sound:play()
 
 	logMessage("Creating Fan")
@@ -159,7 +159,7 @@ function InitializeWorld(  )
 	GameLogic.fan2.sound = GameLogic.fan2.go.au:createSoundInstance("fan", "/fan/fan")
 	GameLogic.fan2.blades = {GameLogic.fanblade2}
 	CreateScriptComponent(GameLogic.fan2, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan2:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.paperonly)
+	GameLogic.fan2:initializeGameObjectFan(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.paperonly)
 	
 	logMessage("Creating Fan")
 	local fan = Config.fans.fan3
@@ -169,7 +169,7 @@ function InitializeWorld(  )
 	GameLogic.fan3.sound = GameLogic.fan3.go.au:createSoundInstance("fan", "/fan/fan")
 	GameLogic.fan3.blades = {GameLogic.fanblade3, GameLogic.fanblade4, GameLogic.fanblade5, GameLogic.fanblade6}
 	CreateScriptComponent(GameLogic.fan3, FanMeta.init, FanMeta.update, FanMeta.destroy)
-	GameLogic.fan3:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.woodonly)
+	GameLogic.fan3:initializeGameObjectFan(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.woodonly)
 
 	
 	---------------------------
