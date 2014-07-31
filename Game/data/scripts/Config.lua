@@ -62,6 +62,7 @@ Config = {
 		
 	},
 
+	-- INPUT
 	keys = {
 		keyboard = {
 			forward = Key.W,
@@ -88,35 +89,41 @@ Config = {
 	
 	fans = {
 		forces = {
-			woodonly = Vec3(0.0,0.0,3123.0),
-			stoneonly =  Vec3(5000.0,0.0,0.0),
-			paperonly = Vec3(0.0,0.0,650.0)
+			woodonly = Vec3(0.0,0.0,3123.0),	-- power of the wood only fan (fan3)
+			stoneonly =  Vec3(5000.0,0.0,0.0),  -- power of the stone only fan (fan1)
+			paperonly = Vec3(0.0,0.0,650.0)     -- power of the paper only fan (fan2)
 		},
 		
-		fan1 = {
+		-- stone only fan
+		fan1 = {				
 		position = Vec3(-170,-70,-30),
 		size = Vec3(20,5,5),
 		name = "fan1",
 		active = true	
 		},
+
+		-- paper only fan
 		fan2 = {
 		position = Vec3(-185,-150,-25),
 		size = Vec3(5,5,7),
 		name = "fan2",
 		active = false
-		--active = true
 		},
+
+		-- wood only fan
+		-- This fan is represented by four visible fan models, but actually it's just one trigger box that contains the four fans. 
+		-- This is why four fanblades belong to fan3
 		fan3 = {
 		position = Vec3(51,-150,-13),
 		size = Vec3(27.5,5,20),
 		name = "fan3",
 		active = false
-		--active = true	
 		},
 		
 	},
 
-	fanblades = {		
+	fanblades = {
+		-- belongs to fan1		
 		fanblade1 = {
 			position = Vec3(-191,-70,-26),
 			rotationaxis = Vec3(-1, 0, 0),
@@ -124,6 +131,8 @@ Config = {
 			name = "fanblade1",
 			active = true	
 		},
+
+		-- belongs to fan2
 		fanblade2 = {
 			position = Vec3(-185,-150,-32.1),
 			rotationaxis = Vec3(-1, 0, 0),
@@ -131,6 +140,8 @@ Config = {
 			name = "fanblade2",
 			active = false
 		},
+
+		-- belong to fan3
 		fanblade3 = {
 			position = Vec3(27,-150,-32.1),
 			rotationaxis = Vec3(-1, 0, 0),
@@ -164,47 +175,56 @@ Config = {
 	
 	transformators = {
 		transformatorsize = Vec3(0.7,0.7,0.7),
+
 		transformator1 = {
 			name = "transformator1",
 			position = Vec3(-69.9,-77.2,1),
-			transformTo = "playerInstanceStone"		
+			transformTo = "playerInstanceStone"		    -- stone
 		},
 		transformator2 = {
 			name = "transformator2",
 			position = Vec3(-177.3,-135,-30),
-			transformTo = "playerInstancePaper"		
+			transformTo = "playerInstancePaper"		    -- paper
 		},
 		transformator3 = {
 			name = "transformator3",
 				position = Vec3(22.3,-163,0.8),
-				transformTo = "playerInstance"		
+				transformTo = "playerInstance"			-- wood
 		},
 		transformator4 = {
 			name = "transformator4",
 				position = Vec3(12,-118,0.8),
-				transformTo = "playerInstanceStone"		
+				transformTo = "playerInstanceStone"		-- stone
 		},
 	},	
+
 	triggers = {
 		triggersize = Vec3(0.7,0.7,0.7),
+
+		-- activates fan2
 		trigger1 = {
 			position = Vec3(-312.4,-105,-30),
 			name = "trigger1"
 		},
+
+		-- activates fan3
 		trigger2 = {
 			position = Vec3(-17.2,-202.5,0.8),
 			name = "trigger2"
 		},
+
+		-- show endscreen
 		endtrigger = {
 			position = Vec3(100,0,-20),
 			name = "endtrigger"
 		}
 	
 	},
+
 	triggerplates = 
 	{
-		trigger1 = Vec3(-312.5,-105,-31.2),
-		trigger2 = Vec3(-17.6,-202.5,-0.2),
+		trigger1 = Vec3(-312.5,-105,-31.2),		-- belongs to trigger1
+		trigger2 = Vec3(-17.6,-202.5,-0.2),     -- belongs to trigger2
 	}
 		
 	
