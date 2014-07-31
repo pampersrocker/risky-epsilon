@@ -1,6 +1,8 @@
 function InitializeWorld(  )
 
-	-- body
+    ------------------
+	-- create world --
+    ------------------
 	local cinfo = WorldCInfo()
 	cinfo.gravity = Config.world.gravity
 	cinfo.worldSize = Config.world.worldSize
@@ -8,21 +10,25 @@ function InitializeWorld(  )
 	PhysicsSystem:setWorld(world)
 	PhysicsSystem:setDebugDrawingEnabled(false)
 
-	PlayerMeta.__index = PlayerMeta
 	GameLogic.totalElapsedTime = 0
 	GameLogic.deathCount = 0
 	GameLogic.finished = false
 	GameLogic.debugDrawings = false
 	GameLogic.showHelp = false
 	
-	-- create player
+	PlayerMeta.__index = PlayerMeta
+    ------------------------
+	-- create player wood --
+    ------------------------
 	GameLogic.playerInstance = CreateEmptyGameObject("playerInstance")
 	setmetatable( GameLogic.playerInstance, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstance, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
 	GameLogic.playerInstance:initializeGameObjectWood()
 	--GameLogic.playerInstance.go:setComponentStates(ComponentState.Inactive)
 
-	-- create playerStone
+    -------------------------
+	-- create player stone --
+    -------------------------
 	GameLogic.playerInstanceStone = CreateEmptyGameObject("playerInstanceStone")
 
 	setmetatable( GameLogic.playerInstanceStone, PlayerMeta)
@@ -30,14 +36,18 @@ function InitializeWorld(  )
 	GameLogic.playerInstanceStone:initializeGameObjectStone()
 	GameLogic.playerInstanceStone.go:setComponentStates(ComponentState.Inactive)
 
-	-- create playerPaper
+	-------------------------
+	-- create player paper --
+    -------------------------
 	GameLogic.playerInstancePaper = CreateEmptyGameObject("playerInstancePaper")
 	setmetatable( GameLogic.playerInstancePaper, PlayerMeta)
 	CreateScriptComponent(GameLogic.playerInstancePaper, PlayerMeta.init, PlayerMeta.update, PlayerMeta.destroy)
 	GameLogic.playerInstancePaper:initializeGameObjectPaper()
 	GameLogic.playerInstancePaper.go:setComponentStates(ComponentState.Inactive)
 
-	--create camera
+	-------------------
+	-- create camera --
+    -------------------
 	GameLogic.isoCam = createDefaultCam("IsoCam")
 	GameLogic.isoCam.go.cc:look(Config.camera.initLook)
 	GameLogic.isoCam.trackingObject = GetGObyGUID("playerInstance")
@@ -46,7 +56,9 @@ function InitializeWorld(  )
 	GameLogic.isoCam.isEnabled = true
 
 	
-	-- sound banks
+	------------------------
+	-- create sound banks --
+    ------------------------
 	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank")
 	SoundSystem:loadLibrary(".\\data\\sound\\Master Bank.bank.strings")
 	--SoundSystem:loadLibrary(".\\data\\sound\\trigger.bank")
@@ -54,14 +66,11 @@ function InitializeWorld(  )
 	
 
 
-	--create Level Tracks
+	------------------------
+	-- create level tracks --
+    ------------------------
      
 	LevelMeta.__index = LevelMeta
-	-- logMessage("Creating Level")
-	-- GameLogic.level = CreateEmptyGameObject("TestLevel")
-	-- setmetatable(GameLogic.level, LevelMeta)
-	-- CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
-	-- GameLogic.level:initializeGameObject()
 
 	logMessage("Creating Track Ice")
 	GameLogic.level = CreateEmptyGameObject("Track_ice")
@@ -75,7 +84,11 @@ function InitializeWorld(  )
 	CreateScriptComponent(GameLogic.level, LevelMeta.init, LevelMeta.update, LevelMeta.destroy)
 	GameLogic.level:initializeTrack_wood()
 
-	--create Fanblades
+
+
+	----------------------
+	-- create fanblades --
+    ----------------------
 	FanBladesMeta.__index = FanBladesMeta
 
 	logMessage("Creating FanBlade")
@@ -120,7 +133,11 @@ function InitializeWorld(  )
 	CreateScriptComponent(GameLogic.fanblade6, FanBladesMeta.init, FanBladesMeta.update, FanBladesMeta.destroy)
 	GameLogic.fanblade6:initializeGameObjectFanBlade(fanblade.name, fanblade.position, fanblade.active, fanblade.rotationaxis, fanblade.baserotation)
 
-	--create Fans
+	
+	-----------------
+	-- create fans --
+    -----------------
+
 	FanMeta.__index = FanMeta
 	
 	logMessage("Creating Fan")
@@ -155,7 +172,9 @@ function InitializeWorld(  )
 	GameLogic.fan3:initializeGameObjectFan1(fan.name, fan.size, fan.position, fan.active, Config.fans.forces.woodonly)
 
 	
-	-- create transformators
+	---------------------------
+	-- create transformators --
+    ---------------------------
 	local transformator = Config.transformators.transformator1
 	GameLogic.transformator1 = createPhantomCallbackTriggerBox(transformator.name, Config.transformators.transformatorsize, transformator.position)
 	GameLogic.transformator1.au = GameLogic.transformator1.go:createAudioComponent()
@@ -224,7 +243,12 @@ function InitializeWorld(  )
 		return EventResult.Handled
 	end)
 	
-	-- create trigger plates
+
+
+
+	---------------------------
+	-- create trigger plates --
+    ---------------------------
 	
 	GameLogic.triggerPlate1 = CreateEmptyGameObject("triggerPlate1")
 	local cinfo = RigidBodyCInfo()
@@ -246,7 +270,11 @@ function InitializeWorld(  )
 	CreatePhysicsComponent( GameLogic.triggerPlate2 , cinfo )
 	CreateRenderComponent(GameLogic.triggerPlate2, "data/models/LevelElements/track_switch_01.thModel")	
 	
-	--create Triggers
+
+
+	---------------------
+	-- create triggers --
+    ---------------------
 	local triggerC = Config.triggers.trigger1
 	local gotrigger = CreateEmptyGameObject(triggerC.name)
 	GameLogic.trigger1 = FanMeta:createPhantomCallbackTriggerBox(triggerC.name, Config.triggers.triggersize, triggerC.position)
@@ -288,7 +316,10 @@ function InitializeWorld(  )
 	GameLogic.trigger2.sound = GameLogic.trigger2.go.au:createSoundInstance("fan", "/trigger/Doorknob")
 	
 	
-	--create EndTrigger
+
+	-----------------------
+	-- create endtrigger --
+    -----------------------
 	local triggerC = Config.triggers.endtrigger
 	local endtrigger = CreateEmptyGameObject(triggerC.name)
 	triggerEnd = FanMeta:createPhantomCallbackTriggerBox(triggerC.name, Config.triggers.triggersize, triggerC.position)
@@ -303,15 +334,16 @@ function InitializeWorld(  )
 		return EventResult.Handled
 	end)
 	
-	--create trigger for groundfall
+
+	-----------------------------------
+	-- create trigger for groundfall --
+    -----------------------------------
 	local gotrigger = CreateEmptyGameObject("trigger for groundfall")
 	trigger = FanMeta:createPhantomCallbackTriggerBox("trigger for groundfall", Vec3(Config.world.worldSize/2.0,Config.world.worldSize/2.0,3.0), Vec3(0.0,0.0,-Config.world.worldSize/2.5))
 	trigger.go.phantomCallback:getEnterEvent():registerListener(function(arg)
 		GameLogic.restart()		
 		return EventResult.Handled
-	end)
-	
-		
+	end)	
 	
 end
 
