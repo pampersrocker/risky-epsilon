@@ -15,12 +15,14 @@ function IsNull(x)
 
 end
 
+-- Clamp function
 function math.Clamp(val, lower, upper)
     assert(val and lower and upper, "not very useful error message here")
     if lower > upper then lower, upper = upper, lower end -- swap if boundaries supplied the wrong way
     return math.max(lower, math.min(upper, val))
 end
 
+-- create trigger box 
 function createPhantomCallbackTriggerBox(guid, halfExtends, position)
 	local trigger = CreateEmptyGameObject( guid )
 	trigger.pc = trigger.go:createPhysicsComponent()
@@ -36,6 +38,7 @@ function createPhantomCallbackTriggerBox(guid, halfExtends, position)
 	return trigger
 end
 
+-- create empty game object
 function CreateEmptyGameObject( name )
 	local go = GameObjectManager:getGameObject(name)
 	if IsNull(go) then
@@ -54,6 +57,7 @@ function CreateEmptyGameObject( name )
 
 end
 
+-- create script component
 function CreateScriptComponent( gameObject, initFunction , updateFunction, destroyFunction )
 
 	gameObject.go.sc = gameObject.go:createScriptComponent();
@@ -63,18 +67,21 @@ function CreateScriptComponent( gameObject, initFunction , updateFunction, destr
 	return gameObject.go.sc;
 end
 
+-- create render component
 function CreateRenderComponent( gameObject, path )
 	gameObject.go.rc = gameObject.go:createRenderComponent();
 	gameObject.go.rc:setPath( path );
 	return gameObject.go.rc;
 end
 
+-- create physics component
 function CreatePhysicsComponent( gameObject, phyParams )
 	gameObject.go.pc = gameObject.go:createPhysicsComponent();
 	gameObject.go.rb = gameObject.go.pc:createRigidBody(phyParams);
 	return gameObject.go.rb;
 end
 
+-- create default cam
 function createDefaultCam(guid)
 	local cam = CreateEmptyGameObject(guid)
 	cam.go.cc = cam.go:createCameraComponent()
@@ -86,7 +93,7 @@ function createDefaultCam(guid)
 	return cam
 end
 
-
+-- create collision box
 function CreateCollisionBox(guid, halfExtends, position)
 	local box = GameObjectManager:createGameObject(guid)
 	box.pc = box:createPhysicsComponent()
@@ -98,6 +105,7 @@ function CreateCollisionBox(guid, halfExtends, position)
 	return box
 end
 
+-- create collision sphere
 function CreateCollisionSphere(guid, radius, position)
 	local box = GameObjectManager:createGameObject(guid)
 	box.pc = box:createPhysicsComponent()
@@ -109,33 +117,45 @@ function CreateCollisionSphere(guid, radius, position)
 	return box
 end
 
+-- list of all gameobjects.
 local GameObjects = {}
 
+-- get game object by GUID
 function GetGObyGUID( guid )
 	return GameObjects[guid]
 end
 
+-- add game object to game object list with GUID as identifier
 function SetGObyGUID( guid , instance )
 	GameObjects[guid] = instance
 end
 
+-- reset camera to initial position 
 function ResetCamera()
 	GameLogic.isoCam.go.cc:setViewDirection(Vec3(-1.0, 0.0, 0.0))
 	GameLogic.isoCam.go.cc:look(Config.camera.initLook)	
 	GameLogic.isoCam.distance = Config.camera.distance
 end
 
+-- change player from whatever he currently is to the newGo (i.e. either wood, stone or paper)
 function ChangePlayer( newGo )
-	-- inactivate current player
-	GameLogic.isoCam.trackingObject.go:setComponentStates(ComponentState.Inactive)
+	local oldGo = GameLogic.isoCam.trackingObject
+	
+	-- if old and new game object are the same: return
+	if newGo.go:getName() == oldGo.go:getName() then
+		return
+	end
 
 	-- activate newGo player
-	newGo.go.rb:setAngularVelocity(GameLogic.isoCam.trackingObject.go.rb:getAngularVelocity())
-	newGo.go.rb:setLinearVelocity(GameLogic.isoCam.trackingObject.go.rb:getLinearVelocity())
-	newGo.go:setPosition(GameLogic.isoCam.trackingObject.go:getWorldPosition())
 	newGo.go:setComponentStates(ComponentState.Active)
-	newGo.lastTransformator = GameLogic.isoCam.trackingObject.lastTransformator
-	-- change cam-lockAT
+	newGo.go.rb:setAngularVelocity(oldGo.go.rb:getAngularVelocity())
+	newGo.go.rb:setLinearVelocity(oldGo.go.rb:getLinearVelocity())
+	newGo.go:setPosition(oldGo.go:getWorldPosition())
+	newGo.lastTransformator = oldGo.lastTransformator
+
+	-- change camera tracking object
 	GameLogic.isoCam.trackingObject = newGo
 
+	-- deactivate current player
+	oldGo.go:setComponentStates(ComponentState.Inactive)
 end

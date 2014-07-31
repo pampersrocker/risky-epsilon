@@ -1,6 +1,9 @@
 
 LevelMeta = {}
 
+------------------------------
+-- initialize the ice track --
+------------------------------ 
 function LevelMeta:initializeTrack_ice()
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/roundtrack_ice.hkx")
@@ -12,6 +15,9 @@ function LevelMeta:initializeTrack_ice()
 	CreateRenderComponent(self, "data/models/LevelElements/roundtrack_ice.thModel")
 end
 
+---------------------------------
+-- initialize the wooden track --
+--------------------------------- 
 function LevelMeta:initializeTrack_wood()
 	local cinfo = RigidBodyCInfo()
 	cinfo.shape = PhysicsFactory:loadCollisionMesh("data/models/LevelElements/roundtrack_wood.hkx")

@@ -1,7 +1,9 @@
 
 PlayerMeta = {}
 
-
+----------------------------
+-- initialize player wood --
+----------------------------
 function PlayerMeta:initializeGameObjectWood( )
 	logMessage("PlayerMeta:init() start ")
 	local cinfo = RigidBodyCInfo()
@@ -13,7 +15,6 @@ function PlayerMeta:initializeGameObjectWood( )
 	cinfo.friction = materialTable.friction
 	cinfo.maxLinearVelocity = Config.player.maxLinearVelocity
 	cinfo.maxAngularVelocity = Config.player.maxAngularVelocity
-	--cinfo.linearDamping = materialTable.linearDamping
 	cinfo.angularDamping = materialTable.angularDamping
 	cinfo.position = Config.player.spawnPosition
 	CreatePhysicsComponent( self , cinfo )
@@ -21,15 +22,11 @@ function PlayerMeta:initializeGameObjectWood( )
 	
 	self.lastTransformator = Config.player.lastTransformator
 	logMessage("PlayerMeta:init() end")
-
-	--self.ac = self.go:createAnimationComponent()
-	--self.ac:setSkinFile("data/animations/barbarian/barbarian.hkt")
-	--self.ac:setSkeletonFile("data/animations/barbarian/barbarian.hkt")
-
-	--self.ac:addAnimationFile("FOO","data/animations/barbarian/barbarian_walk.hkt")
 end
 
-
+-----------------------------
+-- initialize player stone --
+-----------------------------
 function PlayerMeta:initializeGameObjectStone( )
 	logMessage("PlayerMeta:initStone() start ")
 	local cinfo = RigidBodyCInfo()
@@ -50,6 +47,9 @@ function PlayerMeta:initializeGameObjectStone( )
 	logMessage("PlayerMeta:initStone() end")
 end
 
+-----------------------------
+-- initialize player paper --
+-----------------------------
 function PlayerMeta:initializeGameObjectPaper( )
 	logMessage("PlayerMeta:initPaper() start ")
 	local cinfo = RigidBodyCInfo()
@@ -70,16 +70,22 @@ function PlayerMeta:initializeGameObjectPaper( )
 	logMessage("PlayerMeta:initPaper() end")
 end
 
+
+
+
 function PlayerMeta.update( guid, elapsedTime )
 
 	local player = GetGObyGUID(guid)
 	local pos = GameLogic.isoCam.trackingObject.go:getWorldPosition()
+
+	-- draw position and velocity of player
 	if(GameLogic.debugDrawings == true) then
 		DebugRenderer:printText(Vec2(-0.9, 0.65), "Velocity:" .. player.go.rb:getLinearVelocity():length())
 		DebugRenderer:printText(Vec2(-0.9, 0.55), "X:" .. pos.x)
 		DebugRenderer:printText(Vec2(-0.9, 0.50), "Y:" .. pos.y)
 		DebugRenderer:printText(Vec2(-0.9, 0.45), "Z:" .. pos.z)
 	end
+
 	local viewDir = GameLogic.isoCam.go.cc:getViewDirection()
 	viewDir.z = 0
 	viewDir = viewDir:normalized()
@@ -87,7 +93,9 @@ function PlayerMeta.update( guid, elapsedTime )
 	local mouseDelta = InputHandler:getMouseDelta()
 
 	local movementDirection = Vec3(0,0,0)
-	-- restart game
+	local buttonpressed = false
+
+	-- restart game if according keys are pressed
 	if(InputHandler:isPressed(Config.keys.keyboard.restart)) then
 		GameLogic.restart()
 	end
@@ -96,65 +104,74 @@ function PlayerMeta.update( guid, elapsedTime )
 		if (bit32.btest(buttonsTriggered, Config.keys.gamepad.restart) ) then
 			GameLogic.restart()
 		end
-		endmovementDirection = movementDirection:add(viewDir:mulScalar(InputHandler:gamepad(0):leftStick().x))
-		movementDirection = movementDirection:add(rightDir:mulScalar(-InputHandler:gamepad(0):leftStick().y))
 	end
 
-
-	-- set position to last transformator
+	-- set position to last transformator if according keys are pressed
 	if(InputHandler:isPressed(Config.keys.keyboard.lastTransformator)) then
 		GameLogic.lastTransformator()
 	end
-	local buttonsTriggered = InputHandler:gamepad(0):buttonsTriggered()
 	if InputHandler:gamepad(0):isConnected() then
 		if (bit32.btest(buttonsTriggered, Config.keys.gamepad.lastTransformator) ) then
 			GameLogic.lastTransformator()
 		end
-		movementDirection = movementDirection:add(viewDir:mulScalar(InputHandler:gamepad(0):leftStick().x))
-		movementDirection = movementDirection:add(rightDir:mulScalar(-InputHandler:gamepad(0):leftStick().y))
 	end
 
-	-- movement
 
+	-- handle player input for movement
 	if (InputHandler:isPressed(Config.keys.keyboard.left)) then
-		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(-moveSpeed))
+		buttonpressed = true
 		player.go.angularVelocitySwapped = false
 		movementDirection = movementDirection:add(-viewDir)
 	end
 	if (InputHandler:isPressed(Config.keys.keyboard.right)) then
-		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+		buttonpressed = true
 		player.go.angularVelocitySwapped = false
 		movementDirection = movementDirection:add(viewDir)
 	end
 
 	if (InputHandler:isPressed(Config.keys.keyboard.forward)) then
-		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+		buttonpressed = true
 		player.go.angularVelocitySwapped = false
 		movementDirection = movementDirection:add(-rightDir)
 	end
 	if (InputHandler:isPressed(Config.keys.keyboard.backward)) then
-		--player.pc.rb:applyLinearImpulse(rightDir:mulScalar(moveSpeed))
+		buttonpressed = true
 		player.go.angularVelocitySwapped = false
 		movementDirection = movementDirection:add(rightDir)
 	end
 
-	-- development-jump-to-transformator-section
-	if (InputHandler:isPressed(Key.Numpad1) or InputHandler:isPressed(Key.J)) then
-		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator1.position)
-	end
-	if (InputHandler:isPressed(Key.Numpad2)or InputHandler:isPressed(Key.K)) then
-		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator2.position)
-	end
-	if (InputHandler:isPressed(Key.Numpad3) or InputHandler:isPressed(Key.L)) then
-		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator3.position)
-	end
-	if (InputHandler:isPressed(Key.Numpad4)or InputHandler:isPressed(Key.U)) then
-		GameLogic.isoCam.trackingObject.go:setPosition(Config.transformators.transformator4.position)
+	if InputHandler:gamepad(0):isConnected() then
+		buttonpressed = true
+		movementDirection = movementDirection:add(viewDir:mulScalar(InputHandler:gamepad(0):leftStick().x))
+		movementDirection = movementDirection:add(rightDir:mulScalar(-InputHandler:gamepad(0):leftStick().y))
 	end
 
-	local linearVelocity = Vec3(movementDirection.y,-movementDirection.x,movementDirection.z)
-	player.go.rb:applyLinearImpulse(linearVelocity:mulScalar(Config.player.linearVelocityScalar*elapsedTime))
-	player.go.rb:applyTorque(elapsedTime, movementDirection:mulScalar(Config.player.torqueMulScalar))
+
+	-- DEBUG: jump-to-transformator-section
+	if (InputHandler:isPressed(Key.Numpad1) or InputHandler:isPressed(Key.J)) then
+		jumpToPosition(Config.transformators.transformator1.position)
+	end
+	if (InputHandler:isPressed(Key.Numpad2)or InputHandler:isPressed(Key.K)) then
+		jumpToPosition(Config.transformators.transformator2.position)
+	end
+	if (InputHandler:isPressed(Key.Numpad3) or InputHandler:isPressed(Key.L)) then
+		jumpToPosition(Config.transformators.transformator3.position)
+	end
+	if (InputHandler:isPressed(Key.Numpad4)or InputHandler:isPressed(Key.U)) then
+		jumpToPosition(Config.transformators.transformator4.position)
+	end
+
+	if buttonpressed then
+		local linearVelocity = Vec3(movementDirection.y,-movementDirection.x,movementDirection.z)
+		player.go.rb:applyLinearImpulse(linearVelocity:mulScalar(Config.player.linearVelocityScalar*elapsedTime))
+		player.go.rb:applyTorque(elapsedTime, movementDirection:mulScalar(Config.player.torqueMulScalar))
+	end
+end
+
+function jumpToPosition( pos )
+	GameLogic.isoCam.trackingObject.go:setPosition(pos)
+	GameLogic.isoCam.trackingObject.go.rb:setAngularVelocity(Vec3(0,0,0))
+	GameLogic.isoCam.trackingObject.go.rb:setLinearVelocity(Vec3(0,0,0))
 end
 
 
