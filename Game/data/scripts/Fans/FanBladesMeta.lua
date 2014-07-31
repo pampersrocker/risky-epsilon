@@ -23,6 +23,10 @@ function FanBladesMeta:Activate()
 	self.isActive = true
 end
 
+function FanBladesMeta:Deactivate()
+	self.isActive = false
+end
+
 function FanBladesMeta.init( guid )
 	-- body
 end

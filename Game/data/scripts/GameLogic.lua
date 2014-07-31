@@ -107,11 +107,12 @@ function GameLogic.restart()
 	if not(GameLogic.isoCam.trackingObject == go) then
 		ChangePlayer(go)
 	end
-	GameLogic.fan2.isActive = false
-	GameLogic.fan2.sound:stop()
-	GameLogic.fan3.isActive = false
-	GameLogic.fan3.sound:stop()
-	-- reset buttons. 
+	GameLogic.fan2:Deactivate()
+	GameLogic.fan3:Deactivate()
+	GameLogic.trigger1.triggered = false
+	GameLogic.triggerPlate1.go:setPosition( Config.triggerplates.trigger1 )
+	GameLogic.trigger2.triggered = false
+	GameLogic.triggerPlate2.go:setPosition( Config.triggerplates.trigger2 )
 	ResetCamera()
 end
 

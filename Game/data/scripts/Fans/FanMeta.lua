@@ -39,6 +39,14 @@ function FanMeta:Activate()
 	self.sound:play()
 end
 
+function FanMeta:Deactivate()
+	self.isActive = false
+	for _, blade in ipairs(self.blades) do
+		blade:Deactivate()
+	end
+	self.sound:stop()
+end
+
 function FanMeta:createPhantomCallbackTriggerBox(guid, halfExtends, position)
 	local trigger = GetGObyGUID( guid )
 	trigger.go.pc = trigger.go:createPhysicsComponent()
